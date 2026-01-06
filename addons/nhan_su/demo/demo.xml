@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Nhân viên mẫu -->
+        <record id="nhan_vien_demo_1" model="nhan_vien">
+            <field name="ma_dinh_danh">NV001</field>
+            <field name="ngay_sinh">1990-05-15</field>
+            <field name="que_quan">Hà Nội</field>
+            <field name="email">nguyen.van.a@example.com</field>
+            <field name="so_dien_thoai">0123456789</field>
+            <field name="luong_co_ban">10000000</field>
+            <field name="so_cong_chuan">26</field>
+        </record>
+
+        <record id="nhan_vien_demo_2" model="nhan_vien">
+            <field name="ma_dinh_danh">NV002</field>
+            <field name="ngay_sinh">1995-08-20</field>
+            <field name="que_quan">TP. Hồ Chí Minh</field>
+            <field name="email">tran.thi.b@example.com</field>
+            <field name="so_dien_thoai">0987654321</field>
+            <field name="luong_co_ban">12000000</field>
+            <field name="so_cong_chuan">26</field>
+        </record>
+
+        <!-- Chấm công tháng 12/2025 cho NV001 -->
+        <!-- Tuần 1: 1-5/12 -->
+        <record id="cham_cong_nv001_01" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-01</field>
+            <field name="gio_vao">7.5</field>  <!-- 7h30 -->
+            <field name="gio_ra">17.5</field>   <!-- 17h30 -->
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_02" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-02</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_03" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-03</field>
+            <field name="gio_vao">8.0</field>  <!-- 8h00 - Đi trễ -->
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">di_tre</field>
+        </record>
+
+        <record id="cham_cong_nv001_04" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-04</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_05" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-05</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <!-- Tuần 2: 8-12/12 -->
+        <record id="cham_cong_nv001_08" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-08</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_09" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-09</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_10" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-10</field>
+            <field name="gio_vao">0</field>
+            <field name="gio_ra">0</field>
+            <field name="trang_thai">nghi_phep</field>
+            <field name="ghi_chu">Nghỉ phép năm</field>
+        </record>
+
+        <record id="cham_cong_nv001_11" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-11</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_12" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-12</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <!-- Tuần 3: 15-19/12 -->
+        <record id="cham_cong_nv001_15" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-15</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_16" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-16</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_17" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-17</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.0</field>  <!-- 17h00 - Về sớm -->
+            <field name="trang_thai">ve_som</field>
+        </record>
+
+        <record id="cham_cong_nv001_18" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-18</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_19" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-19</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <!-- Tuần 4: 22-26/12 -->
+        <record id="cham_cong_nv001_22" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-22</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_23" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-23</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_24" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-24</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_25" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-25</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv001_26" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="ngay_cham_cong">2025-12-26</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <!-- Bảng lương tháng 12/2025 cho NV001 -->
+        <record id="bang_luong_nv001_12_2025" model="bang_luong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_1"/>
+            <field name="thang">12</field>
+            <field name="nam">2025</field>
+            <field name="thuong">500000</field>  <!-- Thưởng 500k -->
+            <field name="phat">100000</field>    <!-- Phạt 100k (đi trễ, về sớm) -->
+            <field name="trang_thai">chua_duyet</field>
+            <field name="ghi_chu">Bảng lương tháng 12/2025. Nhân viên làm việc tốt, có 1 ngày nghỉ phép.</field>
+        </record>
+
+        <!-- Chấm công tháng 12/2025 cho NV002 (ít hơn) -->
+        <record id="cham_cong_nv002_01" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_2"/>
+            <field name="ngay_cham_cong">2025-12-01</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv002_02" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_2"/>
+            <field name="ngay_cham_cong">2025-12-02</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv002_03" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_2"/>
+            <field name="ngay_cham_cong">2025-12-03</field>
+            <field name="gio_vao">0</field>
+            <field name="gio_ra">0</field>
+            <field name="trang_thai">vang_mat</field>
+            <field name="ghi_chu">Vắng không phép</field>
+        </record>
+
+        <record id="cham_cong_nv002_04" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_2"/>
+            <field name="ngay_cham_cong">2025-12-04</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <record id="cham_cong_nv002_05" model="cham_cong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_2"/>
+            <field name="ngay_cham_cong">2025-12-05</field>
+            <field name="gio_vao">7.5</field>
+            <field name="gio_ra">17.5</field>
+            <field name="trang_thai">co_mat</field>
+        </record>
+
+        <!-- Bảng lương tháng 12/2025 cho NV002 -->
+        <record id="bang_luong_nv002_12_2025" model="bang_luong">
+            <field name="nhan_vien_id" ref="nhan_vien_demo_2"/>
+            <field name="thang">12</field>
+            <field name="nam">2025</field>
+            <field name="thuong">0</field>
+            <field name="phat">200000</field>  <!-- Phạt vắng mặt -->
+            <field name="trang_thai">chua_duyet</field>
+            <field name="ghi_chu">Có 1 ngày vắng mặt không phép.</field>
+        </record>
+    </data>
+</odoo>

@@ -2,53 +2,164 @@
 <odoo>
     <data>
         <record id="view_nhan_vien_form" model="ir.ui.view">
-            <field name="name">nhan_vien</field>
+            <field name="name">nhan_vien.form</field>
             <field name="model">nhan_vien</field>
             <field name="arch" type="xml">
-                <form>
+                <form string="Nhân viên">
                     <sheet>
-                        <div class="oe_read_only" style="font-size:25px">Nhân viên</div>
-                        <group col="4" string="Thông tin chung">
-                            <field name="ma_dinh_danh"/>
-                            <field name="ngay_sinh"/>
-                            <field name="que_quan"/>
-                            <field name="email"/>
+                        <!-- Header với tiêu đề đẹp -->
+                        <div class="oe_title">
+                            <label for="ma_dinh_danh" class="oe_edit_only" string="Mã NV"/>
+                            <h1 class="d-flex">
+                                <field name="ma_dinh_danh" placeholder="Mã NV" class="text-uppercase oe_inline" 
+                                       style="width: 150px; margin-right: 10px;"/>
+                                <field name="ten_nv" placeholder="Họ và tên nhân viên..." 
+                                       class="oe_inline" required="1"/>
+                            </h1>
+                        </div>
+                        
+                        <group>
+                            <group string="👤 Thông Tin Cá Nhân">
+                                <field name="ngay_sinh" widget="date"/>
+                                <field name="email" widget="email" placeholder="example@company.com"/>
+                                <field name="so_dien_thoai" widget="phone" placeholder="0912345678"/>
+                                <field name="que_quan" placeholder="Tỉnh/Thành phố"/>
+                                <field name="dia_chi" placeholder="Địa chỉ chi tiết..."/>
+                            </group>
+                            
+                            <group string="💼 Thông Tin Công Việc">
+                                <field name="chuc_vu" placeholder="VD: Nhân viên kinh doanh"/>
+                                <field name="phong_ban" placeholder="VD: Phòng kinh doanh"/>
+                                <separator string="💰 Thông tin lương" colspan="2"/>
+                                <field name="luong_co_ban" widget="monetary" 
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="so_cong_chuan"/>
+                                <separator string="⚠️ Chế độ phạt" colspan="2"/>
+                                <field name="muc_phat_di_tre" widget="monetary" 
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="muc_phat_ve_som" widget="monetary" 
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
                         </group>
+                        
+                        <!-- Tabs -->
+                        <notebook>
+                            <page string="📅 Chấm Công" name="cham_cong">
+                                <field name="cham_cong_ids" context="{'default_nhan_vien_id': active_id}">
+                                    <tree decoration-success="trang_thai=='co_mat'" 
+                                          decoration-warning="trang_thai in ['di_tre','ve_som']"
+                                          decoration-danger="trang_thai=='vang_mat'"
+                                          decoration-info="trang_thai=='nghi_phep'"
+                                          editable="bottom">
+                                        <field name="ngay_cham_cong"/>
+                                        <field name="gio_vao" widget="float_time"/>
+                                        <field name="gio_ra" widget="float_time"/>
+                                        <field name="so_gio_lam" widget="float_time" sum="Tổng giờ"/>
+                                        <field name="trang_thai"/>
+                                        <field name="ghi_chu" optional="hide"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            
+                            <page string="💰 Bảng Lương" name="bang_luong">
+                                <field name="bang_luong_ids" context="{'default_nhan_vien_id': active_id}">
+                                    <tree decoration-info="trang_thai=='chua_duyet'" 
+                                          decoration-success="trang_thai=='da_duyet'"
+                                          decoration-muted="trang_thai=='da_thanh_toan'">
+                                        <field name="thang"/>
+                                        <field name="nam"/>
+                                        <field name="so_cong_thuc_te" string="Số công"/>
+                                        <field name="luong_co_ban" widget="monetary" optional="hide"/>
+                                        <field name="thuong" widget="monetary" sum="Tổng thưởng"/>
+                                        <field name="phat" widget="monetary" sum="Tổng phạt"/>
+                                        <field name="luong_nhan" widget="monetary" sum="Tổng lương" 
+                                               decoration-bf="1"/>
+                                        <field name="trang_thai"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>
         </record>
 
         <record id="view_nhan_vien_tree" model="ir.ui.view">
-            <field name="name">nhan_vien</field>
+            <field name="name">nhan_vien.tree</field>
             <field name="model">nhan_vien</field>
             <field name="arch" type="xml">
-                <tree>
-                    <field name="ma_dinh_danh"/>
-                    <field name="ngay_sinh"/>
-                    <field name="que_quan"/>
-                    <field name="email"/>
+                <tree string="Danh sách nhân viên">
+                    <field name="ma_dinh_danh" decoration-bf="1"/>
+                    <field name="ten_nv" decoration-bf="1"/>
+                    <field name="chuc_vu"/>
+                    <field name="phong_ban"/>
+                    <field name="so_dien_thoai"/>
+                    <field name="luong_co_ban" widget="monetary"/>
+                    <field name="so_cong_chuan" optional="hide"/>
+                    
+                    <!-- Thống kê tháng hiện tại -->
+                    <field name="so_ngay_lam_thang" string="Ngày làm" 
+                           decoration-success="so_ngay_lam_thang &gt;= so_cong_chuan"
+                           decoration-warning="so_ngay_lam_thang &lt; so_cong_chuan and so_ngay_lam_thang &gt;= so_cong_chuan * 0.8"
+                           decoration-danger="so_ngay_lam_thang &lt; so_cong_chuan * 0.8"/>
+                    <field name="so_ngay_di_tre" string="Đi trễ" 
+                           decoration-warning="so_ngay_di_tre &gt; 0"/>
+                    <field name="so_ngay_vang" string="Vắng" 
+                           decoration-danger="so_ngay_vang &gt; 0"/>
+                    <field name="ty_le_cham_cong" string="Tỷ lệ (%)" 
+                           widget="progressbar"
+                           decoration-success="ty_le_cham_cong &gt;= 95"
+                           decoration-warning="ty_le_cham_cong &gt;= 80 and ty_le_cham_cong &lt; 95"
+                           decoration-danger="ty_le_cham_cong &lt; 80"/>
+                    <field name="luong_thang_nay" string="Lương tháng này" 
+                           widget="monetary" optional="show"
+                           decoration-danger="1"/>
+                    
+                    <field name="currency_id" invisible="1"/>
                 </tree>
             </field>
         </record>
 
         <record model="ir.ui.view" id="nhan_vien_search">
+            <field name="name">nhan_vien.search</field>
             <field name="model">nhan_vien</field>
             <field name="arch" type="xml">
-                <search>
+                <search string="Tìm kiếm nhân viên">
                     <field name="ma_dinh_danh"/>
-                    <field name="ngay_sinh"/>
-                    <field name="que_quan"/>
+                    <field name="ten_nv"/>
+                    <field name="chuc_vu"/>
+                    <field name="phong_ban"/>
+                    <field name="so_dien_thoai"/>
                     <field name="email"/>
+                    
+                    <filter string="Lương cao (&gt; 10tr)" name="luong_cao" 
+                            domain="[('luong_co_ban', '&gt;', 10000000)]"/>
+                    
+                    <group expand="0" string="Nhóm theo">
+                        <filter string="Phòng ban" name="group_phong_ban" 
+                                context="{'group_by':'phong_ban'}"/>
+                        <filter string="Chức vụ" name="group_chuc_vu" 
+                                context="{'group_by':'chuc_vu'}"/>
+                    </group>
                 </search>
             </field>
         </record>
 
         <record id="action_nhan_vien" model="ir.actions.act_window">
-            <field name="name">Nhân viên</field>
+            <field name="name">Nhân Viên</field>
             <field name="res_model">nhan_vien</field>
             <field name="view_mode">tree,form</field>
-            <field name="search_view_id" ref = "nhan_vien_search"/>
+            <field name="search_view_id" ref="nhan_vien_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Thêm nhân viên mới
+                </p>
+                <p>
+                    Click <b>Tạo</b> để thêm nhân viên vào hệ thống.
+                </p>
+            </field>
         </record>
     </data>
 </odoo>

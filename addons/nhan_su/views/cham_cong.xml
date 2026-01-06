@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_cham_cong_tree" model="ir.ui.view">
+        <field name="name">cham_cong.tree</field>
+        <field name="model">cham_cong</field>
+        <field name="arch" type="xml">
+            <tree string="Chấm công">
+                <field name="nhan_vien_id"/>
+                <field name="ngay_cham_cong"/>
+                <field name="gio_vao" widget="float_time"/>
+                <field name="gio_ra" widget="float_time"/>
+                <field name="so_gio_lam" widget="float_time"/>
+                <field name="trang_thai" decoration-success="trang_thai == 'co_mat'" 
+                       decoration-danger="trang_thai == 'vang_mat'"
+                       decoration-warning="trang_thai in ['di_tre', 've_som']"
+                       decoration-info="trang_thai == 'nghi_phep'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_cham_cong_form" model="ir.ui.view">
+        <field name="name">cham_cong.form</field>
+        <field name="model">cham_cong</field>
+        <field name="arch" type="xml">
+            <form string="Chấm công">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="nhan_vien_id" placeholder="Chọn nhân viên..." 
+                                   required="1" options="{'no_create': True}"/>
+                        </h1>
+                        <h3 class="text-muted">
+                            <field name="ngay_cham_cong" required="1" class="oe_inline"/> - 
+                            <field name="trang_thai" class="oe_inline" widget="badge"/>
+                        </h3>
+                    </div>
+                    
+                    <group>
+                        <group string="⏰ Giờ Làm Việc">
+                            <label for="gio_vao"/>
+                            <div class="o_row">
+                                <field name="gio_vao" widget="float_time" class="oe_inline"/>
+                                <span class="text-muted ml-2">
+                                    (VD: 7.5 = 7h30, 8 = 8h00)
+                                </span>
+                            </div>
+                            
+                            <label for="gio_ra"/>
+                            <div class="o_row">
+                                <field name="gio_ra" widget="float_time" class="oe_inline"/>
+                                <span class="text-muted ml-2">
+                                    (VD: 17.5 = 17h30, 18 = 18h00)
+                                </span>
+                            </div>
+                            
+                            <field name="so_gio_lam" widget="float_time" 
+                                   readonly="1" class="text-success font-weight-bold"/>
+                        </group>
+                        
+                        <group string="📝 Ghi Chú">
+                            <field name="ghi_chu" nolabel="1" 
+                                   placeholder="Ghi chú về ngày làm việc..."/>
+                        </group>
+                    </group>
+                    
+                    <div class="alert alert-info mt-3" role="alert">
+                        <h5 class="alert-heading">📌 Lưu ý:</h5>
+                        <ul class="mb-0">
+                            <li>Giờ nghỉ trưa: <strong>12h00 - 13h30</strong> (1.5 giờ) tự động trừ</li>
+                            <li>Số giờ làm chuẩn: <strong>8 giờ/ngày</strong></li>
+                            <li>1 công = 8 giờ làm việc</li>
+                        </ul>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="view_cham_cong_calendar" model="ir.ui.view">
+        <field name="name">cham_cong.calendar</field>
+        <field name="model">cham_cong</field>
+        <field name="arch" type="xml">
+            <calendar string="Lịch chấm công" date_start="ngay_cham_cong" color="trang_thai" mode="month">
+                <field name="nhan_vien_id"/>
+                <field name="trang_thai"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_cham_cong_search" model="ir.ui.view">
+        <field name="name">cham_cong.search</field>
+        <field name="model">cham_cong</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm chấm công">
+                <field name="nhan_vien_id"/>
+                <field name="ngay_cham_cong"/>
+                <field name="trang_thai"/>
+                
+                <filter string="Hôm nay" name="today" 
+                        domain="[('ngay_cham_cong', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Tháng này" name="this_month" 
+                        domain="[('ngay_cham_cong', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                
+                <separator/>
+                <filter string="✅ Có mặt" name="co_mat" 
+                        domain="[('trang_thai', '=', 'co_mat')]"/>
+                <filter string="❌ Vắng mặt" name="vang_mat" 
+                        domain="[('trang_thai', '=', 'vang_mat')]"/>
+                <filter string="⚠️ Đi trễ" name="di_tre" 
+                        domain="[('trang_thai', '=', 'di_tre')]"/>
+                <filter string="⚠️ Về sớm" name="ve_som" 
+                        domain="[('trang_thai', '=', 've_som')]"/>
+                <filter string="📅 Nghỉ phép" name="nghi_phep" 
+                        domain="[('trang_thai', '=', 'nghi_phep')]"/>
+                
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Nhân viên" name="group_nhan_vien" 
+                            context="{'group_by': 'nhan_vien_id'}"/>
+                    <filter string="Trạng thái" name="group_trang_thai" 
+                            context="{'group_by': 'trang_thai'}"/>
+                    <filter string="Ngày" name="group_ngay" 
+                            context="{'group_by': 'ngay_cham_cong'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_cham_cong" model="ir.actions.act_window">
+        <field name="name">Chấm Công</field>
+        <field name="res_model">cham_cong</field>
+        <field name="view_mode">tree,form,calendar</field>
+        <field name="context">{'search_default_this_month': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo bản ghi chấm công
+            </p>
+            <p>
+                Click <b>Tạo</b> để ghi nhận giờ vào, giờ ra của nhân viên.
+            </p>
+        </field>
+    </record>
+</odoo>

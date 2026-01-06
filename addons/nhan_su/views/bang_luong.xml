@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_bang_luong_tree" model="ir.ui.view">
+        <field name="name">bang_luong.tree</field>
+        <field name="model">bang_luong</field>
+        <field name="arch" type="xml">
+            <tree string="Bảng lương"
+                  decoration-info="trang_thai=='chua_duyet'" 
+                  decoration-success="trang_thai=='da_duyet'"
+                  decoration-muted="trang_thai=='da_thanh_toan'"
+                  create="false">
+                <header>
+                    <button name="action_tao_bang_luong_thang_nay" string="➕ Tạo bảng lương tháng này" 
+                            type="object" class="btn-primary"/>
+                </header>
+                <field name="nhan_vien_id"/>
+                <field name="thang"/>
+                <field name="nam"/>
+                <field name="so_cong_thuc_te" string="Số công"/>
+                <field name="so_lan_di_tre" optional="show" decoration-warning="so_lan_di_tre &gt; 0"/>
+                <field name="so_lan_ve_som" optional="show" decoration-warning="so_lan_ve_som &gt; 0"/>
+                <field name="so_cong_chuan" optional="hide"/>
+                <field name="luong_co_ban" widget="monetary" optional="hide"/>
+                <field name="luong_theo_cong" widget="monetary" optional="hide"/>
+                <field name="thuong" widget="monetary" sum="Tổng thưởng" decoration-success="1"/>
+                <field name="phat_di_tre_ve_som" widget="monetary" optional="show" sum="Tổng phạt trễ/sớm" decoration-warning="1"/>
+                <field name="phat" widget="monetary" sum="Tổng phạt khác" decoration-danger="1"/>
+                <field name="luong_nhan" widget="monetary" sum="Tổng lương" decoration-bf="1" decoration-info="1"/>
+                <field name="trang_thai"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_bang_luong_form" model="ir.ui.view">
+        <field name="name">bang_luong.form</field>
+        <field name="model">bang_luong</field>
+        <field name="arch" type="xml">
+            <form string="Bảng lương">
+                <header>
+                    <button name="action_tinh_lai_luong" string="🔄 Tính lại" type="object" 
+                            class="btn-secondary"/>
+                    <button name="action_duyet" string="✅ Duyệt" type="object" 
+                            class="oe_highlight"/>
+                    <button name="action_thanh_toan" string="💰 Thanh toán" type="object" 
+                            class="oe_highlight"/>
+                    <field name="trang_thai" widget="statusbar" 
+                           statusbar_visible="chua_duyet,da_duyet,da_thanh_toan"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1 class="d-flex">
+                            <field name="nhan_vien_id" placeholder="Chọn nhân viên..." 
+                                   required="1" options="{'no_create': True}" class="oe_inline"/>
+                        </h1>
+                        <h3 class="text-muted">
+                            Tháng <field name="thang" required="1" class="oe_inline" style="width: 80px;"/>
+                            / <field name="nam" required="1" class="oe_inline" style="width: 100px;"/>
+                        </h3>
+                    </div>
+                    
+                    <group>
+                        <group string="📊 Thông Tin Công">
+                            <field name="so_cong_thuc_te" string="Số công thực tế"
+                                   readonly="1" class="text-primary font-weight-bold"/>
+                            <field name="so_cong_chuan" string="Số công chuẩn"
+                                   readonly="1" class="text-muted"/>
+                            <separator string="⚠️ Thống kê vi phạm" colspan="2"/>
+                            <field name="so_lan_di_tre" readonly="1" class="text-warning"/>
+                            <field name="so_lan_ve_som" readonly="1" class="text-warning"/>
+                            <field name="phat_di_tre_ve_som" readonly="1" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"
+                                   class="text-danger font-weight-bold"/>
+                        </group>
+                        
+                        <group string="💵 Chi Tiết Lương">
+                            <field name="luong_co_ban" readonly="1" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="luong_theo_cong" readonly="1" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <separator string="Điều chỉnh" colspan="2"/>
+                            <field name="thuong" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="phat" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}" 
+                                   help="Phạt khác (không bao gồm đi trễ/về sớm)"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Tổng lương nổi bật -->
+                    <group>
+                        <group></group>
+                        <group>
+                            <label for="luong_nhan" string="Tổng Lương Nhận" 
+                                   class="font-weight-bold" style="font-size: 16px;"/>
+                            <field name="luong_nhan" readonly="1" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"
+                                   class="text-success font-weight-bold"
+                                   style="font-size: 28px;"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <field name="ghi_chu" nolabel="1" 
+                               placeholder="Ghi chú về bảng lương..."/>
+                    </group>
+                    
+                    <!-- Công thức tính lương -->
+                    <div class="alert alert-success mt-3" role="alert">
+                        <h5 class="alert-heading">📐 Công thức tính lương:</h5>
+                        <p class="mb-0">
+                            <strong>Lương nhận</strong> = (Số công × Lương cơ bản) ÷ Số công chuẩn + Thưởng - Phạt
+                        </p>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_bang_luong_pivot" model="ir.ui.view">
+        <field name="name">bang_luong.pivot</field>
+        <field name="model">bang_luong</field>
+        <field name="arch" type="xml">
+            <pivot string="Thống kê lương">
+                <field name="nhan_vien_id" type="row"/>
+                <field name="thang" type="col"/>
+                <field name="luong_nhan" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="view_bang_luong_graph" model="ir.ui.view">
+        <field name="name">bang_luong.graph</field>
+        <field name="model">bang_luong</field>
+        <field name="arch" type="xml">
+            <graph string="Biểu đồ lương" type="bar">
+                <field name="nhan_vien_id"/>
+                <field name="luong_nhan" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_bang_luong_search" model="ir.ui.view">
+        <field name="name">bang_luong.search</field>
+        <field name="model">bang_luong</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm bảng lương">
+                <field name="nhan_vien_id"/>
+                <field name="thang"/>
+                <field name="nam"/>
+                
+                <filter string="Tháng này" name="this_month" 
+                        domain="[('thang', '=', str(context_today().month)), ('nam', '=', context_today().year)]"/>
+                <filter string="Năm nay" name="this_year" 
+                        domain="[('nam', '=', context_today().year)]"/>
+                
+                <separator/>
+                <filter string="⏳ Chưa duyệt" name="chua_duyet" 
+                        domain="[('trang_thai', '=', 'chua_duyet')]"/>
+                <filter string="✅ Đã duyệt" name="da_duyet" 
+                        domain="[('trang_thai', '=', 'da_duyet')]"/>
+                <filter string="💰 Đã thanh toán" name="da_thanh_toan" 
+                        domain="[('trang_thai', '=', 'da_thanh_toan')]"/>
+                
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Nhân viên" name="group_nhan_vien" 
+                            context="{'group_by': 'nhan_vien_id'}"/>
+                    <filter string="Tháng" name="group_thang" 
+                            context="{'group_by': 'thang'}"/>
+                    <filter string="Năm" name="group_nam" 
+                            context="{'group_by': 'nam'}"/>
+                    <filter string="Trạng thái" name="group_trang_thai" 
+                            context="{'group_by': 'trang_thai'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_bang_luong" model="ir.actions.act_window">
+        <field name="name">Bảng Lương</field>
+        <field name="res_model">bang_luong</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="context">{'search_default_this_month': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo bảng lương mới
+            </p>
+            <p>
+                Click <b>Tạo</b> để tính lương cho nhân viên theo tháng.<br/>
+                Hệ thống sẽ tự động tính toán dựa trên số công đã chấm.
+            </p>
+        </field>
+    </record>
+</odoo>
