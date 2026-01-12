@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Dashboard View - Pivot -->
+    <record id="view_van_ban_pivot" model="ir.ui.view">
+        <field name="name">van_ban.pivot</field>
+        <field name="model">van_ban</field>
+        <field name="arch" type="xml">
+            <pivot string="Báo cáo văn bản">
+                <field name="loai_van_ban_id" type="row"/>
+                <field name="trang_thai" type="col"/>
+                <field name="gia_tri_hop_dong" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Dashboard View - Graph -->
+    <record id="view_van_ban_graph" model="ir.ui.view">
+        <field name="name">van_ban.graph</field>
+        <field name="model">van_ban</field>
+        <field name="arch" type="xml">
+            <graph string="Biểu đồ văn bản" type="bar">
+                <field name="trang_thai"/>
+                <field name="gia_tri_hop_dong" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Dashboard View - Graph by Type -->
+    <record id="view_van_ban_graph_type" model="ir.ui.view">
+        <field name="name">van_ban.graph.type</field>
+        <field name="model">van_ban</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <graph string="Văn bản theo loại" type="pie">
+                <field name="loai_van_ban_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action Dashboard -->
+    <record id="action_van_ban_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboard văn bản</field>
+        <field name="res_model">van_ban</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="domain">[('trang_thai', '!=', 'huy')]</field>
+    </record>
+
+    <!-- Action Thống kê theo loại -->
+    <record id="action_van_ban_thong_ke_loai" model="ir.actions.act_window">
+        <field name="name">Thống kê theo loại</field>
+        <field name="res_model">van_ban</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="view_id" ref="view_van_ban_graph_type"/>
+        <field name="domain">[('trang_thai', '!=', 'huy')]</field>
+    </record>
+
+    <!-- Yêu cầu ký - Pivot -->
+    <record id="view_yeu_cau_ky_pivot" model="ir.ui.view">
+        <field name="name">yeu_cau_ky.pivot</field>
+        <field name="model">yeu_cau_ky</field>
+        <field name="arch" type="xml">
+            <pivot string="Thống kê yêu cầu ký">
+                <field name="trang_thai" type="col"/>
+                <field name="khach_hang_id" type="row"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Yêu cầu ký - Graph -->
+    <record id="view_yeu_cau_ky_graph" model="ir.ui.view">
+        <field name="name">yeu_cau_ky.graph</field>
+        <field name="model">yeu_cau_ky</field>
+        <field name="arch" type="xml">
+            <graph string="Biểu đồ yêu cầu ký" type="pie">
+                <field name="trang_thai"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action Thống kê yêu cầu ký -->
+    <record id="action_yeu_cau_ky_thong_ke" model="ir.actions.act_window">
+        <field name="name">Thống kê yêu cầu ký</field>
+        <field name="res_model">yeu_cau_ky</field>
+        <field name="view_mode">pivot,graph</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Form View -->
+    <record id="view_don_hang_form" model="ir.ui.view">
+        <field name="name">don_hang.form</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <form string="Đơn hàng">
+                <header>
+                    <button name="action_xac_nhan" string="Xác nhận" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('trang_thai', '!=', 'moi')]}"/>
+                    <button name="action_hoan_thanh" string="Hoàn thành" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('trang_thai', 'not in', ['dang_xu_ly', 'dang_giao'])]}"/>
+                    <button name="action_huy" string="Hủy" type="object"
+                            attrs="{'invisible': [('trang_thai', 'in', ['hoan_thanh', 'huy'])]}"/>
+                    <field name="trang_thai" widget="statusbar" statusbar_visible="moi,dang_xu_ly,hoan_thanh"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="ma_don_hang" readonly="1"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Thông tin đơn hàng">
+                            <field name="khach_hang_id"/>
+                            <field name="ngay_dat_hang"/>
+                            <field name="nhan_vien_xu_ly_id"/>
+                        </group>
+                        <group string="Tổng cộng">
+                            <field name="tong_tien" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Chi tiết đơn hàng">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="san_pham_id"/>
+                                    <field name="so_luong"/>
+                                    <field name="don_gia"/>
+                                    <field name="thanh_tien" sum="Tổng cộng"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Ghi chú">
+                            <field name="ghi_chu" placeholder="Ghi chú về đơn hàng..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_don_hang_tree" model="ir.ui.view">
+        <field name="name">don_hang.tree</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <tree string="Đơn hàng" decoration-success="trang_thai=='hoan_thanh'"
+                  decoration-info="trang_thai=='dang_xu_ly'" decoration-muted="trang_thai=='huy'">
+                <field name="ma_don_hang"/>
+                <field name="khach_hang_id"/>
+                <field name="ngay_dat_hang"/>
+                <field name="nhan_vien_xu_ly_id"/>
+                <field name="tong_tien" sum="Tổng tiền"/>
+                <field name="trang_thai" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_don_hang_search" model="ir.ui.view">
+        <field name="name">don_hang.search</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="ma_don_hang"/>
+                <field name="khach_hang_id"/>
+                <field name="nhan_vien_xu_ly_id"/>
+                
+                <filter string="Mới" name="moi" domain="[('trang_thai', '=', 'moi')]"/>
+                <filter string="Đang xử lý" name="dang_xu_ly" domain="[('trang_thai', '=', 'dang_xu_ly')]"/>
+                <filter string="Hoàn thành" name="hoan_thanh" domain="[('trang_thai', '=', 'hoan_thanh')]"/>
+                <separator/>
+                <filter string="Đơn hàng của tôi" name="cua_toi" domain="[('nhan_vien_xu_ly_id.user_id', '=', uid)]"/>
+                
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Trạng thái" name="group_trang_thai" context="{'group_by':'trang_thai'}"/>
+                    <filter string="Khách hàng" name="group_khach_hang" context="{'group_by':'khach_hang_id'}"/>
+                    <filter string="Nhân viên" name="group_nhan_vien" context="{'group_by':'nhan_vien_xu_ly_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_don_hang" model="ir.actions.act_window">
+        <field name="name">Đơn hàng</field>
+        <field name="res_model">don_hang</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_don_hang_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo đơn hàng mới
+            </p>
+        </field>
+    </record>
+
+</odoo>

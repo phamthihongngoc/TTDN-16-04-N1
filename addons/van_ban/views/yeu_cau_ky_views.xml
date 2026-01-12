@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Form View -->
+    <record id="view_yeu_cau_ky_form" model="ir.ui.view">
+        <field name="name">yeu_cau_ky.form</field>
+        <field name="model">yeu_cau_ky</field>
+        <field name="arch" type="xml">
+            <form string="Yêu cầu ký">
+                <header>
+                    <button name="action_gui_email_yeu_cau_ky" string="Gửi email" type="object"
+                            class="oe_highlight"
+                            attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}"/>
+                    
+                    <button name="action_gui_lai" string="Gửi lại" type="object"
+                            attrs="{'invisible': [('trang_thai', 'not in', ['cho_ky', 'het_han'])]}"/>
+                    
+                    <button name="action_tu_choi" string="Từ chối" type="object"
+                            attrs="{'invisible': [('trang_thai', '!=', 'cho_ky')]}"
+                            confirm="Bạn có chắc muốn từ chối yêu cầu ký này?"/>
+                    
+                    <field name="trang_thai" widget="statusbar"/>
+                </header>
+                
+                <sheet>
+                    <widget name="web_ribbon" title="Đã ký" bg_color="bg-success"
+                            attrs="{'invisible': [('trang_thai', '!=', 'da_ky')]}"/>
+                    <widget name="web_ribbon" title="Từ chối" bg_color="bg-danger"
+                            attrs="{'invisible': [('trang_thai', '!=', 'tu_choi')]}"/>
+                    <widget name="web_ribbon" title="Hết hạn" bg_color="bg-warning"
+                            attrs="{'invisible': [('trang_thai', '!=', 'het_han')]}"/>
+                    
+                    <group>
+                        <group string="Thông tin văn bản">
+                            <field name="van_ban_id"/>
+                            <field name="khach_hang_id"/>
+                            <field name="email"/>
+                        </group>
+                        <group string="Thời hạn">
+                            <field name="ngay_gui"/>
+                            <field name="ngay_het_han"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Bảo mật" groups="van_ban.group_quan_tri_van_ban">
+                        <group>
+                            <field name="token" readonly="1"/>
+                            <field name="otp_code" readonly="1"/>
+                            <field name="otp_het_han"/>
+                            <field name="so_lan_nhap_sai"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Thông tin ký" attrs="{'invisible': [('trang_thai', '!=', 'da_ky')]}">
+                        <group>
+                            <field name="ngay_ky"/>
+                            <field name="ip_ky"/>
+                        </group>
+                        <group>
+                            <field name="chu_ky" widget="image"/>
+                        </group>
+                    </group>
+                    
+                    <group attrs="{'invisible': [('trang_thai', '!=', 'tu_choi')]}">
+                        <field name="ly_do_tu_choi"/>
+                    </group>
+                    
+                    <group>
+                        <field name="ghi_chu" placeholder="Ghi chú thêm..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_yeu_cau_ky_tree" model="ir.ui.view">
+        <field name="name">yeu_cau_ky.tree</field>
+        <field name="model">yeu_cau_ky</field>
+        <field name="arch" type="xml">
+            <tree string="Yêu cầu ký"
+                  decoration-success="trang_thai=='da_ky'"
+                  decoration-warning="trang_thai=='cho_ky'"
+                  decoration-danger="trang_thai=='tu_choi' or trang_thai=='het_han'">
+                <field name="van_ban_id"/>
+                <field name="khach_hang_id"/>
+                <field name="email"/>
+                <field name="ngay_gui"/>
+                <field name="ngay_het_han"/>
+                <field name="ngay_ky"/>
+                <field name="trang_thai" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_yeu_cau_ky_kanban" model="ir.ui.view">
+        <field name="name">yeu_cau_ky.kanban</field>
+        <field name="model">yeu_cau_ky</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="trang_thai">
+                <field name="van_ban_id"/>
+                <field name="khach_hang_id"/>
+                <field name="trang_thai"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <strong><field name="van_ban_id"/></strong>
+                                </div>
+                                <div>
+                                    <i class="fa fa-user"/> <field name="khach_hang_id"/>
+                                </div>
+                                <div class="text-muted">
+                                    <i class="fa fa-envelope"/> <field name="email"/>
+                                </div>
+                                <div class="text-muted">
+                                    <i class="fa fa-calendar"/> <field name="ngay_het_han"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_yeu_cau_ky_search" model="ir.ui.view">
+        <field name="name">yeu_cau_ky.search</field>
+        <field name="model">yeu_cau_ky</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="van_ban_id"/>
+                <field name="khach_hang_id"/>
+                <field name="email"/>
+                
+                <filter string="Chờ ký" name="cho_ky" domain="[('trang_thai', '=', 'cho_ky')]"/>
+                <filter string="Đã ký" name="da_ky" domain="[('trang_thai', '=', 'da_ky')]"/>
+                <filter string="Từ chối" name="tu_choi" domain="[('trang_thai', '=', 'tu_choi')]"/>
+                <filter string="Hết hạn" name="het_han" domain="[('trang_thai', '=', 'het_han')]"/>
+                
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Trạng thái" name="group_trang_thai" context="{'group_by':'trang_thai'}"/>
+                    <filter string="Khách hàng" name="group_khach_hang" context="{'group_by':'khach_hang_id'}"/>
+                    <filter string="Văn bản" name="group_van_ban" context="{'group_by':'van_ban_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_yeu_cau_ky" model="ir.actions.act_window">
+        <field name="name">Yêu cầu ký</field>
+        <field name="res_model">yeu_cau_ky</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_yeu_cau_ky_search"/>
+        <field name="context">{'search_default_cho_ky': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Chưa có yêu cầu ký nào
+            </p>
+            <p>
+                Yêu cầu ký sẽ được tạo tự động khi gửi văn bản cho khách hàng ký.
+            </p>
+        </field>
+    </record>
+
+</odoo>

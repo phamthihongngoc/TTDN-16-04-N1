@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Form View -->
+    <record id="view_wizard_ky_khach_hang_form" model="ir.ui.view">
+        <field name="name">wizard.ky.khach.hang.form</field>
+        <field name="model">wizard.ky.khach.hang</field>
+        <field name="arch" type="xml">
+            <form string="Ký điện tử - Khách hàng">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <i class="fa fa-pencil-square-o"/> Ký điện tử văn bản
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Thông tin văn bản">
+                            <field name="yeu_cau_ky_id" invisible="1"/>
+                            <field name="van_ban_id" invisible="1"/>
+                            <field name="khach_hang_id" invisible="1"/>
+                            <field name="ten_van_ban" readonly="1"/>
+                            <field name="ten_khach_hang" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <separator string="Xác thực OTP"/>
+                    
+                    <div class="alert alert-warning" role="alert">
+                        <p><i class="fa fa-shield"/> <strong>Bảo mật:</strong></p>
+                        <p>Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư và nhập mã OTP bên dưới.</p>
+                        <p>Nếu chưa nhận được, click nút "Gửi lại OTP".</p>
+                    </div>
+                    
+                    <group>
+                        <field name="otp_code" placeholder="Nhập 6 số OTP..." password="True"/>
+                        <button name="action_gui_otp" string="Gửi lại OTP" type="object" class="btn-link" icon="fa-envelope"/>
+                    </group>
+                    
+                    <separator string="Vẽ chữ ký của bạn"/>
+                    
+                    <div class="alert alert-info" role="alert">
+                        <p><i class="fa fa-info-circle"/> <strong>Hướng dẫn:</strong></p>
+                        <ul>
+                            <li>Dùng chuột hoặc màn hình cảm ứng để vẽ chữ ký trong khung bên dưới</li>
+                            <li>Click "Xóa" nếu muốn vẽ lại</li>
+                            <li>Chữ ký của bạn có giá trị pháp lý</li>
+                        </ul>
+                    </div>
+                    
+                    <group>
+                        <field name="chu_ky" 
+                               widget="signature" 
+                               options="{'size': [600, 200], 'editable': true, 'clear': true}"
+                               placeholder="Vẽ chữ ký ở đây..."/>
+                    </group>
+                    
+                    <group>
+                        <field name="xac_nhan"/>
+                        <label for="xac_nhan" string=""/>
+                        <div class="text-muted" style="font-size: 90%;">
+                            Bằng việc đánh dấu vào ô này và ký điện tử, tôi xác nhận rằng:
+                            <ul>
+                                <li>Đã đọc kỹ và hiểu rõ nội dung văn bản</li>
+                                <li>Đồng ý với toàn bộ điều khoản và nội dung</li>
+                                <li>Chịu trách nhiệm về chữ ký điện tử này</li>
+                                <li>Chữ ký này có giá trị pháp lý tương đương chữ ký tay</li>
+                            </ul>
+                        </div>
+                    </group>
+                    
+                </sheet>
+                
+                <footer>
+                    <button name="action_ky" 
+                            string="Xác nhận ký" 
+                            type="object" 
+                            class="oe_highlight btn-primary"
+                            icon="fa-check"/>
+                    <button string="Hủy" 
+                            special="cancel" 
+                            class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

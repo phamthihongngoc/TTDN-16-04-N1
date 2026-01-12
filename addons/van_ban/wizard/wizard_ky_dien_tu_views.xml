@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Form View -->
+    <record id="view_wizard_ky_dien_tu_form" model="ir.ui.view">
+        <field name="name">wizard.ky.dien.tu.form</field>
+        <field name="model">wizard.ky.dien.tu</field>
+        <field name="arch" type="xml">
+            <form string="Ký điện tử">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <i class="fa fa-pencil-square-o"/> Ký điện tử
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Thông tin văn bản">
+                            <field name="van_ban_id" invisible="1"/>
+                            <field name="ten_van_ban" readonly="1"/>
+                            <field name="loai_van_ban" readonly="1"/>
+                        </group>
+                        <group string="Người ký">
+                            <field name="nguoi_ky_id" invisible="1"/>
+                            <field name="ten_nguoi_ky"/>
+                            <field name="chuc_vu"/>
+                        </group>
+                    </group>
+                    
+                    <separator string="Vẽ chữ ký của bạn"/>
+                    
+                    <div class="alert alert-info" role="alert">
+                        <p><i class="fa fa-info-circle"/> <strong>Hướng dẫn:</strong></p>
+                        <ul>
+                            <li>Dùng chuột hoặc màn hình cảm ứng để vẽ chữ ký trong khung bên dưới</li>
+                            <li>Click "Xóa" nếu muốn vẽ lại</li>
+                            <li>Chữ ký sẽ được lưu lại và có giá trị pháp lý</li>
+                        </ul>
+                    </div>
+                    
+                    <group>
+                        <field name="chu_ky" 
+                               widget="signature" 
+                               options="{'size': [600, 200], 'editable': true, 'clear': true}"
+                               placeholder="Vẽ chữ ký ở đây..."/>
+                    </group>
+                    
+                    <group>
+                        <field name="xac_nhan"/>
+                        <label for="xac_nhan" string=""/>
+                        <div class="text-muted" style="font-size: 90%;">
+                            Bằng việc đánh dấu vào ô này và ký điện tử, tôi xác nhận rằng:
+                            <ul>
+                                <li>Đã đọc kỹ nội dung văn bản</li>
+                                <li>Đồng ý với toàn bộ nội dung</li>
+                                <li>Chịu trách nhiệm về chữ ký điện tử này</li>
+                            </ul>
+                        </div>
+                    </group>
+                    
+                </sheet>
+                
+                <footer>
+                    <button name="action_ky" 
+                            string="Xác nhận ký" 
+                            type="object" 
+                            class="oe_highlight btn-primary"
+                            icon="fa-check"/>
+                    <button string="Hủy" 
+                            special="cancel" 
+                            class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_wizard_ky_dien_tu" model="ir.actions.act_window">
+        <field name="name">Ký điện tử</field>
+        <field name="res_model">wizard.ky.dien.tu</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_van_ban"/>
+    </record>
+
+</odoo>

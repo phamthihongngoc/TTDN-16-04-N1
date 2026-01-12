@@ -1,30 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- Root Menu -->
         <menuitem
             id="menu_root"
-            name="QLNS"
-            sequence="0"/>
+            name="Quản lý nhân sự"
+            sequence="10"
+            web_icon="nhan_su,static/description/icon.png"/>
+        
+        <!-- Submenu: Quản lý -->
+        <menuitem 
+            id="menu_quan_ly"
+            name="Quản lý"
+            parent="menu_root"
+            sequence="1"/>
           
-        <menuitem name="Quản lý nhân viên" 
+        <menuitem 
+            name="Nhân viên" 
             id="menu_nhan_vien" 
-            parent="menu_root" 
+            parent="menu_quan_ly" 
             sequence="1"
-            action="action_nhan_vien"
-        />
+            action="action_nhan_vien"/>
         
-        <menuitem name="Chấm công" 
-            id="menu_cham_cong" 
-            parent="menu_root" 
+        <menuitem 
+            name="Vai trò &amp; Quyền hạn" 
+            id="menu_vai_tro" 
+            parent="menu_quan_ly" 
             sequence="2"
-            action="action_cham_cong"
-        />
+            action="action_vai_tro"
+            groups="group_quan_tri_nhan_su,group_giam_doc"/>
         
-        <menuitem name="Bảng lương" 
+        <!-- Submenu: Chấm công & Lương -->
+        <menuitem 
+            id="menu_cham_cong_luong"
+            name="Chấm công &amp; Lương"
+            parent="menu_root"
+            sequence="2"/>
+        
+        <menuitem 
+            name="Chấm công" 
+            id="menu_cham_cong" 
+            parent="menu_cham_cong_luong" 
+            sequence="1"
+            action="action_cham_cong"/>
+        
+        <menuitem 
+            name="Bảng lương" 
             id="menu_bang_luong" 
-            parent="menu_root" 
-            sequence="3"
+            parent="menu_cham_cong_luong" 
+            sequence="2"
             action="action_bang_luong"
-        />
+            groups="group_truong_phong,group_quan_tri_nhan_su"/>
+        
+        <!-- Submenu: Cấu hình -->
+        <menuitem 
+            id="menu_cau_hinh"
+            name="Cấu hình"
+            parent="menu_root"
+            sequence="99"
+            groups="group_quan_tri_nhan_su"/>
     </data>
 </odoo>

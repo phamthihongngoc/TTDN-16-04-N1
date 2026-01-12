@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Root Menu -->
+    <menuitem id="menu_van_ban_root"
+              name="Quản lý văn bản"
+              web_icon="van_ban,static/description/icon.png"
+              sequence="35"/>
+
+    <!-- Menu chính: Văn bản -->
+    <menuitem id="menu_van_ban_main"
+              name="Văn bản ký"
+              parent="menu_van_ban_root"
+              sequence="10"/>
+
+    <menuitem id="menu_van_ban_tat_ca"
+              name="Tất cả văn bản"
+              action="action_van_ban"
+              parent="menu_van_ban_main"
+              sequence="1"/>
+
+    <menuitem id="menu_van_ban_cho_duyet"
+              name="Chờ duyệt"
+              action="action_van_ban_cho_duyet"
+              parent="menu_van_ban_main"
+              sequence="2"
+              groups="van_ban.group_truong_phong_duyet"/>
+
+    <menuitem id="menu_van_ban_sap_het_han"
+              name="Sắp hết hạn"
+              action="action_van_ban_sap_het_han"
+              parent="menu_van_ban_main"
+              sequence="3"/>
+
+    <!-- Menu: Văn bản đến -->
+    <menuitem id="menu_van_ban_den_main"
+              name="Văn bản đến"
+              parent="menu_van_ban_root"
+              sequence="15"/>
+
+    <menuitem id="menu_van_ban_den"
+              name="Tất cả văn bản đến"
+              action="action_van_ban_den"
+              parent="menu_van_ban_den_main"
+              sequence="1"/>
+
+    <menuitem id="menu_van_ban_den_qua_han"
+              name="Quá hạn xử lý"
+              action="action_van_ban_den_qua_han"
+              parent="menu_van_ban_den_main"
+              sequence="2"/>
+
+    <!-- Menu: Văn bản đi -->
+    <menuitem id="menu_van_ban_di_main"
+              name="Văn bản đi"
+              parent="menu_van_ban_root"
+              sequence="20"/>
+
+    <menuitem id="menu_van_ban_di"
+              name="Tất cả văn bản đi"
+              action="action_van_ban_di"
+              parent="menu_van_ban_di_main"
+              sequence="1"/>
+
+    <menuitem id="menu_van_ban_di_cho_duyet"
+              name="Chờ duyệt"
+              action="action_van_ban_di_cho_duyet"
+              parent="menu_van_ban_di_main"
+              sequence="2"
+              groups="van_ban.group_truong_phong_duyet"/>
+
+    <menuitem id="menu_van_ban_di_cho_ky"
+              name="Chờ ký"
+              action="action_van_ban_di_cho_ky"
+              parent="menu_van_ban_di_main"
+              sequence="3"
+              groups="van_ban.group_giam_doc_ky"/>
+
+    <!-- Menu: Yêu cầu ký -->
+    <menuitem id="menu_yeu_cau_ky"
+              name="Yêu cầu ký"
+              action="action_yeu_cau_ky"
+              parent="menu_van_ban_root"
+              sequence="20"/>
+
+    <!-- Menu: Báo cáo -->
+    <menuitem id="menu_van_ban_bao_cao"
+              name="Báo cáo"
+              parent="menu_van_ban_root"
+              sequence="30"/>
+
+    <menuitem id="menu_van_ban_dashboard"
+              name="Dashboard"
+              action="action_van_ban_dashboard"
+              parent="menu_van_ban_bao_cao"
+              sequence="1"/>
+
+    <menuitem id="menu_van_ban_thong_ke_loai"
+              name="Thống kê theo loại"
+              action="action_van_ban_thong_ke_loai"
+              parent="menu_van_ban_bao_cao"
+              sequence="2"/>
+
+    <menuitem id="menu_yeu_cau_ky_thong_ke"
+              name="Thống kê yêu cầu ký"
+              action="action_yeu_cau_ky_thong_ke"
+              parent="menu_van_ban_bao_cao"
+              sequence="3"/>
+
+    <menuitem id="menu_lich_su_van_ban"
+              name="Lịch sử thao tác"
+              action="action_lich_su_van_ban"
+              parent="menu_van_ban_bao_cao"
+              sequence="4"
+              groups="van_ban.group_truong_phong_duyet"/>
+
+    <!-- Menu: Cấu hình -->
+    <menuitem id="menu_van_ban_cau_hinh"
+              name="Cấu hình"
+              parent="menu_van_ban_root"
+              sequence="40"
+              groups="van_ban.group_quan_tri_van_ban"/>
+
+    <menuitem id="menu_loai_van_ban"
+              name="Loại văn bản"
+              action="action_loai_van_ban"
+              parent="menu_van_ban_cau_hinh"
+              sequence="1"/>
+
+</odoo>

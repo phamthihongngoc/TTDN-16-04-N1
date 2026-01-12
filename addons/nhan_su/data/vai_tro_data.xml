@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Vai trò 1: Nhân viên kinh doanh -->
+        <record id="vai_tro_nhan_vien_kinh_doanh" model="vai_tro">
+            <field name="ten_vai_tro">Nhân viên kinh doanh</field>
+            <field name="ma_vai_tro">NVKD</field>
+            <field name="mo_ta">Nhân viên kinh doanh - Soạn thảo văn bản, quản lý khách hàng được phân công</field>
+            <field name="thu_tu">30</field>
+            <field name="active" eval="True"/>
+            
+            <!-- Quyền văn bản -->
+            <field name="quyen_soan_thao" eval="True"/>
+            <field name="quyen_duyet" eval="False"/>
+            <field name="quyen_phe_duyet" eval="False"/>
+            <field name="quyen_huy" eval="False"/>
+            <field name="quyen_xem_tat_ca" eval="False"/>
+            
+            <!-- Quyền khách hàng -->
+            <field name="quyen_them_khach_hang" eval="True"/>
+            <field name="quyen_phan_cong_khach_hang" eval="False"/>
+            <field name="quyen_xem_khach_hang_tat_ca" eval="False"/>
+            
+            <!-- Quyền quản lý -->
+            <field name="quyen_quan_ly_nhan_su" eval="False"/>
+            <field name="quyen_phan_quyen" eval="False"/>
+            
+            <!-- Link tới security group -->
+            <field name="group_id" ref="group_nhan_vien_kinh_doanh"/>
+        </record>
+
+        <!-- Vai trò 2: Trưởng phòng -->
+        <record id="vai_tro_truong_phong" model="vai_tro">
+            <field name="ten_vai_tro">Trưởng phòng</field>
+            <field name="ma_vai_tro">TP</field>
+            <field name="mo_ta">Trưởng phòng - Duyệt văn bản, phân công nhân viên</field>
+            <field name="thu_tu">20</field>
+            <field name="active" eval="True"/>
+            
+            <field name="quyen_soan_thao" eval="True"/>
+            <field name="quyen_duyet" eval="True"/>
+            <field name="quyen_phe_duyet" eval="False"/>
+            <field name="quyen_huy" eval="False"/>
+            <field name="quyen_xem_tat_ca" eval="True"/>
+            
+            <field name="quyen_them_khach_hang" eval="True"/>
+            <field name="quyen_phan_cong_khach_hang" eval="True"/>
+            <field name="quyen_xem_khach_hang_tat_ca" eval="True"/>
+            
+            <field name="quyen_quan_ly_nhan_su" eval="False"/>
+            <field name="quyen_phan_quyen" eval="False"/>
+            
+            <field name="group_id" ref="group_truong_phong"/>
+        </record>
+
+        <!-- Vai trò 3: Giám đốc -->
+        <record id="vai_tro_giam_doc" model="vai_tro">
+            <field name="ten_vai_tro">Giám đốc</field>
+            <field name="ma_vai_tro">GD</field>
+            <field name="mo_ta">Giám đốc - Phê duyệt cuối cùng, toàn quyền quản lý</field>
+            <field name="thu_tu">10</field>
+            <field name="active" eval="True"/>
+            
+            <field name="quyen_soan_thao" eval="True"/>
+            <field name="quyen_duyet" eval="True"/>
+            <field name="quyen_phe_duyet" eval="True"/>
+            <field name="quyen_huy" eval="True"/>
+            <field name="quyen_xem_tat_ca" eval="True"/>
+            
+            <field name="quyen_them_khach_hang" eval="True"/>
+            <field name="quyen_phan_cong_khach_hang" eval="True"/>
+            <field name="quyen_xem_khach_hang_tat_ca" eval="True"/>
+            
+            <field name="quyen_quan_ly_nhan_su" eval="True"/>
+            <field name="quyen_phan_quyen" eval="True"/>
+            
+            <field name="group_id" ref="group_giam_doc"/>
+        </record>
+
+    </data>
+</odoo>

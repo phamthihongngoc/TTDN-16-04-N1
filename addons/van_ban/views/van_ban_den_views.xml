@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Form View -->
+    <record id="view_van_ban_den_form" model="ir.ui.view">
+        <field name="name">van_ban_den.form</field>
+        <field name="model">van_ban_den</field>
+        <field name="arch" type="xml">
+            <form string="Văn bản đến">
+                <header>
+                    <button name="action_bat_dau_xu_ly" string="Bắt đầu xử lý" type="object"
+                            class="oe_highlight"
+                            attrs="{'invisible': [('trang_thai', '!=', 'moi')]}"/>
+                    
+                    <button name="action_hoan_thanh" string="Hoàn thành" type="object"
+                            class="btn-success"
+                            attrs="{'invisible': [('trang_thai', '!=', 'dang_xu_ly')]}"/>
+                    
+                    <button name="action_luu_tru" string="Lưu trữ" type="object"
+                            attrs="{'invisible': [('trang_thai', 'not in', ['hoan_thanh'])]}"/>
+                    
+                    <field name="trang_thai" widget="statusbar"/>
+                </header>
+                
+                <sheet>
+                    <widget name="web_ribbon" title="Quá hạn" bg_color="bg-danger"
+                            attrs="{'invisible': [('qua_han', '=', False)]}"/>
+                    
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Số ký hiệu văn bản..."/>
+                        </h1>
+                        <label for="so_den"/>
+                        <h2>
+                            <field name="so_den"/>
+                        </h2>
+                    </div>
+                    
+                    <group>
+                        <group string="Thông tin văn bản">
+                            <field name="ngay_van_ban"/>
+                            <field name="ngay_den"/>
+                            <field name="loai_van_ban_id"/>
+                            <field name="trich_yeu"/>
+                        </group>
+                        <group string="Độ ưu tiên">
+                            <field name="do_khan" widget="badge"/>
+                            <field name="do_mat" widget="badge"/>
+                            <field name="han_xu_ly" attrs="{'invisible': [('han_xu_ly', '=', False)]}"/>
+                            <field name="so_ngay_con_lai" attrs="{'invisible': [('han_xu_ly', '=', False)]}"/>
+                            <field name="qua_han" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Đơn vị gửi">
+                            <field name="don_vi_gui"/>
+                            <field name="khach_hang_id"/>
+                            <field name="nguoi_ky_ban_gui"/>
+                        </group>
+                        <group string="Người xử lý">
+                            <field name="nguoi_nhan_id"/>
+                            <field name="don_vi_xu_ly"/>
+                            <field name="nguoi_xu_ly_id"/>
+                            <field name="nguoi_phoi_hop_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Nội dung">
+                            <group>
+                                <field name="noi_dung" placeholder="Nội dung văn bản..."/>
+                            </group>
+                            <group>
+                                <field name="y_kien_xu_ly" placeholder="Ý kiến chỉ đạo xử lý..."/>
+                            </group>
+                            <group attrs="{'invisible': [('trang_thai', 'not in', ['hoan_thanh', 'luu'])]}">
+                                <field name="ket_qua_xu_ly" placeholder="Kết quả xử lý..."/>
+                                <field name="ngay_hoan_thanh"/>
+                            </group>
+                        </page>
+                        
+                        <page string="File đính kèm">
+                            <group>
+                                <group string="File gốc">
+                                    <field name="file_dinh_kem" filename="ten_file"/>
+                                    <field name="ten_file"/>
+                                </group>
+                                <group string="File phản hồi" attrs="{'invisible': [('file_phan_hoi', '=', False)]}">
+                                    <field name="file_phan_hoi" filename="ten_file_phan_hoi"/>
+                                    <field name="ten_file_phan_hoi"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Thông tin khác">
+                            <group>
+                                <group>
+                                    <field name="so_trang"/>
+                                    <field name="so_ban"/>
+                                    <field name="nguoi_tao_id" readonly="1"/>
+                                    <field name="ngay_tao" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="ghi_chu" placeholder="Ghi chú..."/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_van_ban_den_tree" model="ir.ui.view">
+        <field name="name">van_ban_den.tree</field>
+        <field name="model">van_ban_den</field>
+        <field name="arch" type="xml">
+            <tree string="Văn bản đến"
+                  decoration-danger="qua_han==True"
+                  decoration-success="trang_thai=='hoan_thanh'"
+                  decoration-muted="trang_thai=='luu'">
+                <field name="so_den"/>
+                <field name="name"/>
+                <field name="ngay_van_ban"/>
+                <field name="ngay_den"/>
+                <field name="trich_yeu"/>
+                <field name="don_vi_gui"/>
+                <field name="khach_hang_id"/>
+                <field name="do_khan" widget="badge"/>
+                <field name="nguoi_xu_ly_id"/>
+                <field name="han_xu_ly" optional="show"/>
+                <field name="so_ngay_con_lai" optional="show"/>
+                <field name="qua_han" invisible="1"/>
+                <field name="trang_thai" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_van_ban_den_kanban" model="ir.ui.view">
+        <field name="name">van_ban_den.kanban</field>
+        <field name="model">van_ban_den</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="trang_thai">
+                <field name="name"/>
+                <field name="trich_yeu"/>
+                <field name="don_vi_gui"/>
+                <field name="do_khan"/>
+                <field name="qua_han"/>
+                <field name="trang_thai"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click #{record.qua_han.raw_value ? 'bg-danger-light' : ''}">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <strong><field name="name"/></strong>
+                                    <span t-if="record.do_khan.raw_value != 'thuong'" 
+                                          class="badge bg-warning">
+                                        <field name="do_khan"/>
+                                    </span>
+                                </div>
+                                <div><field name="trich_yeu"/></div>
+                                <div class="text-muted">
+                                    <field name="don_vi_gui"/>
+                                </div>
+                                <div t-if="record.qua_han.raw_value" class="text-danger">
+                                    <i class="fa fa-warning"/> Quá hạn xử lý
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_van_ban_den_search" model="ir.ui.view">
+        <field name="name">van_ban_den.search</field>
+        <field name="model">van_ban_den</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="so_den"/>
+                <field name="trich_yeu"/>
+                <field name="don_vi_gui"/>
+                <field name="khach_hang_id"/>
+                <field name="nguoi_xu_ly_id"/>
+                
+                <filter string="Mới đến" name="moi" domain="[('trang_thai', '=', 'moi')]"/>
+                <filter string="Đang xử lý" name="dang_xu_ly" domain="[('trang_thai', '=', 'dang_xu_ly')]"/>
+                <filter string="Hoàn thành" name="hoan_thanh" domain="[('trang_thai', '=', 'hoan_thanh')]"/>
+                <separator/>
+                <filter string="Quá hạn" name="qua_han" domain="[('qua_han', '=', True)]"/>
+                <filter string="Khẩn" name="khan" domain="[('do_khan', 'in', ['khan', 'hoa_toc', 'tuc_thi'])]"/>
+                <separator/>
+                <filter string="Tôi xử lý" name="toi_xu_ly" 
+                        domain="[('nguoi_xu_ly_id.user_id', '=', uid)]"/>
+                
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Trạng thái" name="group_trang_thai" context="{'group_by':'trang_thai'}"/>
+                    <filter string="Độ khẩn" name="group_do_khan" context="{'group_by':'do_khan'}"/>
+                    <filter string="Người xử lý" name="group_xu_ly" context="{'group_by':'nguoi_xu_ly_id'}"/>
+                    <filter string="Ngày đến" name="group_ngay_den" context="{'group_by':'ngay_den'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_van_ban_den" model="ir.actions.act_window">
+        <field name="name">Văn bản đến</field>
+        <field name="res_model">van_ban_den</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="context">{'search_default_dang_xu_ly': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo văn bản đến mới
+            </p>
+        </field>
+    </record>
+
+    <record id="action_van_ban_den_qua_han" model="ir.actions.act_window">
+        <field name="name">Văn bản đến quá hạn</field>
+        <field name="res_model">van_ban_den</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('qua_han', '=', True)]</field>
+    </record>
+
+</odoo>

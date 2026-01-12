@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Dashboard Actions -->
+    
+    <!-- Action for KPI CSKH -->
+    <record id="action_kpi_cskh" model="ir.actions.act_window">
+        <field name="name">KPI CSKH</field>
+        <field name="res_model">ho_tro_khach_hang</field>
+        <field name="view_mode">pivot,tree</field>
+        <field name="view_id" ref="view_ho_tro_pivot"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Thống kê KPI chăm sóc khách hàng
+            </p>
+        </field>
+    </record>
+    
+    <!-- Action for Staff Performance -->
+    <record id="action_hieu_suat_nv" model="ir.actions.act_window">
+        <field name="name">Hiệu suất nhân viên</field>
+        <field name="res_model">ho_tro_khach_hang</field>
+        <field name="view_mode">graph,tree</field>
+        <field name="view_id" ref="view_ho_tro_graph"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Biểu đồ hiệu suất nhân viên
+            </p>
+        </field>
+    </record>
+    
+    <!-- Action for Staff Handling -->
+    <record id="action_nhan_vien_xu_ly" model="ir.actions.act_window">
+        <field name="name">Nhân viên xử lý</field>
+        <field name="res_model">ho_tro_khach_hang</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('nhan_vien_id', '!=', False)]</field>
+        <field name="context">{'search_default_group_by_nhan_vien': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Danh sách yêu cầu theo nhân viên xử lý
+            </p>
+        </field>
+    </record>
+    
+    <!-- Action for Ratings -->
+    <record id="action_danh_gia" model="ir.actions.act_window">
+        <field name="name">Đánh giá</field>
+        <field name="res_model">ho_tro_khach_hang</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('danh_gia', '!=', False)]</field>
+        <field name="context">{'search_default_group_by_danh_gia': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Danh sách đánh giá từ khách hàng
+            </p>
+        </field>
+    </record>
+
+    <!-- Pivot View for Support Statistics -->
+    <record id="view_ho_tro_pivot" model="ir.ui.view">
+        <field name="name">ho_tro_khach_hang.pivot</field>
+        <field name="model">ho_tro_khach_hang</field>
+        <field name="arch" type="xml">
+            <pivot string="KPI CSKH">
+                <field name="nhan_vien_id" type="row"/>
+                <field name="trang_thai" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View for Support Statistics -->
+    <record id="view_ho_tro_graph" model="ir.ui.view">
+        <field name="name">ho_tro_khach_hang.graph</field>
+        <field name="model">ho_tro_khach_hang</field>
+        <field name="arch" type="xml">
+            <graph string="Hiệu suất nhân viên" type="bar">
+                <field name="nhan_vien_id"/>
+                <field name="trang_thai" type="col"/>
+            </graph>
+        </field>
+    </record>
+    
+    <!-- Tree View for Support Statistics -->
+    <record id="view_ho_tro_stats_tree" model="ir.ui.view">
+        <field name="name">ho_tro_khach_hang.stats.tree</field>
+        <field name="model">ho_tro_khach_hang</field>
+        <field name="arch" type="xml">
+            <tree string="Chi tiết hỗ trợ" create="false" edit="false">
+                <field name="ten_yeu_cau"/>
+                <field name="khach_hang_id"/>
+                <field name="nhan_vien_id"/>
+                <field name="ngay_tao"/>
+                <field name="ngay_hoan_thanh"/>
+                <field name="trang_thai" widget="badge"/>
+                <field name="danh_gia"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Customer Ranking Action -->
+    <record id="action_xep_hang_khach_hang" model="ir.actions.act_window">
+        <field name="name">Xếp hạng khách hàng</field>
+        <field name="res_model">khach_hang</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="context">{'search_default_trang_thai_dang_giao_dich': 1}</field>
+    </record>
+
+    <!-- Pivot View for Customer Ranking -->
+    <record id="view_khach_hang_pivot" model="ir.ui.view">
+        <field name="name">khach_hang.pivot</field>
+        <field name="model">khach_hang</field>
+        <field name="arch" type="xml">
+            <pivot string="Xếp hạng khách hàng">
+                <field name="phan_loai" type="row"/>
+                <field name="tong_chi_tieu" type="measure"/>
+                <field name="so_lan_mua_hang" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View for Customer Ranking -->
+    <record id="view_khach_hang_graph" model="ir.ui.view">
+        <field name="name">khach_hang.graph</field>
+        <field name="model">khach_hang</field>
+        <field name="arch" type="xml">
+            <graph string="Biểu đồ khách hàng" type="pie">
+                <field name="phan_loai"/>
+                <field name="tong_chi_tieu" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Order Analysis Action -->
+    <record id="action_thong_ke_don_hang" model="ir.actions.act_window">
+        <field name="name">Thống kê đơn hàng</field>
+        <field name="res_model">don_hang</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="context">{'search_default_hoan_thanh': 1}</field>
+    </record>
+
+    <!-- Pivot View for Orders -->
+    <record id="view_don_hang_pivot" model="ir.ui.view">
+        <field name="name">don_hang.pivot</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <pivot string="Phân tích đơn hàng">
+                <field name="nhan_vien_xu_ly_id" type="row"/>
+                <field name="ngay_dat_hang" interval="month" type="col"/>
+                <field name="tong_tien" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View for Orders -->
+    <record id="view_don_hang_graph" model="ir.ui.view">
+        <field name="name">don_hang.graph</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <graph string="Biểu đồ doanh thu" type="line">
+                <field name="ngay_dat_hang" interval="month"/>
+                <field name="tong_tien" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+</odoo>

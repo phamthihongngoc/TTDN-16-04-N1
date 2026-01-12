@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Form View -->
+    <record id="view_ho_tro_form" model="ir.ui.view">
+        <field name="name">ho_tro_khach_hang.form</field>
+        <field name="model">ho_tro_khach_hang</field>
+        <field name="arch" type="xml">
+            <form string="Hỗ trợ khách hàng">
+                <header>
+                    <button name="action_xu_ly" string="Xử lý" type="object" 
+                            class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'moi')]}"/>
+                    <button name="action_hoan_thanh" string="Hoàn thành" type="object" 
+                            class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'dang_xu_ly')]}"/>
+                    <button name="action_huy" string="Hủy" type="object" 
+                            attrs="{'invisible': [('trang_thai', 'in', ['hoan_thanh', 'huy'])]}"/>
+                    <field name="trang_thai" widget="statusbar" 
+                           statusbar_visible="moi,dang_xu_ly,hoan_thanh"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="ten_yeu_cau" placeholder="Tiêu đề yêu cầu..."/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="khach_hang_id"/>
+                            <field name="phuong_thuc"/>
+                            <field name="nhan_vien_id"/>
+                        </group>
+                        <group>
+                            <field name="ngay_tao"/>
+                            <field name="ngay_hoan_thanh"/>
+                            <field name="danh_gia"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Mô tả">
+                            <field name="mo_ta" placeholder="Mô tả chi tiết..."/>
+                        </page>
+                        <page string="Nhận xét" attrs="{'invisible': [('trang_thai', '!=', 'hoan_thanh')]}">
+                            <field name="nhan_xet" placeholder="Nhận xét từ khách hàng..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_ho_tro_tree" model="ir.ui.view">
+        <field name="name">ho_tro_khach_hang.tree</field>
+        <field name="model">ho_tro_khach_hang</field>
+        <field name="arch" type="xml">
+            <tree string="Hỗ trợ khách hàng" 
+                  decoration-success="trang_thai=='hoan_thanh'"
+                  decoration-info="trang_thai=='dang_xu_ly'" 
+                  decoration-warning="trang_thai=='moi'">
+                <field name="ten_yeu_cau"/>
+                <field name="khach_hang_id"/>
+                <field name="phuong_thuc"/>
+                <field name="nhan_vien_id"/>
+                <field name="ngay_tao"/>
+                <field name="trang_thai"/>
+                <field name="danh_gia" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_ho_tro_kanban" model="ir.ui.view">
+        <field name="name">ho_tro_khach_hang.kanban</field>
+        <field name="model">ho_tro_khach_hang</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="trang_thai">
+                <field name="ten_yeu_cau"/>
+                <field name="khach_hang_id"/>
+                <field name="nhan_vien_id"/>
+                <field name="ngay_tao"/>
+                <field name="trang_thai"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="oe_kanban_card">
+                                    <strong><field name="ten_yeu_cau"/></strong>
+                                    <div>KH: <field name="khach_hang_id"/></div>
+                                    <div>NV: <field name="nhan_vien_id"/></div>
+                                    <div class="text-muted"><field name="ngay_tao"/></div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_ho_tro_search" model="ir.ui.view">
+        <field name="name">ho_tro_khach_hang.search</field>
+        <field name="model">ho_tro_khach_hang</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm">
+                <field name="ten_yeu_cau"/>
+                <field name="khach_hang_id"/>
+                <field name="nhan_vien_id"/>
+                <filter string="Mới" name="moi" domain="[('trang_thai', '=', 'moi')]"/>
+                <filter string="Đang xử lý" name="dang_xu_ly" domain="[('trang_thai', '=', 'dang_xu_ly')]"/>
+                <filter string="Hoàn thành" name="hoan_thanh" domain="[('trang_thai', '=', 'hoan_thanh')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_ho_tro_khach_hang" model="ir.actions.act_window">
+        <field name="name">Hỗ trợ khách hàng</field>
+        <field name="res_model">ho_tro_khach_hang</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo yêu cầu hỗ trợ mới
+            </p>
+        </field>
+    </record>
+
+</odoo>

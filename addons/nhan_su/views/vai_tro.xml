@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form view cho Vai trò -->
+        <record id="view_vai_tro_form" model="ir.ui.view">
+            <field name="name">vai_tro.form</field>
+            <field name="model">vai_tro</field>
+            <field name="arch" type="xml">
+                <form string="Vai trò nhân sự">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object" 
+                                    class="oe_stat_button" icon="fa-archive">
+                                <field name="active" widget="boolean_button" 
+                                       options='{"terminology": "archive"}'/>
+                            </button>
+                        </div>
+                        
+                        <div class="oe_title">
+                            <label for="ten_vai_tro" class="oe_edit_only"/>
+                            <h1>
+                                <field name="ten_vai_tro" placeholder="VD: Trưởng phòng kinh doanh..."/>
+                            </h1>
+                            <h3>
+                                <field name="ma_vai_tro" placeholder="Mã vai trò (VD: TP_KD)" 
+                                       class="text-uppercase"/>
+                            </h3>
+                        </div>
+                        
+                        <group>
+                            <group>
+                                <field name="thu_tu"/>
+                                <field name="so_nhan_vien" string="Số nhân viên"/>
+                                <field name="group_id" groups="base.group_no_one"/>
+                            </group>
+                            <group>
+                                <field name="mo_ta" placeholder="Mô tả vai trò và trách nhiệm..." colspan="2"/>
+                            </group>
+                        </group>
+                        
+                        <notebook>
+                            <!-- Tab Quyền văn bản -->
+                            <page string="📄 Quyền xử lý văn bản" name="quyen_van_ban">
+                                <group>
+                                    <group string="Quyền cơ bản">
+                                        <field name="quyen_soan_thao"/>
+                                        <field name="quyen_duyet"/>
+                                        <field name="quyen_phe_duyet"/>
+                                    </group>
+                                    <group string="Quyền mở rộng">
+                                        <field name="quyen_huy"/>
+                                        <field name="quyen_xem_tat_ca"/>
+                                    </group>
+                                </group>
+                                <separator string="💡 Hướng dẫn"/>
+                                <div class="alert alert-info" role="status" aria-live="polite">
+                                    <ul>
+                                        <li><b>Soạn thảo:</b> Tạo và chỉnh sửa văn bản mới</li>
+                                        <li><b>Duyệt:</b> Xét duyệt văn bản (cấp trưởng phòng)</li>
+                                        <li><b>Phê duyệt:</b> Phê duyệt cuối cùng (cấp giám đốc)</li>
+                                        <li><b>Hủy:</b> Hủy bỏ văn bản đã được duyệt</li>
+                                        <li><b>Xem tất cả:</b> Xem toàn bộ văn bản trong hệ thống</li>
+                                    </ul>
+                                </div>
+                            </page>
+                            
+                            <!-- Tab Quyền khách hàng -->
+                            <page string="👥 Quyền quản lý khách hàng" name="quyen_khach_hang">
+                                <group>
+                                    <group>
+                                        <field name="quyen_them_khach_hang"/>
+                                        <field name="quyen_phan_cong_khach_hang"/>
+                                    </group>
+                                    <group>
+                                        <field name="quyen_xem_khach_hang_tat_ca"/>
+                                    </group>
+                                </group>
+                                <separator string="💡 Hướng dẫn"/>
+                                <div class="alert alert-info" role="status" aria-live="polite">
+                                    <ul>
+                                        <li><b>Thêm khách hàng:</b> Tạo mới hồ sơ khách hàng</li>
+                                        <li><b>Phân công:</b> Gán khách hàng cho nhân viên phụ trách</li>
+                                        <li><b>Xem tất cả:</b> Xem toàn bộ khách hàng (không chỉ của mình)</li>
+                                    </ul>
+                                </div>
+                            </page>
+                            
+                            <!-- Tab Quyền quản trị -->
+                            <page string="⚙️ Quyền quản trị" name="quyen_quan_tri">
+                                <group>
+                                    <field name="quyen_quan_ly_nhan_su"/>
+                                    <field name="quyen_phan_quyen"/>
+                                </group>
+                                <separator string="💡 Hướng dẫn"/>
+                                <div class="alert alert-warning" role="status" aria-live="polite">
+                                    <strong>Cảnh báo:</strong> Các quyền này chỉ dành cho quản trị viên hệ thống.
+                                    <ul>
+                                        <li><b>Quản lý nhân sự:</b> Thêm/sửa/xóa nhân viên</li>
+                                        <li><b>Phân quyền:</b> Gán vai trò và quyền hạn cho nhân viên</li>
+                                    </ul>
+                                </div>
+                            </page>
+                            
+                            <!-- Tab Danh sách nhân viên -->
+                            <page string="👤 Nhân viên" name="nhan_vien">
+                                <field name="nhan_vien_ids" mode="tree">
+                                    <tree>
+                                        <field name="ma_dinh_danh"/>
+                                        <field name="ten_nv"/>
+                                        <field name="chuc_vu"/>
+                                        <field name="phong_ban"/>
+                                        <field name="email"/>
+                                        <field name="trang_thai_lam_viec" widget="badge"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree view cho Vai trò -->
+        <record id="view_vai_tro_tree" model="ir.ui.view">
+            <field name="name">vai_tro.tree</field>
+            <field name="model">vai_tro</field>
+            <field name="arch" type="xml">
+                <tree string="Danh sách vai trò">
+                    <field name="thu_tu" widget="handle"/>
+                    <field name="ma_vai_tro" decoration-bf="1"/>
+                    <field name="ten_vai_tro" decoration-bf="1"/>
+                    <field name="so_nhan_vien" sum="Tổng NV"/>
+                    <field name="quyen_soan_thao" widget="boolean_toggle"/>
+                    <field name="quyen_duyet" widget="boolean_toggle"/>
+                    <field name="quyen_phe_duyet" widget="boolean_toggle"/>
+                    <field name="quyen_xem_tat_ca" widget="boolean_toggle" optional="hide"/>
+                    <field name="quyen_quan_ly_nhan_su" widget="boolean_toggle" optional="hide"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Kanban view cho Vai trò -->
+        <record id="view_vai_tro_kanban" model="ir.ui.view">
+            <field name="name">vai_tro.kanban</field>
+            <field name="model">vai_tro</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="id"/>
+                    <field name="ten_vai_tro"/>
+                    <field name="ma_vai_tro"/>
+                    <field name="so_nhan_vien"/>
+                    <field name="quyen_soan_thao"/>
+                    <field name="quyen_duyet"/>
+                    <field name="quyen_phe_duyet"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <span><field name="ten_vai_tro"/></span>
+                                        </strong>
+                                        <small class="text-muted">
+                                            <field name="ma_vai_tro"/>
+                                        </small>
+                                    </div>
+                                    <span class="badge badge-pill">
+                                        <i class="fa fa-users" title="Số nhân viên"/> <field name="so_nhan_vien"/> NV
+                                    </span>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div>
+                                        <t t-if="record.quyen_soan_thao.raw_value">
+                                            <span class="badge badge-info">📝 Soạn thảo</span>
+                                        </t>
+                                        <t t-if="record.quyen_duyet.raw_value">
+                                            <span class="badge badge-warning">✅ Duyệt</span>
+                                        </t>
+                                        <t t-if="record.quyen_phe_duyet.raw_value">
+                                            <span class="badge badge-success">✔️ Phê duyệt</span>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Search view -->
+        <record id="view_vai_tro_search" model="ir.ui.view">
+            <field name="name">vai_tro.search</field>
+            <field name="model">vai_tro</field>
+            <field name="arch" type="xml">
+                <search string="Tìm kiếm vai trò">
+                    <field name="ten_vai_tro"/>
+                    <field name="ma_vai_tro"/>
+                    
+                    <filter string="Có quyền duyệt" name="co_quyen_duyet" 
+                            domain="[('quyen_duyet', '=', True)]"/>
+                    <filter string="Có quyền phê duyệt" name="co_quyen_phe_duyet" 
+                            domain="[('quyen_phe_duyet', '=', True)]"/>
+                    <separator/>
+                    <filter string="Đang hoạt động" name="active" 
+                            domain="[('active', '=', True)]"/>
+                    <filter string="Đã lưu trữ" name="archived" 
+                            domain="[('active', '=', False)]"/>
+                    
+                    <group expand="0" string="Nhóm theo">
+                        <filter string="Quyền duyệt" name="group_quyen_duyet" 
+                                context="{'group_by':'quyen_duyet'}"/>
+                        <filter string="Quyền phê duyệt" name="group_quyen_phe_duyet" 
+                                context="{'group_by':'quyen_phe_duyet'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_vai_tro" model="ir.actions.act_window">
+            <field name="name">Vai trò &amp; Quyền hạn</field>
+            <field name="res_model">vai_tro</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="search_view_id" ref="view_vai_tro_search"/>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Tạo vai trò mới
+                </p>
+                <p>
+                    Định nghĩa vai trò và phân quyền cho nhân viên trong quy trình xử lý văn bản.
+                </p>
+                <p>
+                    <b>Ví dụ:</b> Nhân viên kinh doanh, Trưởng phòng, Giám đốc
+                </p>
+            </field>
+        </record>
+
+        <!-- Server action để tạo vai trò mặc định -->
+        <record id="action_server_create_default_roles" model="ir.actions.server">
+            <field name="name">Tạo vai trò mặc định</field>
+            <field name="model_id" ref="model_vai_tro"/>
+            <field name="state">code</field>
+            <field name="code">model.create_default_roles()</field>
+        </record>
+
+    </data>
+</odoo>

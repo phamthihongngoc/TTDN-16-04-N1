@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Form View -->
+    <record id="view_email_khach_hang_form" model="ir.ui.view">
+        <field name="name">email_khach_hang.form</field>
+        <field name="model">email_khach_hang</field>
+        <field name="arch" type="xml">
+            <form string="Email Marketing">
+                <header>
+                    <button name="action_gui_email" string="Gửi Email" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('trang_thai', '=', 'da_gui')]}"/>
+                    <field name="trang_thai" widget="statusbar" statusbar_visible="nhap,da_gui"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="chu_de" placeholder="Chủ đề email..."/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Thông tin gửi">
+                            <field name="nguoi_tao_id"/>
+                            <field name="khach_hang_ids" widget="many2many_tags"/>
+                            <field name="so_nguoi_nhan"/>
+                            <field name="ngay_gui" attrs="{'invisible': [('trang_thai', '=', 'nhap')]}"/>
+                        </group>
+                        <group string="File đính kèm">
+                            <field name="attachment_ids" widget="many2many_binary" nolabel="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Nội dung Email">
+                            <field name="noi_dung" widget="html" options="{'style-inline': true}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_email_khach_hang_tree" model="ir.ui.view">
+        <field name="name">email_khach_hang.tree</field>
+        <field name="model">email_khach_hang</field>
+        <field name="arch" type="xml">
+            <tree string="Email Marketing" decoration-success="trang_thai=='da_gui'">
+                <field name="chu_de"/>
+                <field name="nguoi_tao_id"/>
+                <field name="so_nguoi_nhan"/>
+                <field name="ngay_gui"/>
+                <field name="trang_thai" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_email_khach_hang_search" model="ir.ui.view">
+        <field name="name">email_khach_hang.search</field>
+        <field name="model">email_khach_hang</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="chu_de"/>
+                <field name="nguoi_tao_id"/>
+                
+                <filter string="Nháp" name="nhap" domain="[('trang_thai', '=', 'nhap')]"/>
+                <filter string="Đã gửi" name="da_gui" domain="[('trang_thai', '=', 'da_gui')]"/>
+                <separator/>
+                <filter string="Email của tôi" name="cua_toi" domain="[('nguoi_tao_id', '=', uid)]"/>
+                
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Trạng thái" name="group_trang_thai" context="{'group_by':'trang_thai'}"/>
+                    <filter string="Người tạo" name="group_nguoi_tao" context="{'group_by':'nguoi_tao_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_email_khach_hang" model="ir.actions.act_window">
+        <field name="name">Email Marketing</field>
+        <field name="res_model">email_khach_hang</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_email_khach_hang_search"/>
+        <field name="context">{'search_default_nhap': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo email marketing mới
+            </p>
+        </field>
+    </record>
+
+</odoo>

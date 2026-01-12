@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_khach_hang_user,khach_hang.user,model_khach_hang,group_khach_hang_user,1,1,1,0
+access_khach_hang_manager,khach_hang.manager,model_khach_hang,group_khach_hang_manager,1,1,1,1
+access_ho_tro_user,ho_tro.user,model_ho_tro_khach_hang,group_khach_hang_user,1,1,1,0
+access_ho_tro_manager,ho_tro.manager,model_ho_tro_khach_hang,group_khach_hang_manager,1,1,1,1
+access_don_hang_user,don_hang.user,model_don_hang,group_khach_hang_user,1,1,1,0
+access_don_hang_manager,don_hang.manager,model_don_hang,group_khach_hang_manager,1,1,1,1
+access_don_hang_line_user,don_hang_line.user,model_don_hang_line,group_khach_hang_user,1,1,1,1
+access_don_hang_line_manager,don_hang_line.manager,model_don_hang_line,group_khach_hang_manager,1,1,1,1
+access_san_pham_user,san_pham.user,model_san_pham,group_khach_hang_user,1,0,0,0
+access_san_pham_manager,san_pham.manager,model_san_pham,group_khach_hang_manager,1,1,1,1
+access_email_user,email.user,model_email_khach_hang,group_khach_hang_user,1,1,1,0
+access_email_manager,email.manager,model_email_khach_hang,group_khach_hang_manager,1,1,1,1

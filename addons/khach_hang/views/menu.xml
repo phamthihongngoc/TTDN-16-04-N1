@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Main Menu -->
+    <menuitem id="menu_khach_hang_root" 
+              name="Quản lý Khách hàng" 
+              sequence="10"/>
+
+    <!-- Customers -->
+    <menuitem id="menu_khach_hang" 
+              name="Khách hàng" 
+              parent="menu_khach_hang_root" 
+              sequence="10"/>
+    
+    <menuitem id="menu_khach_hang_list" 
+              name="Danh sách khách hàng" 
+              parent="menu_khach_hang" 
+              action="action_khach_hang" 
+              sequence="10"/>
+
+    <menuitem id="menu_khach_hang_xep_hang" 
+              name="Xếp hạng khách hàng" 
+              parent="menu_khach_hang" 
+              action="action_xep_hang_khach_hang" 
+              sequence="20"/>
+
+    <!-- Support -->
+    <menuitem id="menu_ho_tro" 
+              name="Hỗ trợ" 
+              parent="menu_khach_hang_root" 
+              sequence="20"/>
+    
+    <menuitem id="menu_ho_tro_list" 
+              name="Yêu cầu hỗ trợ" 
+              parent="menu_ho_tro" 
+              action="action_ho_tro_khach_hang" 
+              sequence="10"/>
+    
+    <menuitem id="menu_danh_gia" 
+              name="Đánh giá" 
+              parent="menu_ho_tro" 
+              action="action_danh_gia" 
+              sequence="20"/>
+    
+    <!-- Support Statistics -->
+    <menuitem id="menu_thong_ke_ho_tro" 
+              name="Thống kê hỗ trợ" 
+              parent="menu_khach_hang_root" 
+              sequence="30"/>
+    
+    <menuitem id="menu_kpi_cskh" 
+              name="KPI CSKH" 
+              parent="menu_thong_ke_ho_tro" 
+              action="action_kpi_cskh" 
+              sequence="10"/>
+    
+    <menuitem id="menu_hieu_suat_nv" 
+              name="Hiệu suất NV" 
+              parent="menu_thong_ke_ho_tro" 
+              action="action_hieu_suat_nv" 
+              sequence="20"/>
+
+    <!-- Orders -->
+    <menuitem id="menu_don_hang" 
+              name="Đơn hàng" 
+              parent="menu_khach_hang_root" 
+              sequence="40"/>
+    
+    <menuitem id="menu_don_hang_list" 
+              name="Danh sách đơn hàng" 
+              parent="menu_don_hang" 
+              action="action_don_hang" 
+              sequence="10"/>
+
+    <menuitem id="menu_thong_ke_don_hang" 
+              name="Phân tích đơn hàng" 
+              parent="menu_don_hang" 
+              action="action_thong_ke_don_hang" 
+              sequence="20"/>
+
+    <!-- Products -->
+    <menuitem id="menu_san_pham" 
+              name="Sản phẩm" 
+              parent="menu_khach_hang_root" 
+              sequence="50"/>
+    
+    <menuitem id="menu_san_pham_list" 
+              name="Danh sách sản phẩm" 
+              parent="menu_san_pham" 
+              action="action_san_pham" 
+              sequence="10"/>
+
+    <!-- Email Marketing -->
+    <menuitem id="menu_email" 
+              name="Email Marketing" 
+              parent="menu_khach_hang_root" 
+              sequence="60"/>
+    
+    <menuitem id="menu_email_list" 
+              name="Chiến dịch Email" 
+              parent="menu_email" 
+              action="action_email_khach_hang" 
+              sequence="10"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_cau_hinh" 
+              name="Cấu hình" 
+              parent="menu_khach_hang_root" 
+              sequence="100"
+              groups="group_khach_hang_manager"/>
+
+</odoo>

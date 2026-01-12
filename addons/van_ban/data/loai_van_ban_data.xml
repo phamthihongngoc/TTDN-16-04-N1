@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Loại văn bản mặc định -->
+        <record id="loai_hop_dong" model="loai_van_ban">
+            <field name="ten_loai">Hợp đồng</field>
+            <field name="ma_loai">HD</field>
+            <field name="mo_ta">Hợp đồng với khách hàng, đối tác</field>
+            <field name="thu_tu">1</field>
+            <field name="yeu_cau_duyet">True</field>
+            <field name="yeu_cau_ky">True</field>
+            <field name="cho_phep_khach_ky">True</field>
+        </record>
+
+        <record id="loai_bao_gia" model="loai_van_ban">
+            <field name="ten_loai">Báo giá</field>
+            <field name="ma_loai">BG</field>
+            <field name="mo_ta">Báo giá sản phẩm, dịch vụ</field>
+            <field name="thu_tu">2</field>
+            <field name="yeu_cau_duyet">True</field>
+            <field name="yeu_cau_ky">False</field>
+            <field name="cho_phep_khach_ky">False</field>
+        </record>
+
+        <record id="loai_phu_luc" model="loai_van_ban">
+            <field name="ten_loai">Phụ lục hợp đồng</field>
+            <field name="ma_loai">PL</field>
+            <field name="mo_ta">Phụ lục bổ sung hợp đồng</field>
+            <field name="thu_tu">3</field>
+            <field name="yeu_cau_duyet">True</field>
+            <field name="yeu_cau_ky">True</field>
+            <field name="cho_phep_khach_ky">True</field>
+        </record>
+
+        <record id="loai_bien_ban" model="loai_van_ban">
+            <field name="ten_loai">Biên bản nghiệm thu</field>
+            <field name="ma_loai">BB</field>
+            <field name="mo_ta">Biên bản nghiệm thu công việc, dự án</field>
+            <field name="thu_tu">4</field>
+            <field name="yeu_cau_duyet">True</field>
+            <field name="yeu_cau_ky">True</field>
+            <field name="cho_phep_khach_ky">True</field>
+        </record>
+
+        <record id="loai_cong_van" model="loai_van_ban">
+            <field name="ten_loai">Công văn</field>
+            <field name="ma_loai">CV</field>
+            <field name="mo_ta">Công văn nội bộ và bên ngoài</field>
+            <field name="thu_tu">5</field>
+            <field name="yeu_cau_duyet">True</field>
+            <field name="yeu_cau_ky">True</field>
+            <field name="cho_phep_khach_ky">False</field>
+        </record>
+
+        <record id="loai_to_trinh" model="loai_van_ban">
+            <field name="ten_loai">Tờ trình</field>
+            <field name="ma_loai">TT</field>
+            <field name="mo_ta">Tờ trình nội bộ</field>
+            <field name="thu_tu">6</field>
+            <field name="yeu_cau_duyet">True</field>
+            <field name="yeu_cau_ky">False</field>
+            <field name="cho_phep_khach_ky">False</field>
+        </record>
+
+    </data>
+</odoo>

@@ -65,7 +65,7 @@
                         </group>
                     </group>
                     
-                    <div class="alert alert-info mt-3" role="alert">
+                    <div class="alert alert-info mt-3" role="status" aria-live="polite">
                         <h5 class="alert-heading">📌 Lưu ý:</h5>
                         <ul class="mb-0">
                             <li>Giờ nghỉ trưa: <strong>12h00 - 13h30</strong> (1.5 giờ) tự động trừ</li>

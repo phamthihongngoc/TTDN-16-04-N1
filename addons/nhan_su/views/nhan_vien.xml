@@ -6,6 +6,10 @@
             <field name="model">nhan_vien</field>
             <field name="arch" type="xml">
                 <form string="Nhân viên">
+                    <header>
+                        <field name="trang_thai_lam_viec" widget="statusbar" 
+                               statusbar_visible="dang_lam,tam_nghi,nghi_viec"/>
+                    </header>
                     <sheet>
                         <!-- Header với tiêu đề đẹp -->
                         <div class="oe_title">
@@ -30,6 +34,14 @@
                             <group string="💼 Thông Tin Công Việc">
                                 <field name="chuc_vu" placeholder="VD: Nhân viên kinh doanh"/>
                                 <field name="phong_ban" placeholder="VD: Phòng kinh doanh"/>
+                                <field name="ngay_vao_lam" widget="date"/>
+                                <field name="ngay_nghi_viec" widget="date" 
+                                       attrs="{'invisible': [('trang_thai_lam_viec', '!=', 'nghi_viec')]}"/>
+                                <separator string="🔐 Vai trò &amp; Quyền hạn" colspan="2"/>
+                                <field name="vai_tro_ids" widget="many2many_tags" 
+                                       options="{'color_field': 'color', 'no_create': True}"
+                                       placeholder="Chọn vai trò..."/>
+                                <field name="user_id" placeholder="Liên kết tài khoản người dùng..."/>
                                 <separator string="💰 Thông tin lương" colspan="2"/>
                                 <field name="luong_co_ban" widget="monetary" 
                                        options="{'currency_field': 'currency_id'}"/>
@@ -80,6 +92,23 @@
                                     </tree>
                                 </field>
                             </page>
+                            
+                            <page string="📊 Thống kê công việc" name="thong_ke_cong_viec">
+                                <group>
+                                    <group string="📄 Văn bản">
+                                        <field name="so_van_ban_tao" widget="statinfo" string="Đã tạo"/>
+                                        <field name="so_van_ban_duyet" widget="statinfo" string="Đã duyệt"/>
+                                        <field name="so_van_ban_ky" widget="statinfo" string="Đã ký"/>
+                                    </group>
+                                    <group string="👥 Khách hàng">
+                                        <field name="so_khach_hang_phu_trach" widget="statinfo" string="Phụ trách"/>
+                                    </group>
+                                </group>
+                                <p class="text-muted">
+                                    <i class="fa fa-info-circle"></i> 
+                                    Thống kê chỉ tính cho nhân viên đang làm việc. Dữ liệu được đồng bộ tự động từ các module khác.
+                                </p>
+                            </page>
                         </notebook>
                     </sheet>
                 </form>
@@ -90,11 +119,18 @@
             <field name="name">nhan_vien.tree</field>
             <field name="model">nhan_vien</field>
             <field name="arch" type="xml">
-                <tree string="Danh sách nhân viên">
+                <tree string="Danh sách nhân viên" 
+                      decoration-muted="trang_thai_lam_viec=='nghi_viec'"
+                      decoration-warning="trang_thai_lam_viec=='tam_nghi'">
                     <field name="ma_dinh_danh" decoration-bf="1"/>
                     <field name="ten_nv" decoration-bf="1"/>
+                    <field name="trang_thai_lam_viec" widget="badge" 
+                           decoration-success="trang_thai_lam_viec=='dang_lam'"
+                           decoration-warning="trang_thai_lam_viec=='tam_nghi'"
+                           decoration-danger="trang_thai_lam_viec=='nghi_viec'"/>
                     <field name="chuc_vu"/>
                     <field name="phong_ban"/>
+                    <field name="vai_tro_ids" widget="many2many_tags" optional="show"/>
                     <field name="so_dien_thoai"/>
                     <field name="luong_co_ban" widget="monetary"/>
                     <field name="so_cong_chuan" optional="hide"/>
@@ -133,11 +169,19 @@
                     <field name="phong_ban"/>
                     <field name="so_dien_thoai"/>
                     <field name="email"/>
+                    <field name="vai_tro_ids"/>
                     
+                    <filter string="Đang làm việc" name="dang_lam" 
+                            domain="[('trang_thai_lam_viec', '=', 'dang_lam')]"/>
+                    <filter string="Nghỉ việc" name="nghi_viec" 
+                            domain="[('trang_thai_lam_viec', '=', 'nghi_viec')]"/>
+                    <separator/>
                     <filter string="Lương cao (&gt; 10tr)" name="luong_cao" 
                             domain="[('luong_co_ban', '&gt;', 10000000)]"/>
                     
                     <group expand="0" string="Nhóm theo">
+                        <filter string="Trạng thái" name="group_trang_thai" 
+                                context="{'group_by':'trang_thai_lam_viec'}"/>
                         <filter string="Phòng ban" name="group_phong_ban" 
                                 context="{'group_by':'phong_ban'}"/>
                         <filter string="Chức vụ" name="group_chuc_vu" 
