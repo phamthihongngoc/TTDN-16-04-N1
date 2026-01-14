@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Workflow Template Views -->
+    <record id="view_workflow_template_tree" model="ir.ui.view">
+        <field name="name">workflow.template.tree</field>
+        <field name="model">workflow.template</field>
+        <field name="arch" type="xml">
+            <tree string="Workflow Templates">
+                <field name="name"/>
+                <field name="model_name"/>
+                <field name="description"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_workflow_template_form" model="ir.ui.view">
+        <field name="name">workflow.template.form</field>
+        <field name="model">workflow.template</field>
+        <field name="arch" type="xml">
+            <form string="Workflow Template">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="model_name"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Transitions">
+                            <field name="transition_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence"/>
+                                    <field name="name"/>
+                                    <field name="from_state"/>
+                                    <field name="to_state"/>
+                                    <field name="required_group"/>
+                                    <field name="auto_transition"/>
+                                    <field name="active"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Workflow Transition Views -->
+    <record id="view_workflow_transition_form" model="ir.ui.view">
+        <field name="name">workflow.transition.form</field>
+        <field name="model">workflow.transition</field>
+        <field name="arch" type="xml">
+            <form string="Workflow Transition">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="sequence"/>
+                            <field name="from_state"/>
+                            <field name="to_state"/>
+                        </group>
+                        <group>
+                            <field name="required_group"/>
+                            <field name="auto_transition"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Conditions &amp; Actions">
+                        <field name="email_template_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_workflow_template" model="ir.actions.act_window">
+        <field name="name">Workflow Templates</field>
+        <field name="res_model">workflow.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create workflow templates to define dynamic approval processes for documents.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_workflow_template" name="Workflow Templates"
+              parent="menu_van_ban_cau_hinh" action="action_workflow_template"
+              groups="van_ban.group_quan_tri_van_ban" sequence="20"/>
+
+</odoo>

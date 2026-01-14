@@ -7,6 +7,7 @@ class LoaiVanBan(models.Model):
     _name = 'loai_van_ban'
     _description = 'Loại văn bản'
     _order = 'thu_tu, ten_loai'
+    _rec_name = 'ten_loai'
 
     ten_loai = fields.Char('Tên loại văn bản', required=True)
     ma_loai = fields.Char('Mã loại', required=True)

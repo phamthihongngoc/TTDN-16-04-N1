@@ -14,7 +14,7 @@ class WizardKyKhachHang(models.TransientModel):
     khach_hang_id = fields.Many2one(related='yeu_cau_ky_id.khach_hang_id', string='Khách hàng')
     
     ten_van_ban = fields.Char(related='van_ban_id.ten_van_ban', string='Tên văn bản')
-    ten_khach_hang = fields.Char(related='khach_hang_id.ten_khach_hang', string='Khách hàng')
+    ten_khach_hang = fields.Char(related='khach_hang_id.ten_khach_hang', string='Tên khách hàng')
     
     # Chữ ký
     chu_ky = fields.Binary('Chữ ký', required=True,

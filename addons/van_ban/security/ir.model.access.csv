@@ -23,6 +23,12 @@ access_van_ban_di_truong_phong,van_ban_di.truong_phong,model_van_ban_di,group_tr
 access_van_ban_di_giam_doc,van_ban_di.giam_doc,model_van_ban_di,group_giam_doc_ky,1,1,1,0
 access_van_ban_di_manager,van_ban_di.manager,model_van_ban_di,group_quan_tri_van_ban,1,1,1,1
 access_van_ban_di_admin,van_ban_di.admin,model_van_ban_di,base.group_system,1,1,1,1
+access_van_ban_ocr_user,van_ban_ocr.user,model_van_ban_ocr,group_nhan_vien_soan_thao,1,1,1,0
+access_van_ban_ocr_manager,van_ban_ocr.manager,model_van_ban_ocr,group_quan_tri_van_ban,1,1,1,1
+access_van_ban_ocr_admin,van_ban_ocr.admin,model_van_ban_ocr,base.group_system,1,1,1,1
+access_van_ban_ocr_history_user,van_ban_ocr_history.user,model_van_ban_ocr_history,group_nhan_vien_soan_thao,1,1,1,0
+access_van_ban_ocr_history_manager,van_ban_ocr_history.manager,model_van_ban_ocr_history,group_quan_tri_van_ban,1,1,1,1
+access_van_ban_ocr_history_admin,van_ban_ocr_history.admin,model_van_ban_ocr_history,base.group_system,1,1,1,1
 access_wizard_ky_dien_tu_user,wizard.ky.dien.tu.user,model_wizard_ky_dien_tu,group_nhan_vien_soan_thao,1,1,1,1
 access_wizard_ky_dien_tu_truong_phong,wizard.ky.dien.tu.truong_phong,model_wizard_ky_dien_tu,group_truong_phong_duyet,1,1,1,1
 access_wizard_ky_dien_tu_giam_doc,wizard.ky.dien.tu.giam_doc,model_wizard_ky_dien_tu,group_giam_doc_ky,1,1,1,1
@@ -30,4 +36,13 @@ access_wizard_ky_dien_tu_admin,wizard.ky.dien.tu.admin,model_wizard_ky_dien_tu,b
 access_wizard_ky_khach_hang_public,wizard.ky.khach.hang.public,model_wizard_ky_khach_hang,base.group_public,1,1,1,1
 access_wizard_ky_khach_hang_portal,wizard.ky.khach.hang.portal,model_wizard_ky_khach_hang,base.group_portal,1,1,1,1
 access_wizard_ky_khach_hang_user,wizard.ky.khach.hang.user,model_wizard_ky_khach_hang,base.group_user,1,1,1,1
+
+access_van_ban_signature_log_truong_phong,van_ban.signature.log.truong_phong,model_van_ban_signature_log,group_truong_phong_duyet,1,0,0,0
+access_van_ban_signature_log_giam_doc,van_ban.signature.log.giam_doc,model_van_ban_signature_log,group_giam_doc_ky,1,1,1,0
+access_van_ban_signature_log_manager,van_ban.signature.log.manager,model_van_ban_signature_log,group_quan_tri_van_ban,1,1,1,1
+access_van_ban_signature_log_admin,van_ban.signature.log.admin,model_van_ban_signature_log,base.group_system,1,1,1,1
+access_workflow_template_manager,workflow.template.manager,model_workflow_template,group_quan_tri_van_ban,1,1,1,1
+access_workflow_template_admin,workflow.template.admin,model_workflow_template,group_quan_tri_van_ban,1,1,1,1
+access_workflow_transition_manager,workflow.transition.manager,model_workflow_transition,group_quan_tri_van_ban,1,1,1,1
+access_workflow_transition_admin,workflow.transition.admin,model_workflow_transition,group_quan_tri_van_ban,1,1,1,1
 

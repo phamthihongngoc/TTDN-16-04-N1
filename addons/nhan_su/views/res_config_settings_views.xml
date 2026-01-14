@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_inherit_nhan_su" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.nhan_su</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="Nhân sự" string="Nhân sự" data-key="nhan_su">
+                        <h2>Nhân sự</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <label for="nhan_su_so_cong_chuan"/>
+                                    <div class="text-muted">Số công chuẩn/tháng dùng làm mẫu mặc định khi tạo nhân viên mới.</div>
+                                    <field name="nhan_su_so_cong_chuan"/>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <label for="nhan_su_muc_phat_di_tre"/>
+                                    <div class="text-muted">Mức phạt mặc định cho 1 lần đi trễ.</div>
+                                    <field name="nhan_su_muc_phat_di_tre"/>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <label for="nhan_su_muc_phat_ve_som"/>
+                                    <div class="text-muted">Mức phạt mặc định cho 1 lần về sớm.</div>
+                                    <field name="nhan_su_muc_phat_ve_som"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

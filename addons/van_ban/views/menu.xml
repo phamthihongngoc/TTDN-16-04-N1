@@ -83,6 +83,24 @@
               parent="menu_van_ban_root"
               sequence="20"/>
 
+    <!-- Menu: OCR -->
+    <menuitem id="menu_van_ban_ocr"
+              name="OCR"
+              parent="menu_van_ban_root"
+              sequence="25"/>
+
+    <menuitem id="menu_van_ban_ocr_main"
+              name="Bóc tách OCR"
+              action="action_van_ban_ocr"
+              parent="menu_van_ban_ocr"
+              sequence="1"/>
+
+    <menuitem id="menu_van_ban_ocr_history"
+              name="Lịch sử OCR"
+              action="action_van_ban_ocr_history"
+              parent="menu_van_ban_ocr"
+              sequence="2"/>
+
     <!-- Menu: Báo cáo -->
     <menuitem id="menu_van_ban_bao_cao"
               name="Báo cáo"

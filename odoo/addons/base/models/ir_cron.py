@@ -387,8 +387,12 @@ class ir_cron(models.Model):
             _logger.info('Starting job `%s`.', cron_name)
             if _logger.isEnabledFor(logging.DEBUG):
                 start_time = time.time()
-            self.env['ir.actions.server'].browse(server_action_id).run()
-            self.env['ir.actions.server'].flush()
+            try:
+                self.env['ir.actions.server'].browse(server_action_id).run()
+                self.env['ir.actions.server'].flush()
+            except KeyError as ke:
+                _logger.warning("Skipping cron '%s' because model referenced by server action #%s is missing: %s", cron_name, server_action_id, ke)
+                return
             _logger.info('Job `%s` done.', cron_name)
             if start_time and _logger.isEnabledFor(logging.DEBUG):
                 end_time = time.time()

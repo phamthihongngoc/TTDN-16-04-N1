@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="seq_don_hang" model="ir.sequence">
+            <field name="name">Đơn hàng</field>
+            <field name="code">don_hang</field>
+            <field name="prefix">DH%(year)s%(month)s%(day)s-</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <record id="seq_san_pham_headphone" model="ir.sequence">
+            <field name="name">Sản phẩm Headphone</field>
+            <field name="code">san_pham.headphone</field>
+            <field name="prefix">HP</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <record id="seq_san_pham_iphone" model="ir.sequence">
+            <field name="name">Sản phẩm Iphone</field>
+            <field name="code">san_pham.iphone</field>
+            <field name="prefix">IP</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <record id="seq_san_pham_laptop" model="ir.sequence">
+            <field name="name">Sản phẩm Laptop</field>
+            <field name="code">san_pham.laptop</field>
+            <field name="prefix">LT</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <record id="seq_san_pham_samsung" model="ir.sequence">
+            <field name="name">Sản phẩm Samsung</field>
+            <field name="code">san_pham.samsung</field>
+            <field name="prefix">SS</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <record id="seq_san_pham_vivo" model="ir.sequence">
+            <field name="name">Sản phẩm Vivo</field>
+            <field name="code">san_pham.vivo</field>
+            <field name="prefix">VV</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

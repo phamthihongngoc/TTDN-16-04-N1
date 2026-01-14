@@ -18,6 +18,11 @@
                     
                     <button name="action_luu_tru" string="Lưu trữ" type="object"
                             attrs="{'invisible': [('trang_thai', 'not in', ['hoan_thanh'])]}"/>
+
+                        <button name="action_ky_dien_tu" string="Ký điện tử" type="object"
+                            class="btn-success"
+                            attrs="{'invisible': ['|', ('file_dinh_kem', '=', False), ('da_ky_dien_tu', '=', True)]}"
+                            groups="van_ban.group_giam_doc_ky"/>
                     
                     <field name="trang_thai" widget="statusbar"/>
                 </header>
@@ -92,6 +97,33 @@
                                     <field name="ten_file_phan_hoi"/>
                                 </group>
                             </group>
+                        </page>
+
+                        <page string="Ký điện tử">
+                            <group>
+                                <group>
+                                    <field name="nguoi_ky_id"/>
+                                    <field name="da_ky_dien_tu"/>
+                                    <field name="ngay_ky_dien_tu" attrs="{'invisible': [('da_ky_dien_tu', '=', False)]}"/>
+                                </group>
+                                <group attrs="{'invisible': [('chu_ky_dien_tu', '=', False)]}">
+                                    <field name="chu_ky_dien_tu" widget="image" options="{'size': [300, 100]}" nolabel="1"/>
+                                    <label for="chu_ky_dien_tu" string=""/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Lịch sử ký">
+                            <field name="signature_log_ids" readonly="1">
+                                <tree>
+                                    <field name="signed_at"/>
+                                    <field name="user_id"/>
+                                    <field name="nhan_vien_id"/>
+                                    <field name="is_valid" widget="boolean"/>
+                                    <field name="invalid_reason"/>
+                                    <field name="ip_address"/>
+                                </tree>
+                            </field>
                         </page>
                         
                         <page string="Thông tin khác">

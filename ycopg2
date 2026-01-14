@@ -1,0 +1,8 @@
+ id  |                name                 |                res_model                 
+-----+-------------------------------------+------------------------------------------
+ 149 | Snailmail Letters                   | snailmail.letter
+ 150 | Discard snailmail delivery failures | snailmail.letter.cancel
+ 151 | Format Error                        | snailmail.letter.format.error
+ 152 | Failed letter                       | snailmail.letter.missing.required.fields
+(4 rows)
+

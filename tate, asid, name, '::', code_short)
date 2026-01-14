@@ -1,0 +1,16 @@
+id
+ir_actions_server_id
+cron_name
+user_id
+active
+interval_number
+interval_type
+numbercall
+doall
+nextcall
+lastcall
+priority
+create_uid
+create_date
+write_uid
+write_date

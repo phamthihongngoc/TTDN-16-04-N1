@@ -29,7 +29,9 @@
     'data': [
         'security/khach_hang_security.xml',
         'security/ir.model.access.csv',
+        'data/sequence_data.xml',
         'data/san_pham_data.xml',
+        'data/cron.xml',
         'views/khach_hang_views.xml',
         'views/ho_tro_khach_hang_views.xml',
         'views/don_hang_views.xml',
@@ -39,6 +41,15 @@
         'views/menu.xml',
     ],
     'demo': [],
+    'external_dependencies': {
+        'python': [
+            'pandas',
+            'numpy',
+            'scikit-learn',
+            'stripe',
+            'paypalrestsdk',
+        ],
+    },
     'installable': True,
     'application': True,
     'auto_install': False,

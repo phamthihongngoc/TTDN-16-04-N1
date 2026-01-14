@@ -16,9 +16,6 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                            <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
-                        </button>
                     </div>
                     
                     <div class="oe_title">
@@ -64,6 +61,11 @@
                                     <field name="trang_thai" widget="badge"/>
                                 </tree>
                             </field>
+                        </page>
+                        <page string="AI / Đề xuất" name="ai_recommendation">
+                            <group>
+                                <field name="san_pham_du_doan_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            </group>
                         </page>
                         <page string="Hỗ trợ" name="ho_tro">
                             <field name="ho_tro_ids">
@@ -181,8 +183,6 @@
                 <separator/>
                 <filter string="Tiềm năng cao" name="tiem_nang_cao" domain="[('phan_loai', '=', 'tiem_nang_cao')]"/>
                 <filter string="Đã mua hàng" name="da_mua" domain="[('so_lan_mua_hang', '>', 0)]"/>
-                <separator/>
-                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
                 
                 <group expand="0" string="Nhóm theo">
                     <filter string="Trạng thái" name="group_trang_thai" context="{'group_by':'trang_thai'}"/>

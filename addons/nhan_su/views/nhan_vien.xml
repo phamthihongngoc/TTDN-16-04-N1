@@ -7,14 +7,40 @@
             <field name="arch" type="xml">
                 <form string="Nhân viên">
                     <header>
+                        <button name="action_create_user_account" type="object" string="Tạo tài khoản" class="btn-primary"
+                                attrs="{'invisible': ['|', ('user_id','!=',False), ('email','=',False)]}"
+                            groups="nhan_su.group_quan_tri_nhan_su,nhan_su.group_giam_doc,base.group_system"/>
+                        <button name="action_offboard" type="object" string="Offboard" class="btn-secondary"
+                                attrs="{'invisible': [('trang_thai_lam_viec','!=','dang_lam')]}"
+                            groups="nhan_su.group_quan_tri_nhan_su,nhan_su.group_giam_doc,base.group_system"/>
+                        <button name="action_reactivate" type="object" string="Kích hoạt lại" class="btn-secondary"
+                                attrs="{'invisible': [('trang_thai_lam_viec','=','dang_lam')]}"
+                            groups="nhan_su.group_quan_tri_nhan_su,nhan_su.group_giam_doc,base.group_system"/>
+                        <button name="action_apply_company_defaults" type="object" string="Áp dụng mặc định" class="btn-secondary"
+                            groups="nhan_su.group_quan_tri_nhan_su,base.group_system"/>
                         <field name="trang_thai_lam_viec" widget="statusbar" 
                                statusbar_visible="dang_lam,tam_nghi,nghi_viec"/>
                     </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button type="object" name="action_view_cham_cong" class="oe_stat_button" icon="fa-calendar">
+                                <field name="so_ngay_lam_thang" widget="statinfo" string="Ngày làm (tháng)"/>
+                            </button>
+                            <button type="object" name="action_view_bang_luong" class="oe_stat_button" icon="fa-money">
+                                <field name="luong_thang_nay" widget="statinfo" string="Lương (tháng)"/>
+                            </button>
+                            <button type="object" name="action_view_khach_hang" class="oe_stat_button" icon="fa-users">
+                                <field name="so_khach_hang_phu_trach" widget="statinfo" string="Khách hàng"/>
+                            </button>
+                            <button type="object" name="action_view_van_ban" class="oe_stat_button" icon="fa-file-text-o">
+                                <field name="so_van_ban_tao" widget="statinfo" string="Văn bản"/>
+                            </button>
+                        </div>
                         <!-- Header với tiêu đề đẹp -->
                         <div class="oe_title">
                             <label for="ma_dinh_danh" class="oe_edit_only" string="Mã NV"/>
                             <h1 class="d-flex">
+                                <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_1920'}"/>
                                 <field name="ma_dinh_danh" placeholder="Mã NV" class="text-uppercase oe_inline" 
                                        style="width: 150px; margin-right: 10px;"/>
                                 <field name="ten_nv" placeholder="Họ và tên nhân viên..." 
@@ -23,7 +49,7 @@
                         </div>
                         
                         <group>
-                            <group string="👤 Thông Tin Cá Nhân">
+                            <group string="Thông tin cá nhân">
                                 <field name="ngay_sinh" widget="date"/>
                                 <field name="email" widget="email" placeholder="example@company.com"/>
                                 <field name="so_dien_thoai" widget="phone" placeholder="0912345678"/>
@@ -31,33 +57,37 @@
                                 <field name="dia_chi" placeholder="Địa chỉ chi tiết..."/>
                             </group>
                             
-                            <group string="💼 Thông Tin Công Việc">
-                                <field name="chuc_vu" placeholder="VD: Nhân viên kinh doanh"/>
-                                <field name="phong_ban" placeholder="VD: Phòng kinh doanh"/>
+                            <group string="Thông tin công việc">
+                                <field name="chuc_vu_id" placeholder="VD: Nhân viên kinh doanh"/>
+                                <field name="phong_ban_id" placeholder="VD: Phòng kinh doanh"/>
+                                <field name="manager_id"/>
                                 <field name="ngay_vao_lam" widget="date"/>
                                 <field name="ngay_nghi_viec" widget="date" 
                                        attrs="{'invisible': [('trang_thai_lam_viec', '!=', 'nghi_viec')]}"/>
-                                <separator string="🔐 Vai trò &amp; Quyền hạn" colspan="2"/>
+                                <field name="chuc_vu" invisible="1"/>
+                                <field name="phong_ban" invisible="1"/>
+                                <separator string="Vai trò &amp; quyền hạn" colspan="2"/>
                                 <field name="vai_tro_ids" widget="many2many_tags" 
                                        options="{'color_field': 'color', 'no_create': True}"
                                        placeholder="Chọn vai trò..."/>
                                 <field name="user_id" placeholder="Liên kết tài khoản người dùng..."/>
-                                <separator string="💰 Thông tin lương" colspan="2"/>
+                                <separator string="Thông tin lương" colspan="2"/>
                                 <field name="luong_co_ban" widget="monetary" 
                                        options="{'currency_field': 'currency_id'}"/>
                                 <field name="so_cong_chuan"/>
-                                <separator string="⚠️ Chế độ phạt" colspan="2"/>
+                                <separator string="Chế độ phạt" colspan="2"/>
                                 <field name="muc_phat_di_tre" widget="monetary" 
                                        options="{'currency_field': 'currency_id'}"/>
                                 <field name="muc_phat_ve_som" widget="monetary" 
                                        options="{'currency_field': 'currency_id'}"/>
                                 <field name="currency_id" invisible="1"/>
+                                <field name="company_id" invisible="1"/>
                             </group>
                         </group>
                         
                         <!-- Tabs -->
                         <notebook>
-                            <page string="📅 Chấm Công" name="cham_cong">
+                            <page string="Chấm công" name="cham_cong">
                                 <field name="cham_cong_ids" context="{'default_nhan_vien_id': active_id}">
                                     <tree decoration-success="trang_thai=='co_mat'" 
                                           decoration-warning="trang_thai in ['di_tre','ve_som']"
@@ -74,7 +104,7 @@
                                 </field>
                             </page>
                             
-                            <page string="💰 Bảng Lương" name="bang_luong">
+                            <page string="Bảng lương" name="bang_luong">
                                 <field name="bang_luong_ids" context="{'default_nhan_vien_id': active_id}">
                                     <tree decoration-info="trang_thai=='chua_duyet'" 
                                           decoration-success="trang_thai=='da_duyet'"
@@ -93,14 +123,14 @@
                                 </field>
                             </page>
                             
-                            <page string="📊 Thống kê công việc" name="thong_ke_cong_viec">
+                            <page string="Thống kê công việc" name="thong_ke_cong_viec">
                                 <group>
-                                    <group string="📄 Văn bản">
+                                    <group string="Văn bản">
                                         <field name="so_van_ban_tao" widget="statinfo" string="Đã tạo"/>
                                         <field name="so_van_ban_duyet" widget="statinfo" string="Đã duyệt"/>
                                         <field name="so_van_ban_ky" widget="statinfo" string="Đã ký"/>
                                     </group>
-                                    <group string="👥 Khách hàng">
+                                    <group string="Khách hàng">
                                         <field name="so_khach_hang_phu_trach" widget="statinfo" string="Phụ trách"/>
                                     </group>
                                 </group>
@@ -128,8 +158,8 @@
                            decoration-success="trang_thai_lam_viec=='dang_lam'"
                            decoration-warning="trang_thai_lam_viec=='tam_nghi'"
                            decoration-danger="trang_thai_lam_viec=='nghi_viec'"/>
-                    <field name="chuc_vu"/>
-                    <field name="phong_ban"/>
+                    <field name="chuc_vu_id"/>
+                    <field name="phong_ban_id"/>
                     <field name="vai_tro_ids" widget="many2many_tags" optional="show"/>
                     <field name="so_dien_thoai"/>
                     <field name="luong_co_ban" widget="monetary"/>
@@ -165,8 +195,8 @@
                 <search string="Tìm kiếm nhân viên">
                     <field name="ma_dinh_danh"/>
                     <field name="ten_nv"/>
-                    <field name="chuc_vu"/>
-                    <field name="phong_ban"/>
+                    <field name="chuc_vu_id"/>
+                    <field name="phong_ban_id"/>
                     <field name="so_dien_thoai"/>
                     <field name="email"/>
                     <field name="vai_tro_ids"/>
@@ -183,18 +213,55 @@
                         <filter string="Trạng thái" name="group_trang_thai" 
                                 context="{'group_by':'trang_thai_lam_viec'}"/>
                         <filter string="Phòng ban" name="group_phong_ban" 
-                                context="{'group_by':'phong_ban'}"/>
+                                context="{'group_by':'phong_ban_id'}"/>
                         <filter string="Chức vụ" name="group_chuc_vu" 
-                                context="{'group_by':'chuc_vu'}"/>
+                                context="{'group_by':'chuc_vu_id'}"/>
                     </group>
                 </search>
+            </field>
+        </record>
+
+        <record id="view_nhan_vien_kanban" model="ir.ui.view">
+            <field name="name">nhan_vien.kanban</field>
+            <field name="model">nhan_vien</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_small_column" default_group_by="phong_ban_id">
+                    <field name="image_1920"/>
+                    <field name="ten_nv"/>
+                    <field name="ma_dinh_danh"/>
+                    <field name="chuc_vu_id"/>
+                    <field name="phong_ban_id"/>
+                    <field name="trang_thai_lam_viec"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click o_kanban_card">
+                                <div class="o_kanban_image">
+                                    <img t-if="record.image_1920 and record.image_1920.raw_value" t-att-src="kanban_image('nhan_vien', 'image_1920', record.id)" class="o_kanban_avatar" alt="Avatar"/>
+                                    <div t-if="! (record.image_1920 and record.image_1920.raw_value)" class="o_kanban_avatar o_kanban_avatar_empty"/>
+                                </div>
+                                <div class="oe_kanban_details">
+                                    <strong><field name="ten_nv"/></strong>
+                                    <div class="text-muted"><field name="ma_dinh_danh"/></div>
+                                    <div><field name="chuc_vu_id"/></div>
+                                    <div class="text-muted"><field name="phong_ban_id"/></div>
+                                    <div class="mt8">
+                                        <field name="trang_thai_lam_viec" widget="badge"
+                                               decoration-success="trang_thai_lam_viec=='dang_lam'"
+                                               decoration-warning="trang_thai_lam_viec=='tam_nghi'"
+                                               decoration-danger="trang_thai_lam_viec=='nghi_viec'"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
             </field>
         </record>
 
         <record id="action_nhan_vien" model="ir.actions.act_window">
             <field name="name">Nhân Viên</field>
             <field name="res_model">nhan_vien</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">kanban,tree,form</field>
             <field name="search_view_id" ref="nhan_vien_search"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">

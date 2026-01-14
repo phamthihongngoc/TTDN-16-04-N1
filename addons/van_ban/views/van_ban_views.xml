@@ -47,9 +47,49 @@
                             attrs="{'invisible': [('trang_thai', 'in', ['da_gui', 'huy', 'het_hieu_luc'])]}"
                             confirm="Bạn có chắc muốn hủy văn bản này?"/>
                     
+                    <button name="action_analyze_ai" string="Phân tích AI" type="object"
+                            class="btn-info"
+                            attrs="{'invisible': [('trang_thai', 'in', ['da_gui', 'huy', 'het_hieu_luc'])]}"/>
+                    
                     <field name="trang_thai" widget="statusbar" 
                            statusbar_visible="nhap,cho_duyet,da_duyet,cho_ky,da_ky,da_gui"/>
                 </header>
+                
+                <!-- Dynamic Workflow Section -->
+                <div attrs="{'invisible': [('workflow_template_id', '=', False)]}">
+                    <group string="Available Transitions" name="dynamic_workflow">
+                        <field name="available_transitions" nolabel="1" mode="kanban">
+                            <kanban>
+                                <field name="name"/>
+                                <field name="to_state"/>
+                                <field name="required_group"/>
+                                <templates>
+                                    <t t-name="kanban-box">
+                                        <div class="oe_kanban_card">
+                                            <div class="row">
+                                                <div class="col-8">
+                                                    <strong><field name="name"/></strong>
+                                                    <br/>
+                                                    <small class="text-muted">
+                                                        <field name="from_state"/> &#8594; <field name="to_state"/>
+                                                    </small>
+                                                </div>
+                                                <div class="col-4 text-right">
+                                                    <button type="object" 
+                                                            name="execute_transition" 
+                                                            class="btn btn-sm btn-primary"
+                                                            context="{'transition_id': id, 'van_ban_id': parent.id}">
+                                                        Execute
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </group>
+                </div>
                 
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -83,7 +123,8 @@
                     
                     <group>
                         <group string="Thông tin văn bản">
-                            <field name="loai_van_ban_id"/>
+                            <field name="loai_van_ban_id" placeholder="Chọn loại văn bản (Hợp đồng, Báo giá, Phụ lục...)"/>
+                            <field name="workflow_template_id" placeholder="Chọn workflow template (tùy chọn)"/>
                             <field name="khach_hang_id"/>
                             <field name="don_hang_id" attrs="{'invisible': [('khach_hang_id', '=', False)]}"/>
                             <field name="gia_tri_hop_dong" widget="monetary"/>
@@ -111,6 +152,7 @@
                             <field name="ngay_ky_noi_bo" attrs="{'invisible': [('da_ky_noi_bo', '=', False)]}"/>
                             <field name="da_khach_ky"/>
                             <field name="ngay_khach_ky" attrs="{'invisible': [('da_khach_ky', '=', False)]}"/>
+                            <field name="blockchain_tx_hash" readonly="1" attrs="{'invisible': [('blockchain_tx_hash', '=', False)]}"/>
                             <field name="bi_khoa" readonly="1"/>
                         </group>
                     </group>
@@ -120,16 +162,16 @@
                             <field name="chu_ky_noi_bo" widget="image" options="{'size': [300, 100]}" nolabel="1"/>
                             <label for="chu_ky_noi_bo" string=""/>
                             <div class="text-muted">
-                                <i class="fa fa-user"/> <field name="nguoi_ky_id" readonly="1" nolabel="1"/><br/>
-                                <i class="fa fa-clock-o"/> <field name="ngay_ky_noi_bo" readonly="1" nolabel="1"/>
+                                <i class="fa fa-user" title="Người ký"/> <field name="nguoi_ky_id" readonly="1" nolabel="1"/><br/>
+                                <i class="fa fa-clock-o" title="Ngày ký"/> <field name="ngay_ky_noi_bo" readonly="1" nolabel="1"/>
                             </div>
                         </group>
                         <group string="Chữ ký khách hàng" attrs="{'invisible': [('chu_ky_khach', '=', False)]}">
                             <field name="chu_ky_khach" widget="image" options="{'size': [300, 100]}" nolabel="1"/>
                             <label for="chu_ky_khach" string=""/>
                             <div class="text-muted">
-                                <i class="fa fa-user"/> <field name="khach_hang_id" readonly="1" nolabel="1"/><br/>
-                                <i class="fa fa-clock-o"/> <field name="ngay_khach_ky" readonly="1" nolabel="1"/>
+                                <i class="fa fa-user" title="Khách hàng"/> <field name="khach_hang_id" readonly="1" nolabel="1"/><br/>
+                                <i class="fa fa-clock-o" title="Ngày ký"/> <field name="ngay_khach_ky" readonly="1" nolabel="1"/>
                             </div>
                         </group>
                     </group>
@@ -148,6 +190,20 @@
                                     <field name="ten_file_da_ky"/>
                                 </group>
                             </group>
+                        </page>
+
+                        <page string="Lịch sử ký">
+                            <field name="signature_log_ids" readonly="1">
+                                <tree>
+                                    <field name="signed_at"/>
+                                    <field name="user_id"/>
+                                    <field name="nhan_vien_id"/>
+                                    <field name="is_valid" widget="boolean"/>
+                                    <field name="invalid_reason"/>
+                                    <field name="blockchain_tx_hash"/>
+                                    <field name="ip_address"/>
+                                </tree>
+                            </field>
                         </page>
                         
                         <page string="Mô tả &amp; Ghi chú">
@@ -182,17 +238,26 @@
                                     <field name="ai_suggested_approver" readonly="1"/>
                                     <field name="ai_suggested_signer" readonly="1"/>
                                     <field name="ai_category_suggestion" readonly="1"/>
+                                    <field name="ai_approver_suggestion" readonly="1" widget="many2many_tags"/>
                                 </group>
                                 <group string="AI Assessment">
                                     <field name="ai_risk_level" readonly="1" widget="badge"/>
                                     <field name="ai_priority_score" readonly="1" widget="progressbar"/>
+                                    <field name="ai_sentiment" readonly="1" widget="badge"/>
+                                    <field name="ai_risk_score" readonly="1" widget="progressbar"/>
+                                    <field name="ai_assessment" readonly="1"/>
+                                    <field name="ai_analysis_date" readonly="1"/>
                                     <field name="sla_deadline" readonly="1"/>
                                     <field name="sla_breached" readonly="1"/>
                                 </group>
                             </group>
+                            <group string="AI Summary">
+                                <field name="ai_summary" readonly="1"/>
+                            </group>
                             <group string="Automation Stats">
                                 <field name="auto_follow_up_count" readonly="1"/>
                                 <field name="last_auto_follow_up" readonly="1"/>
+                                <field name="ai_auto_stats" readonly="1"/>
                             </group>
                         </page>
                         
@@ -217,7 +282,7 @@
                                 </group>
                             </group>
                             <separator string="Lưu ý bảo mật"/>
-                            <div class="alert alert-info">
+                            <div class="alert alert-info" role="alert">
                                 <p><strong>Cơ chế khóa văn bản - LOGIC MỚI:</strong></p>
                                 <ul>
                                     <li><strong>Văn bản CHỈ BỊ KHÓA KHI GỬI ĐI</strong></li>
@@ -301,10 +366,10 @@
                                     <field name="loai_van_ban_id"/>
                                 </div>
                                 <div t-if="record.khach_hang_id.value">
-                                    <i class="fa fa-user"/> <field name="khach_hang_id"/>
+                                    <i class="fa fa-user" title="Khách hàng"/> <field name="khach_hang_id"/>
                                 </div>
                                 <div t-if="record.sap_het_han.raw_value" class="text-danger">
-                                    <i class="fa fa-warning"/> Sắp hết hạn
+                                    <i class="fa fa-warning" title="Cảnh báo"/> Sắp hết hạn
                                 </div>
                             </div>
                         </div>

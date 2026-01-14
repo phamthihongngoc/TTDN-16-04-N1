@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="email_template_bao_cao_kpi" model="mail.template">
+            <field name="name">Báo cáo KPI nhân viên</field>
+            <field name="model_id" ref="model_nhan_vien"/>
+            <field name="subject">Báo cáo KPI tháng ${ctx.get('month', '')} năm ${ctx.get('year', '')}</field>
+            <field name="body_html"><![CDATA[
+                <p>Kính chào ${object.ten_nv},</p>
+                <p>Dưới đây là báo cáo KPI của bạn trong tháng này:</p>
+                <ul>
+                    <li>KPI Tổng hợp: ${object.kpi}</li>
+                    <li>Số văn bản đã tạo: ${object.so_van_ban_tao}</li>
+                    <li>Số văn bản đã duyệt: ${object.so_van_ban_duyet}</li>
+                    <li>Số văn bản đã ký: ${object.so_van_ban_ky}</li>
+                    <li>Số khách hàng phụ trách: ${object.so_khach_hang_phu_trach}</li>
+                    <li>Tỷ lệ chấm công: ${object.ty_le_cham_cong}%</li>
+                </ul>
+                <p>Chúc bạn tiếp tục cố gắng!</p>
+            ]]></field>
+            <field name="email_to">${object.user_id.email}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo>

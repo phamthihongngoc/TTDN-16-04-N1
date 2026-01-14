@@ -29,6 +29,8 @@ class LichSuVanBan(models.Model):
         ('huy', 'Hủy'),
         ('het_han', 'Hết hạn'),
         ('mo_khoa', 'Mở khóa'),
+        ('ai_analyze', 'Phân tích AI'),
+        ('ai_apply', 'Áp dụng AI'),
         ('khac', 'Khác')
     ], string='Hành động', required=True)
     
@@ -37,6 +39,8 @@ class LichSuVanBan(models.Model):
                                           default=lambda self: self.env.uid)
     thoi_gian = fields.Datetime('Thời gian', default=fields.Datetime.now)
     ip_address = fields.Char('Địa chỉ IP')
+    user_agent = fields.Text('User Agent', help='Browser/device information')
+    session_id = fields.Char('Session ID', help='User session identifier')
     
     # Related fields
     ten_van_ban = fields.Char(related='van_ban_id.ten_van_ban', string='Tên văn bản', store=True)

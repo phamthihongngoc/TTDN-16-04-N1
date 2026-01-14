@@ -75,6 +75,17 @@ class VanBanDen(models.Model):
     
     file_phan_hoi = fields.Binary('File phản hồi', attachment=True)
     ten_file_phan_hoi = fields.Char('Tên file phản hồi')
+
+    # === KÝ ĐIỆN TỬ (NỘI BỘ) ===
+    nguoi_ky_id = fields.Many2one('nhan_vien', string='Người ký', tracking=True)
+    da_ky_dien_tu = fields.Boolean('Đã ký điện tử', readonly=True, tracking=True)
+    ngay_ky_dien_tu = fields.Datetime('Ngày ký điện tử', readonly=True, tracking=True)
+    chu_ky_dien_tu = fields.Binary('Chữ ký điện tử', readonly=True)
+
+    signature_log_ids = fields.One2many(
+        'van_ban.signature.log', 'van_ban_den_id',
+        string='Lịch sử ký', readonly=True
+    )
     
     # === THÔNG TIN BỔ SUNG ===
     so_trang = fields.Integer('Số trang')
@@ -130,8 +141,7 @@ class VanBanDen(models.Model):
     def action_hoan_thanh(self):
         """Hoàn thành xử lý văn bản"""
         self.ensure_one()
-        if not self.ket_qua_xu_ly:
-            raise UserError(_('Vui lòng nhập kết quả xử lý!'))
+        # Không bắt buộc nhập kết quả xử lý, chỉ ghi log
         self.write({
             'trang_thai': 'hoan_thanh',
             'ngay_hoan_thanh': fields.Date.context_today(self)
@@ -143,3 +153,21 @@ class VanBanDen(models.Model):
         self.ensure_one()
         self.write({'trang_thai': 'luu'})
         self.message_post(body=_('Chuyển văn bản vào lưu trữ'))
+
+    def action_ky_dien_tu(self):
+        """Ký điện tử văn bản đến (xác minh họ tên + phân quyền)"""
+        self.ensure_one()
+
+        if not self.file_dinh_kem:
+            raise UserError(_('Vui lòng đính kèm file trước khi ký!'))
+
+        return {
+            'name': _('Ký điện tử - Vẽ chữ ký'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'wizard.ky.dien.tu',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_van_ban_den_id': self.id,
+            }
+        }

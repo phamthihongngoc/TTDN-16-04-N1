@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_van_ban_ocr_tree" model="ir.ui.view">
+        <field name="name">van_ban_ocr.tree</field>
+        <field name="model">van_ban_ocr</field>
+        <field name="arch" type="xml">
+            <tree string="OCR" default_order="id desc">
+                <field name="name"/>
+                <field name="ten_file"/>
+                <field name="loai_file"/>
+                <field name="create_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_van_ban_ocr_form" model="ir.ui.view">
+        <field name="name">van_ban_ocr.form</field>
+        <field name="model">van_ban_ocr</field>
+        <field name="arch" type="xml">
+            <form string="OCR">
+                <header>
+                    <button name="action_trich_xuat" string="Trích xuất" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('file_dinh_kem', '=', False)]}"/>
+                    <button name="action_clear_file" string="Xóa file hiện tại" type="object"
+                            attrs="{'invisible': [('file_dinh_kem', '=', False)]}"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Upload">
+                            <field name="file_dinh_kem" filename="ten_file"/>
+                            <field name="ten_file"/>
+                            <field name="loai_file" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Kết quả">
+                            <group>
+                                <field name="noi_dung_trich_xuat" placeholder="Nội dung trích xuất sẽ hiển thị ở đây"/>
+                            </group>
+                        </page>
+                        <page string="Lịch sử">
+                            <field name="history_ids" context="{'default_ocr_id': active_id}" nolabel="1">
+                                <tree string="Lịch sử trích xuất" default_order="create_date desc">
+                                    <field name="create_date"/>
+                                    <field name="user_id"/>
+                                    <field name="ten_file"/>
+                                    <field name="loai_file"/>
+                                    <field name="checksum_sha1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Lỗi" attrs="{'invisible': [('loi_xu_ly', '=', False)]}">
+                            <group>
+                                <field name="loi_xu_ly" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_van_ban_ocr" model="ir.actions.act_window">
+        <field name="name">OCR</field>
+        <field name="res_model">van_ban_ocr</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Upload file .docx/.png/.jpg để trích xuất nội dung.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_van_ban_ocr_history_tree" model="ir.ui.view">
+        <field name="name">van_ban_ocr_history.tree</field>
+        <field name="model">van_ban_ocr_history</field>
+        <field name="arch" type="xml">
+            <tree string="Lịch sử OCR" default_order="create_date desc">
+                <field name="create_date"/>
+                <field name="ocr_id"/>
+                <field name="user_id"/>
+                <field name="ten_file"/>
+                <field name="loai_file"/>
+                <field name="checksum_sha1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_van_ban_ocr_history_form" model="ir.ui.view">
+        <field name="name">van_ban_ocr_history.form</field>
+        <field name="model">van_ban_ocr_history</field>
+        <field name="arch" type="xml">
+            <form string="Lịch sử OCR">
+                <sheet>
+                    <group>
+                        <field name="ocr_id" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="ten_file" readonly="1"/>
+                        <field name="loai_file" readonly="1"/>
+                        <field name="checksum_sha1" readonly="1"/>
+                        <field name="lang" readonly="1"/>
+                        <field name="tesseract_config" readonly="1"/>
+                    </group>
+                    <group string="File lưu trữ">
+                        <field name="file_dinh_kem" filename="ten_file"/>
+                    </group>
+                    <notebook>
+                        <page string="Nội dung">
+                            <field name="noi_dung_trich_xuat"/>
+                        </page>
+                        <page string="Lỗi" attrs="{'invisible': [('loi_xu_ly', '=', False)]}">
+                            <field name="loi_xu_ly" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_van_ban_ocr_history" model="ir.actions.act_window">
+        <field name="name">Lịch sử OCR</field>
+        <field name="res_model">van_ban_ocr_history</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_group_by_ocr_id': 1}</field>
+    </record>
+
+</odoo>

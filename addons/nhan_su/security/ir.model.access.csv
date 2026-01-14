@@ -17,3 +17,13 @@ access_vai_tro_truong_phong,vai_tro.truong_phong,model_vai_tro,group_truong_phon
 access_vai_tro_giam_doc,vai_tro.giam_doc,model_vai_tro,group_giam_doc,1,1,0,0
 access_vai_tro_quan_tri,vai_tro.quan_tri,model_vai_tro,group_quan_tri_nhan_su,1,1,1,1
 access_vai_tro_admin,vai_tro.admin,model_vai_tro,base.group_system,1,1,1,1
+
+access_phong_ban_user,phong_ban.user,model_nhan_su_phong_ban,group_nhan_vien_kinh_doanh,1,0,0,0
+access_phong_ban_truong_phong,phong_ban.truong_phong,model_nhan_su_phong_ban,group_truong_phong,1,0,0,0
+access_phong_ban_quan_tri,phong_ban.quan_tri,model_nhan_su_phong_ban,group_quan_tri_nhan_su,1,1,1,1
+access_phong_ban_admin,phong_ban.admin,model_nhan_su_phong_ban,base.group_system,1,1,1,1
+
+access_chuc_vu_user,chuc_vu.user,model_nhan_su_chuc_vu,group_nhan_vien_kinh_doanh,1,0,0,0
+access_chuc_vu_truong_phong,chuc_vu.truong_phong,model_nhan_su_chuc_vu,group_truong_phong,1,0,0,0
+access_chuc_vu_quan_tri,chuc_vu.quan_tri,model_nhan_su_chuc_vu,group_quan_tri_nhan_su,1,1,1,1
+access_chuc_vu_admin,chuc_vu.admin,model_nhan_su_chuc_vu,base.group_system,1,1,1,1

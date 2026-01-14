@@ -57,15 +57,5 @@
             <field name="groups" eval="[(4, ref('group_khach_hang_manager'))]"/>
         </record>
 
-        <!-- Sequence cho đơn hàng -->
-        <record id="seq_don_hang" model="ir.sequence">
-            <field name="name">Đơn hàng</field>
-            <field name="code">don_hang</field>
-            <field name="prefix">DH</field>
-            <field name="padding">5</field>
-            <field name="number_next">1</field>
-            <field name="number_increment">1</field>
-        </record>
-
     </data>
 </odoo>

@@ -1,3 +1,53 @@
+# QUICK GUIDE
+
+## OCR (PDF/Ảnh → Text)
+
+### 1) Cài dependencies Python
+
+```bash
+python3 -m pip install -r addons/van_ban/requirements.txt
+```
+
+### 2) Cài `tesseract` trên hệ điều hành
+
+Ubuntu/Debian:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y tesseract-ocr tesseract-ocr-vie
+```
+
+### 3) Test trong UI
+
+Vào **Văn bản đi** → upload file vào trường **File văn bản** (PDF hoặc ảnh `.png/.jpg/...`).
+
+Kỳ vọng: trường **Nội dung OCR** tự động được điền.
+
+Nếu thiếu dependency, hệ thống sẽ báo lỗi rõ ràng để bạn cài đúng gói.
+
+## Blockchain signing (ghi hash lên blockchain)
+
+### 1) Cài dependencies
+
+```bash
+python3 -m pip install -r addons/van_ban/requirements.txt
+```
+
+### 2) Cấu hình System Parameters
+
+`Settings → Technical → Parameters → System Parameters`
+
+- `blockchain.infura_url`: URL RPC (Infura/Alchemy/hoặc node riêng)
+- `blockchain.private_key`: private key ví ký (cẩn thận bảo mật)
+- (Tuỳ chọn) `blockchain.chain_id`: chain id (vd 1 mainnet, 11155111 sepolia)
+
+### 3) Test
+
+Mở văn bản `van_ban` (trạng thái `da_duyet` hoặc `cho_ky`) → chạy wizard ký điện tử.
+
+- Nếu cấu hình đủ và kết nối được: field `blockchain_tx_hash` sẽ có giá trị.
+- Nếu thiếu cấu hình hoặc không kết nối: hệ thống vẫn ký nội bộ, nhưng `blockchain_tx_hash` trống.
+
 # HƯỚNG DẪN SỬ DỤNG NHANH - Module Văn bản
 
 ## 🚀 QUY TRÌNH CHUẨN

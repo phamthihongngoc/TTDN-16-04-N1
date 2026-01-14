@@ -2,6 +2,19 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+import logging
+
+_logger = logging.getLogger(__name__)
+
+try:
+    import pandas as pd
+    import numpy as np
+    from sklearn.linear_model import LinearRegression
+    from sklearn.cluster import KMeans
+    import stripe
+    import paypalrestsdk
+except ImportError as e:
+    _logger.warning("Missing libraries for advanced features: %s", e)
 
 
 class KhachHang(models.Model):
@@ -22,6 +35,9 @@ class KhachHang(models.Model):
         ('tiem_nang_cao', 'Tiềm năng cao'),
         ('tiem_nang_thap', 'Tiềm năng thấp')
     ], string='Phân loại khách hàng', default='tiem_nang_thap', tracking=True)
+    
+    # Màu sắc cho Kanban view
+    mau_sac = fields.Integer('Màu sắc', compute='_compute_mau_sac', store=True)
     
     trang_thai = fields.Selection([
         ('moi', 'Mới'),
@@ -45,11 +61,12 @@ class KhachHang(models.Model):
     ho_tro_ids = fields.One2many('ho_tro_khach_hang', 'khach_hang_id', string='Yêu cầu hỗ trợ')
     email_ids = fields.Many2many('email_khach_hang', string='Email đã nhận')
     
-    # Tiện ích
-    currency_id = fields.Many2one('res.currency', string='Đơn vị tiền tệ', 
-                                    default=lambda self: self.env.company.currency_id)
-    active = fields.Boolean('Active', default=True)
-    mau_sac = fields.Integer('Màu', compute='_compute_mau_sac')
+    # Dự đoán sản phẩm bằng AI
+    san_pham_du_doan_ids = fields.Many2many('san_pham', string='Sản phẩm dự đoán', compute='_compute_du_doan_san_pham', store=True)
+    
+    # Tiền tệ
+    currency_id = fields.Many2one('res.currency', string='Đơn vị tiền tệ',
+                                   default=lambda self: self.env.company.currency_id)
     
     # === SYSTEM INTEGRATION - SYNC TỪ NHÂN SỰ ===
     # Computed fields để đồng bộ thông tin từ module nhan_su
@@ -81,6 +98,55 @@ class KhachHang(models.Model):
                 record.mau_sac = 3  # Xanh lá
             else:
                 record.mau_sac = 0  # Mặc định
+    
+    @api.depends('don_hang_ids.line_ids.san_pham_id')
+    def _compute_du_doan_san_pham(self):
+        """Dự đoán sản phẩm dựa trên lịch sử mua hàng sử dụng Machine Learning"""
+        for record in self:
+            try:
+                if not record.don_hang_ids:
+                    record.san_pham_du_doan_ids = False
+                    continue
+                
+                # Thu thập dữ liệu lịch sử mua hàng
+                product_counts = {}
+                for order in record.don_hang_ids:
+                    for line in order.line_ids:
+                        product_id = line.san_pham_id.id
+                        if product_id:
+                            product_counts[product_id] = product_counts.get(product_id, 0) + line.so_luong
+                
+                if not product_counts:
+                    record.san_pham_du_doan_ids = False
+                    continue
+                
+                # Chuyển thành DataFrame
+                df = pd.DataFrame(list(product_counts.items()), columns=['product_id', 'quantity'])
+                
+                # Sử dụng KMeans để cluster sản phẩm dựa trên tần suất mua
+                if len(df) > 1:
+                    kmeans = KMeans(n_clusters=min(3, len(df)), random_state=42)
+                    df['cluster'] = kmeans.fit_predict(df[['quantity']])
+                    
+                    # Dự đoán sản phẩm từ cluster có tần suất cao nhất
+                    top_cluster = df.groupby('cluster')['quantity'].sum().idxmax()
+                    predicted_products = df[df['cluster'] == top_cluster]['product_id'].tolist()
+                else:
+                    predicted_products = df['product_id'].tolist()
+                
+                record.san_pham_du_doan_ids = [(6, 0, predicted_products)]
+                
+            except Exception as e:
+                _logger.warning("Error in ML prediction: %s", e)
+                # Fallback to simple method
+                last_orders = record.don_hang_ids.sorted('ngay_dat_hang', reverse=True)[:3]
+                san_pham_ids = last_orders.mapped('line_ids.san_pham_id').ids
+                record.san_pham_du_doan_ids = [(6, 0, list(set(san_pham_ids)))]
+    
+    @api.model
+    def _cron_du_doan_san_pham(self):
+        """Cron job cập nhật dự đoán sản phẩm cho khách hàng"""
+        self.search([])._compute_du_doan_san_pham()
     
     # === SYSTEM INTEGRATION COMPUTE METHODS ===
     @api.depends('nhan_vien_phu_trach_id.ten_nv', 'nhan_vien_phu_trach_id.email', 'nhan_vien_phu_trach_id.phong_ban')

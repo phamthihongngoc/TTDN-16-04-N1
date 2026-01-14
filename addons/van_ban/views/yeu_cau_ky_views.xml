@@ -110,13 +110,13 @@
                                     <strong><field name="van_ban_id"/></strong>
                                 </div>
                                 <div>
-                                    <i class="fa fa-user"/> <field name="khach_hang_id"/>
+                                    <i class="fa fa-user" title="Khách hàng"/> <field name="khach_hang_id"/>
                                 </div>
                                 <div class="text-muted">
-                                    <i class="fa fa-envelope"/> <field name="email"/>
+                                    <i class="fa fa-envelope" title="Email"/> <field name="email"/>
                                 </div>
                                 <div class="text-muted">
-                                    <i class="fa fa-calendar"/> <field name="ngay_het_han"/>
+                                    <i class="fa fa-calendar" title="Ngày hết hạn"/> <field name="ngay_het_han"/>
                                 </div>
                             </div>
                         </div>

@@ -27,7 +27,7 @@
                     <separator string="Xác thực OTP"/>
                     
                     <div class="alert alert-warning" role="alert">
-                        <p><i class="fa fa-shield"/> <strong>Bảo mật:</strong></p>
+                        <p><i class="fa fa-shield" title="Bảo mật"/> <strong>Bảo mật:</strong></p>
                         <p>Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư và nhập mã OTP bên dưới.</p>
                         <p>Nếu chưa nhận được, click nút "Gửi lại OTP".</p>
                     </div>
@@ -40,7 +40,7 @@
                     <separator string="Vẽ chữ ký của bạn"/>
                     
                     <div class="alert alert-info" role="alert">
-                        <p><i class="fa fa-info-circle"/> <strong>Hướng dẫn:</strong></p>
+                        <p><i class="fa fa-info-circle" title="Thông tin"/> <strong>Hướng dẫn:</strong></p>
                         <ul>
                             <li>Dùng chuột hoặc màn hình cảm ứng để vẽ chữ ký trong khung bên dưới</li>
                             <li>Click "Xóa" nếu muốn vẽ lại</li>

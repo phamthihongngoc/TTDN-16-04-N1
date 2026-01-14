@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-from datetime import datetime, timedelta
 
 
 class ChamCong(models.Model):
@@ -32,6 +31,11 @@ class ChamCong(models.Model):
     def _compute_so_gio_lam(self):
         """Tính số giờ làm việc, trừ giờ nghỉ trưa (12h-13h30 = 1.5 giờ)"""
         for record in self:
+            # Nếu là vắng mặt / nghỉ phép thì luôn = 0, không auto-đè trạng thái
+            if record.trang_thai in ['vang_mat', 'nghi_phep']:
+                record.so_gio_lam = 0
+                continue
+
             if record.gio_vao and record.gio_ra:
                 # Tính tổng giờ
                 tong_gio = record.gio_ra - record.gio_vao
@@ -49,13 +53,14 @@ class ChamCong(models.Model):
                 if record.so_gio_lam < 0:
                     record.so_gio_lam = 0
                     
-                # Xác định trạng thái
-                if record.gio_vao > 7.5:  # Vào sau 7h30
-                    record.trang_thai = 'di_tre'
-                elif record.gio_ra < 17.5:  # Ra trước 17h30
-                    record.trang_thai = 've_som'
-                else:
-                    record.trang_thai = 'co_mat'
+                # Xác định trạng thái (chỉ auto khi trạng thái hiện tại không phải do người dùng chọn)
+                if record.trang_thai in [False, 'co_mat', 'di_tre', 've_som']:
+                    if record.gio_vao > 7.5:  # Vào sau 7h30
+                        record.trang_thai = 'di_tre'
+                    elif record.gio_ra < 17.5:  # Ra trước 17h30
+                        record.trang_thai = 've_som'
+                    else:
+                        record.trang_thai = 'co_mat'
             else:
                 record.so_gio_lam = 0
 

@@ -8,6 +8,8 @@
         <field name="arch" type="xml">
             <form string="Đơn hàng">
                 <header>
+                    <button name="action_assign_ma_don_hang" string="Cấp mã" type="object"
+                        attrs="{'invisible': [('ma_don_hang', 'not in', ['New', 'Mới'])]}"/>
                     <button name="action_xac_nhan" string="Xác nhận" type="object" class="oe_highlight"
                             attrs="{'invisible': [('trang_thai', '!=', 'moi')]}"/>
                     <button name="action_hoan_thanh" string="Hoàn thành" type="object" class="oe_highlight"

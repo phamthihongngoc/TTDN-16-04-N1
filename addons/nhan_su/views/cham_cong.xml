@@ -65,8 +65,8 @@
                         </group>
                     </group>
                     
-                    <div class="alert alert-info mt-3" role="status" aria-live="polite">
-                        <h5 class="alert-heading">📌 Lưu ý:</h5>
+                    <div class="alert alert-info mt-3" role="alert" aria-live="polite">
+                        <h5 class="mb-2">📌 Lưu ý:</h5>
                         <ul class="mb-0">
                             <li>Giờ nghỉ trưa: <strong>12h00 - 13h30</strong> (1.5 giờ) tự động trừ</li>
                             <li>Số giờ làm chuẩn: <strong>8 giờ/ngày</strong></li>
@@ -87,6 +87,31 @@
                 <field name="nhan_vien_id"/>
                 <field name="trang_thai"/>
             </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_cham_cong_pivot" model="ir.ui.view">
+        <field name="name">cham_cong.pivot</field>
+        <field name="model">cham_cong</field>
+        <field name="arch" type="xml">
+            <pivot string="Thống kê chấm công">
+                <field name="nhan_vien_id" type="row"/>
+                <field name="ngay_cham_cong" type="col" interval="month"/>
+                <field name="so_gio_lam" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="view_cham_cong_graph" model="ir.ui.view">
+        <field name="name">cham_cong.graph</field>
+        <field name="model">cham_cong</field>
+        <field name="arch" type="xml">
+            <graph string="Biểu đồ giờ làm" type="bar">
+                <field name="nhan_vien_id"/>
+                <field name="so_gio_lam" type="measure"/>
+            </graph>
         </field>
     </record>
 
@@ -133,7 +158,7 @@
     <record id="action_cham_cong" model="ir.actions.act_window">
         <field name="name">Chấm Công</field>
         <field name="res_model">cham_cong</field>
-        <field name="view_mode">tree,form,calendar</field>
+        <field name="view_mode">tree,form,calendar,pivot,graph</field>
         <field name="context">{'search_default_this_month': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

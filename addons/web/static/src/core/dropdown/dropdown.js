@@ -223,13 +223,19 @@ export class Dropdown extends Component {
      * @param {DropdownStateChangedPayload} args
      */
     onDropdownStateChanged(args) {
-        if (this.el.contains(args.emitter.el)) {
+        if (!args || !args.emitter || !args.emitter.el) {
+            return;
+        }
+
+        if (this.el && this.el.contains && args.emitter.el && this.el.contains(args.emitter.el)) {
             // Do not listen to events emitted by self or children
             return;
         }
 
-        // Emitted by direct siblings ?
-        if (args.emitter.el.parentElement === this.el.parentElement) {
+        // Emitted by direct siblings ? (guard parentElement may be null)
+        const emitterParent = args.emitter.el.parentElement;
+        const myParent = this.el && this.el.parentElement;
+        if (emitterParent && myParent && emitterParent === myParent) {
             // Sync the group status
             this.state.groupIsOpen = args.newState.groupIsOpen;
 

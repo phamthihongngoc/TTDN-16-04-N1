@@ -17,20 +17,25 @@
                     <group>
                         <group string="Thông tin văn bản">
                             <field name="van_ban_id" invisible="1"/>
-                            <field name="ten_van_ban" readonly="1"/>
-                            <field name="loai_van_ban" readonly="1"/>
+                            <field name="van_ban_di_id" invisible="1"/>
+                            <field name="van_ban_den_id" invisible="1"/>
+                            <field name="document_display_type" readonly="1"/>
+                            <field name="document_display_name" readonly="1"/>
+                            <field name="ten_van_ban" readonly="1" attrs="{'invisible': [('van_ban_id', '=', False)]}"/>
+                            <field name="loai_van_ban" readonly="1" attrs="{'invisible': [('van_ban_id', '=', False)]}"/>
                         </group>
                         <group string="Người ký">
                             <field name="nguoi_ky_id" invisible="1"/>
                             <field name="ten_nguoi_ky"/>
                             <field name="chuc_vu"/>
+                            <field name="ho_ten_xac_nhan" required="1" placeholder="Nhập đúng họ và tên để xác minh"/>
                         </group>
                     </group>
                     
                     <separator string="Vẽ chữ ký của bạn"/>
                     
                     <div class="alert alert-info" role="alert">
-                        <p><i class="fa fa-info-circle"/> <strong>Hướng dẫn:</strong></p>
+                        <p><i class="fa fa-info-circle" title="Thông tin"/> <strong>Hướng dẫn:</strong></p>
                         <ul>
                             <li>Dùng chuột hoặc màn hình cảm ứng để vẽ chữ ký trong khung bên dưới</li>
                             <li>Click "Xóa" nếu muốn vẽ lại</li>
@@ -55,6 +60,14 @@
                                 <li>Đồng ý với toàn bộ nội dung</li>
                                 <li>Chịu trách nhiệm về chữ ký điện tử này</li>
                             </ul>
+                        </div>
+                    </group>
+
+                    <group string="Blockchain" col="2" attrs="{'invisible': [('van_ban_id', '=', False)]}">
+                        <field name="ky_blockchain"/>
+                        <field name="blockchain_tx_hash" readonly="1" attrs="{'invisible': [('blockchain_tx_hash', '=', False)]}"/>
+                        <div class="text-muted" colspan="2" style="font-size: 90%;" attrs="{'invisible': [('ky_blockchain', '=', False)]}">
+                            Nếu chưa cấu hình `blockchain.infura_url` và `blockchain.private_key` thì hệ thống sẽ ký nội bộ và không ghi TX hash.
                         </div>
                     </group>
                     

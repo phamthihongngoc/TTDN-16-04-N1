@@ -45,7 +45,7 @@
         <record id="nhan_vien_rule_nhan_vien_kinh_doanh" model="ir.rule">
             <field name="name">Nhân viên: Chỉ xem nhân viên đang làm việc</field>
             <field name="model_id" ref="model_nhan_vien"/>
-            <field name="domain_force">[('trang_thai_lam_viec', '=', 'dang_lam')]</field>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_nhan_vien_kinh_doanh'))]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>

@@ -28,7 +28,7 @@
             parent="menu_quan_ly" 
             sequence="2"
             action="action_vai_tro"
-            groups="group_quan_tri_nhan_su,group_giam_doc"/>
+            groups="nhan_su.group_quan_tri_nhan_su,nhan_su.group_giam_doc"/>
         
         <!-- Submenu: Chấm công & Lương -->
         <menuitem 
@@ -50,7 +50,7 @@
             parent="menu_cham_cong_luong" 
             sequence="2"
             action="action_bang_luong"
-            groups="group_truong_phong,group_quan_tri_nhan_su"/>
+            groups="nhan_su.group_truong_phong,nhan_su.group_quan_tri_nhan_su"/>
         
         <!-- Submenu: Cấu hình -->
         <menuitem 
@@ -58,6 +58,38 @@
             name="Cấu hình"
             parent="menu_root"
             sequence="99"
-            groups="group_quan_tri_nhan_su"/>
+            groups="nhan_su.group_quan_tri_nhan_su"/>
+
+        <record id="action_nhan_su_settings" model="ir.actions.act_window">
+            <field name="name">Thiết lập nhân sự</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module': 'nhan_su'}</field>
+        </record>
+
+        <menuitem
+            id="menu_nhan_su_settings"
+            name="Thiết lập"
+            parent="menu_cau_hinh"
+            sequence="1"
+            action="action_nhan_su_settings"
+            groups="nhan_su.group_quan_tri_nhan_su"/>
+
+        <menuitem
+            id="menu_phong_ban"
+            name="Phòng ban"
+            parent="menu_cau_hinh"
+            sequence="2"
+            action="action_phong_ban"
+            groups="nhan_su.group_quan_tri_nhan_su"/>
+
+        <menuitem
+            id="menu_chuc_vu"
+            name="Chức vụ"
+            parent="menu_cau_hinh"
+            sequence="3"
+            action="action_chuc_vu"
+            groups="nhan_su.group_quan_tri_nhan_su"/>
     </data>
 </odoo>

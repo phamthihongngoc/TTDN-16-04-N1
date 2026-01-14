@@ -1,0 +1,5 @@
+ id |   code   |           prefix            | padding | number_next 
+----+----------+-----------------------------+---------+-------------
+  1 | don_hang | DH%(year)s%(month)s%(day)s- |       4 |           1
+(1 row)
+

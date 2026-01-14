@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_chuc_vu_tree" model="ir.ui.view">
+            <field name="name">nhan_su.chuc_vu.tree</field>
+            <field name="model">nhan_su.chuc_vu</field>
+            <field name="arch" type="xml">
+                <tree string="Chức vụ" decoration-muted="active==False">
+                    <field name="name"/>
+                    <field name="code" optional="show"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                    <field name="active" widget="boolean_toggle" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_chuc_vu_form" model="ir.ui.view">
+            <field name="name">nhan_su.chuc_vu.form</field>
+            <field name="model">nhan_su.chuc_vu</field>
+            <field name="arch" type="xml">
+                <form string="Chức vụ">
+                    <sheet>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="code"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_chuc_vu_search" model="ir.ui.view">
+            <field name="name">nhan_su.chuc_vu.search</field>
+            <field name="model">nhan_su.chuc_vu</field>
+            <field name="arch" type="xml">
+                <search string="Tìm kiếm chức vụ">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <filter string="Đang hoạt động" name="active" domain="[('active','=',True)]"/>
+                    <filter string="Ngưng hoạt động" name="inactive" domain="[('active','=',False)]"/>
+                    <group expand="0" string="Nhóm theo">
+                        <filter string="Công ty" name="group_company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_chuc_vu" model="ir.actions.act_window">
+            <field name="name">Chức vụ</field>
+            <field name="res_model">nhan_su.chuc_vu</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_chuc_vu_search"/>
+        </record>
+    </data>
+</odoo>

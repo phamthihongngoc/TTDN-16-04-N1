@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="cron_du_doan_san_pham" model="ir.cron">
+            <field name="name">Dự đoán sản phẩm cho khách hàng</field>
+            <field name="model_id" ref="model_khach_hang"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_du_doan_san_pham()</field>
+            <field name="interval_number">7</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall">False</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+
+    <data>
+        <record id="action_assign_missing_order_codes" model="ir.actions.server">
+            <field name="name">Cấp mã cho đơn hàng thiếu</field>
+            <field name="model_id" ref="model_don_hang"/>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+orders = env['don_hang'].sudo().search([
+    '|', ('ma_don_hang', '=', False), ('ma_don_hang', 'in', ['New', 'Mới'])
+], limit=200)
+seq = env['ir.sequence'].sudo()
+for order in orders:
+    for _i in range(100):
+        candidate = seq.next_by_code('don_hang')
+        if not candidate or candidate in ('New', 'Mới'):
+            continue
+        if not env['don_hang'].sudo().search_count([('ma_don_hang', '=', candidate)]):
+            order.write({'ma_don_hang': candidate})
+            break
+]]></field>
+        </record>
+
+        <record id="cron_assign_missing_order_codes" model="ir.cron">
+            <field name="name">Cấp mã cho đơn hàng thiếu</field>
+            <field name="model_id" ref="model_don_hang"/>
+            <field name="ir_actions_server_id" ref="action_assign_missing_order_codes"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall">False</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

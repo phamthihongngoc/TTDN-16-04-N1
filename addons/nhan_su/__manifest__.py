@@ -27,6 +27,7 @@
     'website': "https://www.fitdnu.com",
     'category': 'Human Resources',
     'version': '1.0',
+    'license': 'LGPL-3',
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'mail'],
@@ -36,7 +37,13 @@
         'security/nhan_su_security.xml',
         'security/ir.model.access.csv',
         'data/vai_tro_data.xml',
+        'data/sequence.xml',
+        'data/cron.xml',
+        'data/email_template.xml',
+        'views/res_config_settings_views.xml',
         'views/nhan_vien.xml',
+        'views/phong_ban.xml',
+        'views/chuc_vu.xml',
         'views/vai_tro.xml',
         'views/cham_cong.xml',
         'views/bang_luong.xml',

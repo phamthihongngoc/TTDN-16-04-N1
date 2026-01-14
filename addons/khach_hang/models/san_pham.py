@@ -6,12 +6,19 @@ from odoo import models, fields, api, _
 class SanPham(models.Model):
     _name = 'san_pham'
     _description = 'Sản phẩm'
+    _rec_name = 'ten_san_pham'
     _order = 'ten_san_pham'
 
     # Thông tin sản phẩm
     ten_san_pham = fields.Char('Tên sản phẩm', required=True)
     ma_san_pham = fields.Char('Mã sản phẩm', copy=False)
-    loai_san_pham = fields.Char('Loại sản phẩm')
+    loai_san_pham = fields.Selection([
+        ('headphone', 'Headphone'),
+        ('iphone', 'Iphone'),
+        ('laptop', 'Laptop'),
+        ('samsung', 'Samsung'),
+        ('vivo', 'Vivo')
+    ], string='Loại sản phẩm', required=True)
     thuong_hieu = fields.Char('Thương hiệu')
     mo_ta = fields.Text('Mô tả')
     
@@ -39,11 +46,12 @@ class SanPham(models.Model):
     active = fields.Boolean('Active', default=True)
     hinh_anh = fields.Binary('Hình ảnh')
     
-    _sql_constraints = [
-        ('ma_san_pham_unique', 'unique(ma_san_pham)', 'Mã sản phẩm đã tồn tại!'),
-        ('check_so_luong', 'CHECK(so_luong_ton_kho >= 0)', 'Số lượng tồn kho không được âm!'),
-        ('check_don_gia', 'CHECK(don_gia >= 0)', 'Đơn giá không được âm!')
-    ]
+    @api.onchange('loai_san_pham')
+    def _onchange_loai_san_pham(self):
+        """Tự sinh mã sản phẩm khi chọn loại"""
+        if self.loai_san_pham and not self.ma_san_pham:
+            sequence_code = f"san_pham.{self.loai_san_pham}"
+            self.ma_san_pham = self.env['ir.sequence'].next_by_code(sequence_code)
     
     @api.depends('don_gia', 'so_luong_ton_kho')
     def _compute_tong_gia_tri_kho(self):

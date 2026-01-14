@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_phong_ban_tree" model="ir.ui.view">
+            <field name="name">nhan_su.phong_ban.tree</field>
+            <field name="model">nhan_su.phong_ban</field>
+            <field name="arch" type="xml">
+                <tree string="Phòng ban" decoration-muted="active==False">
+                    <field name="name"/>
+                    <field name="code" optional="show"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                    <field name="active" widget="boolean_toggle" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_phong_ban_form" model="ir.ui.view">
+            <field name="name">nhan_su.phong_ban.form</field>
+            <field name="model">nhan_su.phong_ban</field>
+            <field name="arch" type="xml">
+                <form string="Phòng ban">
+                    <sheet>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="code"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_phong_ban_search" model="ir.ui.view">
+            <field name="name">nhan_su.phong_ban.search</field>
+            <field name="model">nhan_su.phong_ban</field>
+            <field name="arch" type="xml">
+                <search string="Tìm kiếm phòng ban">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <filter string="Đang hoạt động" name="active" domain="[('active','=',True)]"/>
+                    <filter string="Ngưng hoạt động" name="inactive" domain="[('active','=',False)]"/>
+                    <group expand="0" string="Nhóm theo">
+                        <filter string="Công ty" name="group_company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_phong_ban" model="ir.actions.act_window">
+            <field name="name">Phòng ban</field>
+            <field name="res_model">nhan_su.phong_ban</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_phong_ban_search"/>
+        </record>
+    </data>
+</odoo>

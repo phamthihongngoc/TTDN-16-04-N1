@@ -5,6 +5,19 @@ from odoo.exceptions import UserError, ValidationError
 from datetime import datetime, timedelta
 import hashlib
 import base64
+import logging
+
+_logger = logging.getLogger(__name__)
+
+try:
+    from textblob import TextBlob
+    from sumy.parsers.plaintext import PlaintextParser
+    from sumy.nlp.tokenizers import Tokenizer
+    from sumy.summarizers.lsa import LsaSummarizer
+    AI_AVAILABLE = True
+except ImportError:
+    AI_AVAILABLE = False
+    _logger.warning("AI libraries not available. Install textblob and sumy for AI features.")
 
 
 class VanBan(models.Model):
@@ -34,6 +47,11 @@ class VanBan(models.Model):
         ('het_hieu_luc', 'Hết hiệu lực'),
         ('huy', 'Đã hủy')
     ], string='Trạng thái', default='nhap', required=True, tracking=True)
+    
+    # Dynamic Workflow Template
+    workflow_template_id = fields.Many2one('workflow.template', string='Workflow Template',
+                                           domain="[('model_name', '=', 'van_ban'), ('active', '=', True)]",
+                                           tracking=True, help='Select workflow template for this document')
     
     # === THỜI HẠN ===
     ngay_tao = fields.Datetime('Ngày tạo', default=fields.Datetime.now, readonly=True)
@@ -81,6 +99,11 @@ class VanBan(models.Model):
     da_khach_ky = fields.Boolean('Khách đã ký', readonly=True)
     ngay_khach_ky = fields.Datetime('Ngày khách ký', readonly=True)
     chu_ky_khach = fields.Binary('Chữ ký khách hàng', readonly=True)
+
+    signature_log_ids = fields.One2many(
+        'van_ban.signature.log', 'van_ban_id',
+        string='Lịch sử ký', readonly=True
+    )
     
     # === YÊU CẦU KÝ ===
     yeu_cau_ky_ids = fields.One2many('yeu_cau_ky', 'van_ban_id', string='Yêu cầu ký')
@@ -93,6 +116,20 @@ class VanBan(models.Model):
     hash_file = fields.Char('Hash file', readonly=True, help='Mã hash để kiểm tra tính toàn vẹn')
     bi_khoa = fields.Boolean('Bị khóa', default=False, 
                               help='Văn bản bị khóa không thể chỉnh sửa')
+    
+    # === AI FEATURES ===
+    ai_category_suggestion = fields.Many2one('loai_van_ban', string='AI gợi ý loại', readonly=True)
+    ai_summary = fields.Text('Tóm tắt AI', readonly=True)
+    ai_sentiment = fields.Selection([
+        ('positive', 'Tích cực'),
+        ('neutral', 'Trung lập'),
+        ('negative', 'Tiêu cực')
+    ], string='Sentiment AI', readonly=True)
+    ai_approver_suggestion = fields.Many2many('nhan_vien', string='AI gợi ý người duyệt', readonly=True)
+    ai_risk_score = fields.Float('Điểm rủi ro AI', readonly=True, help='Điểm rủi ro từ 0-1')
+
+    # === BLOCKCHAIN (OPTIONAL) ===
+    blockchain_tx_hash = fields.Char('Blockchain Transaction Hash', readonly=True, tracking=True)
     
     # === GHI CHÚ ===
     ghi_chu = fields.Text('Ghi chú')
@@ -118,6 +155,11 @@ class VanBan(models.Model):
 
     ai_category_suggestion = fields.Char('AI phân loại tự động', compute='_compute_ai_category', store=True)
     ai_priority_score = fields.Float('Điểm ưu tiên (AI)', compute='_compute_ai_priority', store=True)
+    
+    # Additional AI fields for analysis
+    ai_assessment = fields.Text('Đánh giá AI', readonly=True)
+    ai_analysis_date = fields.Datetime('Ngày phân tích AI', readonly=True)
+    ai_auto_stats = fields.Text('Thống kê AI tự động', readonly=True)
 
     # Automated workflow tracking
     auto_follow_up_count = fields.Integer('Số lần follow-up tự động', default=0)
@@ -128,6 +170,47 @@ class VanBan(models.Model):
     _sql_constraints = [
         ('ma_van_ban_unique', 'unique(ma_van_ban)', 'Mã văn bản đã tồn tại!')
     ]
+    
+    # File security constraints
+    ALLOWED_FILE_TYPES = ['pdf', 'doc', 'docx', 'txt', 'jpg', 'jpeg', 'png']
+    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+    
+    @api.constrains('file_dinh_kem', 'ten_file')
+    def _check_file_security(self):
+        """Validate file uploads for security"""
+        for record in self:
+            if record.file_dinh_kem:
+                # Check file size
+                file_size = len(base64.b64decode(record.file_dinh_kem))
+                if file_size > self.MAX_FILE_SIZE:
+                    raise ValidationError(f"File size exceeds maximum allowed size of {self.MAX_FILE_SIZE / (1024*1024):.1f}MB")
+                
+                # Check file extension
+                if record.ten_file:
+                    file_ext = record.ten_file.split('.')[-1].lower() if '.' in record.ten_file else ''
+                    if file_ext not in self.ALLOWED_FILE_TYPES:
+                        raise ValidationError(f"File type '{file_ext}' is not allowed. Allowed types: {', '.join(self.ALLOWED_FILE_TYPES)}")
+                
+                # Check for malicious content (basic check)
+                file_content = base64.b64decode(record.file_dinh_kem)
+                if self._contains_malicious_content(file_content):
+                    raise ValidationError("File contains potentially malicious content and has been rejected")
+    
+    def _contains_malicious_content(self, file_content):
+        """Basic check for malicious file content"""
+        # Check for executable signatures
+        malicious_signatures = [
+            b'MZ',  # Windows executable
+            b'#!/bin/',  # Shell script
+            b'<?php',  # PHP script
+            b'<script',  # JavaScript
+        ]
+        
+        for signature in malicious_signatures:
+            if file_content.startswith(signature):
+                return True
+        
+        return False
     
     # === COMPUTE METHODS ===
     
@@ -458,7 +541,7 @@ class VanBan(models.Model):
             # AI Suggestion: Auto-assign approver if not set
             if not record.nguoi_duyet_id and record.ai_suggested_approver:
                 record.write({'nguoi_duyet_id': record.ai_suggested_approver.id})
-                record._ghi_lich_su('ai_suggest', f'AI tự động đề xuất người duyệt: {record.ai_suggested_approver.ten_nv}')
+                record._ghi_lich_su('ai_apply', f'AI tự động đề xuất người duyệt: {record.ai_suggested_approver.ten_nv}')
 
             record.write({'trang_thai': 'cho_duyet'})
             record._ghi_lich_su('gui_duyet', 'Gửi văn bản để duyệt')
@@ -485,7 +568,7 @@ class VanBan(models.Model):
             # Auto-suggest next signer if not set
             if not record.nguoi_ky_id and record.ai_suggested_signer:
                 record.write({'nguoi_ky_id': record.ai_suggested_signer.id})
-                record._ghi_lich_su('ai_suggest', f'AI tự động đề xuất người ký: {record.ai_suggested_signer.ten_nv}')
+                record._ghi_lich_su('ai_apply', f'AI tự động đề xuất người ký: {record.ai_suggested_signer.ten_nv}')
 
             # Cancel follow-up activities
             record._cancel_pending_follow_ups()
@@ -502,7 +585,7 @@ class VanBan(models.Model):
             # AI Suggestion: Auto-assign signer if not set
             if not record.nguoi_ky_id and record.ai_suggested_signer:
                 record.write({'nguoi_ky_id': record.ai_suggested_signer.id})
-                record._ghi_lich_su('ai_suggest', f'AI tự động đề xuất người ký: {record.ai_suggested_signer.ten_nv}')
+                record._ghi_lich_su('ai_apply', f'AI tự động đề xuất người ký: {record.ai_suggested_signer.ten_nv}')
 
             record.write({'trang_thai': 'cho_ky'})
             record._ghi_lich_su('gui_ky', 'Gửi văn bản để ký')
@@ -650,15 +733,37 @@ class VanBan(models.Model):
     # === HELPER METHODS ===
     
     def _ghi_lich_su(self, hanh_dong, mo_ta):
-        """Ghi lịch sử thay đổi văn bản"""
+        """Ghi lịch sử thay đổi văn bản với audit trail chi tiết"""
         self.ensure_one()
+        
+        # Get audit information from request
+        ip_address = 'N/A'
+        user_agent = 'N/A'
+        session_id = 'N/A'
+        
+        try:
+            # Get IP address
+            if hasattr(self.env['ir.http'], '_get_client_address'):
+                ip_address = self.env['ir.http']._get_client_address()
+            elif hasattr(self.env, 'request') and self.env.request:
+                ip_address = self.env.request.httprequest.remote_addr
+            
+            # Get user agent and session
+            if hasattr(self.env, 'request') and self.env.request:
+                user_agent = self.env.request.httprequest.headers.get('User-Agent', 'N/A')
+                session_id = self.env.request.session.sid if hasattr(self.env.request, 'session') else 'N/A'
+        except Exception as e:
+            _logger.warning(f"Could not capture audit information: {str(e)}")
+        
         self.env['lich_su_van_ban'].create({
             'van_ban_id': self.id,
             'hanh_dong': hanh_dong,
             'mo_ta': mo_ta,
             'nguoi_thuc_hien_id': self.env.uid,
             'thoi_gian': fields.Datetime.now(),
-            'ip_address': self.env['ir.http']._get_client_address() if hasattr(self.env['ir.http'], '_get_client_address') else 'N/A'
+            'ip_address': ip_address,
+            'user_agent': user_agent,
+            'session_id': session_id,
         })
     
     def _compute_hash_file(self):
@@ -723,6 +828,15 @@ class VanBan(models.Model):
             self._send_signature_complete_notifications()
         elif notification_type == 'sent':
             self._send_document_sent_notifications()
+        elif notification_type == 'expired':
+            # Tối thiểu: tạo cảnh báo activity cho người tạo (nếu có user hệ thống)
+            if self.nguoi_tao_id and getattr(self.nguoi_tao_id, 'user_id', False):
+                self.activity_schedule(
+                    'mail.mail_activity_data_warning',
+                    user_id=self.nguoi_tao_id.user_id.id,
+                    summary=_('Văn bản hết hiệu lực: %s') % (self.ten_van_ban or ''),
+                    note=_('Văn bản đã hết hạn/hết hiệu lực và được hệ thống cập nhật tự động.'),
+                )
     
     def _send_approval_request_notifications(self):
         """Gửi thông báo yêu cầu duyệt với thông tin AI"""
@@ -978,6 +1092,182 @@ class VanBan(models.Model):
             }
         }
     
+    def action_analyze_ai(self):
+        """Phân tích văn bản bằng AI và đưa ra đề xuất"""
+        self.ensure_one()
+        
+        if not AI_AVAILABLE:
+            raise UserError("AI libraries không khả dụng. Vui lòng cài đặt textblob và sumy.")
+        
+        try:
+            # Analyze document content
+            content = self._get_document_content_for_analysis()
+            
+            # Perform AI analysis
+            analysis_result = self._perform_ai_analysis(content)
+            
+            # Update AI fields
+            self.write({
+                'ai_summary': analysis_result.get('summary', ''),
+                'ai_category_suggestion': analysis_result.get('category', ''),
+                'ai_priority_score': analysis_result.get('priority', 5),
+                'ai_risk_level': analysis_result.get('risk_level', 'medium'),
+                'ai_suggested_approver': analysis_result.get('suggested_approver'),
+                'ai_suggested_signer': analysis_result.get('suggested_signer'),
+                'ai_assessment': analysis_result.get('assessment', ''),
+                'ai_analysis_date': fields.Datetime.now(),
+                'ai_auto_stats': analysis_result.get('stats', ''),
+            })
+            
+            # Log the analysis
+            self._ghi_lich_su('ai_analyze', 'AI phân tích văn bản và đưa ra đề xuất')
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'AI Analysis Complete',
+                    'message': 'Đã hoàn thành phân tích AI. Kiểm tra tab AI Assistant để xem kết quả.',
+                    'type': 'success',
+                }
+            }
+            
+        except Exception as e:
+            _logger.error(f"AI analysis failed: {str(e)}")
+            raise UserError(f"Lỗi phân tích AI: {str(e)}")
+    
+    def _get_document_content_for_analysis(self):
+        """Lấy nội dung văn bản để phân tích AI"""
+        content_parts = []
+        
+        # Add title and description
+        if self.ten_van_ban:
+            content_parts.append(f"Tiêu đề: {self.ten_van_ban}")
+        if self.mo_ta:
+            content_parts.append(f"Mô tả: {self.mo_ta}")
+        
+        # Add document type
+        if self.loai_van_ban_id:
+            content_parts.append(f"Loại văn bản: {self.loai_van_ban_id.ten_loai}")
+        
+        # Add creator info
+        if self.nguoi_tao_id:
+            content_parts.append(f"Người tạo: {self.nguoi_tao_id.ten_nv}")
+        
+        # Add approver info
+        if self.nguoi_duyet_id:
+            content_parts.append(f"Người duyệt: {self.nguoi_duyet_id.ten_nv}")
+        
+        # Add signer info
+        if self.nguoi_ky_id:
+            content_parts.append(f"Người ký: {self.nguoi_ky_id.ten_nv}")
+        
+        # Add dates
+        if self.ngay_tao:
+            content_parts.append(f"Ngày tạo: {self.ngay_tao}")
+        if self.ngay_het_han:
+            content_parts.append(f"Ngày hết hạn: {self.ngay_het_han}")
+        
+        return "\n".join(content_parts)
+    
+    def _perform_ai_analysis(self, content):
+        """Thực hiện phân tích AI trên nội dung"""
+        result = {
+            'summary': '',
+            'category': '',
+            'priority': 5,
+            'risk_level': 'medium',
+            'suggested_approver': False,
+            'suggested_signer': False,
+            'assessment': '',
+            'stats': '',
+        }
+        
+        if not content:
+            return result
+        
+        try:
+            # Create text blob for analysis
+            blob = TextBlob(content)
+            
+            # Generate summary using sumy
+            parser = PlaintextParser.from_string(content, Tokenizer("english"))
+            summarizer = LsaSummarizer()
+            summary_sentences = summarizer(parser.document, 2)  # 2 sentence summary
+            result['summary'] = " ".join(str(sentence) for sentence in summary_sentences)
+            
+            # Analyze sentiment for priority
+            sentiment = blob.sentiment.polarity
+            if sentiment > 0.1:
+                result['priority'] = 7  # High priority for positive/urgent content
+            elif sentiment < -0.1:
+                result['priority'] = 3  # Low priority for negative content
+            else:
+                result['priority'] = 5  # Medium priority
+            
+            # Determine risk level based on keywords and content
+            risk_keywords = ['khẩn cấp', 'quan trọng', 'deadline', 'hết hạn', 'urgent', 'important']
+            risk_score = 0
+            
+            content_lower = content.lower()
+            for keyword in risk_keywords:
+                if keyword in content_lower:
+                    risk_score += 1
+            
+            if risk_score >= 3:
+                result['risk_level'] = 'critical'
+            elif risk_score >= 2:
+                result['risk_level'] = 'high'
+            elif risk_score >= 1:
+                result['risk_level'] = 'medium'
+            else:
+                result['risk_level'] = 'low'
+            
+            # Suggest approver based on document type and creator
+            if self.loai_van_ban_id and self.nguoi_tao_id:
+                # Find approvers with similar document types
+                suggested_approvers = self.env['nhan_vien'].search([
+                    ('id', '!=', self.nguoi_tao_id.id),
+                ], limit=5)
+                
+                if suggested_approvers:
+                    result['suggested_approver'] = suggested_approvers[0]
+            
+            # Suggest signer (typically higher level than approver)
+            if result['suggested_approver']:
+                # Find signers with higher positions
+                suggested_signers = self.env['nhan_vien'].search([
+                    ('id', '!=', self.nguoi_tao_id.id),
+                ], limit=3)
+                
+                if suggested_signers:
+                    result['suggested_signer'] = suggested_signers[0]
+            
+            # Generate assessment
+            result['assessment'] = f"""
+Đánh giá AI cho văn bản "{self.ten_van_ban}":
+- Độ ưu tiên: {result['priority']}/10
+- Mức độ rủi ro: {result['risk_level'].upper()}
+- Tóm tắt: {result['summary'][:100]}...
+- Đề xuất người duyệt: {result['suggested_approver'].ten_nv if result['suggested_approver'] else 'Không có'}
+- Đề xuất người ký: {result['suggested_signer'].ten_nv if result['suggested_signer'] else 'Không có'}
+            """.strip()
+            
+            # Generate stats
+            result['stats'] = f"""
+Thống kê phân tích:
+- Độ dài nội dung: {len(content)} ký tự
+- Số từ: {len(content.split())}
+- Sentiment: {sentiment:.2f}
+- Từ khóa rủi ro tìm thấy: {risk_score}
+            """.strip()
+            
+        except Exception as e:
+            _logger.warning(f"AI analysis error: {str(e)}")
+            result['assessment'] = f"Lỗi phân tích AI: {str(e)}"
+        
+        return result
+    
     # === SCHEDULED ACTIONS ===
     
     # === ENHANCED SCHEDULED ACTIONS - PROCESS AUTOMATION ===
@@ -1127,3 +1417,47 @@ class VanBan(models.Model):
                     summary=f'📋 Cần bổ sung thông tin: {vb.ten_van_ban}',
                     note=f'Văn bản thiếu các thông tin quan trọng: {", ".join(issues)}'
                 )
+    
+    # === DYNAMIC WORKFLOW METHODS ===
+    available_transitions = fields.Many2many('workflow.transition', string='Available Transitions',
+                                             compute='_compute_available_transitions', store=False)
+    
+    @api.depends('trang_thai', 'workflow_template_id')
+    def _compute_available_transitions(self):
+        """Compute available transitions based on current state and workflow template"""
+        for record in self:
+            if record.workflow_template_id:
+                transitions = record.workflow_template_id.get_available_transitions(record.trang_thai, record)
+                record.available_transitions = transitions
+            else:
+                record.available_transitions = self.env['workflow.transition']
+    
+    def execute_transition(self, transition_id):
+        """Execute a workflow transition"""
+        self.ensure_one()
+        transition = self.env['workflow.transition'].browse(transition_id)
+        
+        if not transition or transition not in self.available_transitions:
+            raise UserError(_('Invalid transition or transition not available for current state.'))
+        
+        # Check required group permission
+        if transition.required_group:
+            if not self.env.user.has_group(transition.required_group.id):
+                raise UserError(_('You do not have permission to execute this transition.'))
+        
+        # Check condition domain if specified
+        if transition.condition_domain:
+            domain = eval(transition.condition_domain)
+            if not self.filtered_domain(domain):
+                raise UserError(_('Transition condition not met.'))
+        
+        # Execute the transition
+        old_state = self.trang_thai
+        result = transition.execute_transition(self)
+        
+        # Log the transition
+        self._ghi_lich_su('transition', 
+                         f'Transition: {old_state} -> {self.trang_thai}',
+                         f'Executed transition: {transition.name}')
+        
+        return result

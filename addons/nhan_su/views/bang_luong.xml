@@ -109,8 +109,8 @@
                     </group>
                     
                     <!-- Công thức tính lương -->
-                    <div class="alert alert-success mt-3" role="status" aria-live="polite">
-                        <h5 class="alert-heading">📐 Công thức tính lương:</h5>
+                    <div class="alert alert-success mt-3" role="alert" aria-live="polite">
+                        <h5 class="mb-2">📐 Công thức tính lương:</h5>
                         <p class="mb-0">
                             <strong>Lương nhận</strong> = (Số công × Lương cơ bản) ÷ Số công chuẩn + Thưởng - Phạt
                         </p>

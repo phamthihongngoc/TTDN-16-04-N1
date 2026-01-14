@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Default Workflow Templates -->
+    <record id="workflow_template_basic" model="workflow.template">
+        <field name="name">Basic Approval Workflow</field>
+        <field name="model_name">van_ban</field>
+        <field name="description">Basic workflow: Draft -> Submit -> Approve -> Sign -> Complete</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Transitions for Basic Workflow -->
+    <record id="transition_submit_approval" model="workflow.transition">
+        <field name="template_id" ref="workflow_template_basic"/>
+        <field name="name">Submit for Approval</field>
+        <field name="sequence">10</field>
+        <field name="from_state">nhap</field>
+        <field name="to_state">cho_duyet</field>
+        <field name="action_method">action_gui_duyet</field>
+        <field name="auto_transition">False</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="transition_approve" model="workflow.transition">
+        <field name="template_id" ref="workflow_template_basic"/>
+        <field name="name">Approve Document</field>
+        <field name="sequence">20</field>
+        <field name="from_state">cho_duyet</field>
+        <field name="to_state">da_duyet</field>
+        <field name="required_group" ref="group_truong_phong_duyet"/>
+        <field name="action_method">action_duyet</field>
+        <field name="auto_transition">False</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="transition_submit_sign" model="workflow.transition">
+        <field name="template_id" ref="workflow_template_basic"/>
+        <field name="name">Submit for Signature</field>
+        <field name="sequence">30</field>
+        <field name="from_state">da_duyet</field>
+        <field name="to_state">cho_ky</field>
+        <field name="action_method">action_gui_ky</field>
+        <field name="auto_transition">False</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="transition_sign" model="workflow.transition">
+        <field name="template_id" ref="workflow_template_basic"/>
+        <field name="name">Sign Document</field>
+        <field name="sequence">40</field>
+        <field name="from_state">cho_ky</field>
+        <field name="to_state">da_ky</field>
+        <field name="required_group" ref="group_giam_doc_ky"/>
+        <field name="action_method">action_ky_noi_bo</field>
+        <field name="auto_transition">False</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="transition_send" model="workflow.transition">
+        <field name="template_id" ref="workflow_template_basic"/>
+        <field name="name">Send Document</field>
+        <field name="sequence">50</field>
+        <field name="from_state">da_ky</field>
+        <field name="to_state">da_gui</field>
+        <field name="action_method">action_gui_van_ban</field>
+        <field name="auto_transition">False</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- High Value Document Workflow -->
+    <record id="workflow_template_high_value" model="workflow.template">
+        <field name="name">High Value Document Workflow</field>
+        <field name="model_name">van_ban</field>
+        <field name="description">Enhanced workflow for high-value documents with multi-level approval</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Transitions for High Value Workflow -->
+    <record id="transition_hv_submit" model="workflow.transition">
+        <field name="template_id" ref="workflow_template_high_value"/>
+        <field name="name">Submit for Review</field>
+        <field name="sequence">10</field>
+        <field name="from_state">nhap</field>
+        <field name="to_state">cho_duyet</field>
+        <field name="condition_domain">[('gia_tri_hop_dong', '>', 100000000)]</field>
+        <field name="action_method">action_gui_duyet</field>
+        <field name="auto_transition">False</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="transition_hv_dept_approve" model="workflow.transition">
+        <field name="template_id" ref="workflow_template_high_value"/>
+        <field name="name">Department Approval</field>
+        <field name="sequence">20</field>
+        <field name="from_state">cho_duyet</field>
+        <field name="to_state">cho_phe_duyet</field>
+        <field name="required_group" ref="group_truong_phong_duyet"/>
+        <field name="action_method">action_gui_phe_duyet</field>
+        <field name="auto_transition">False</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="transition_hv_final_approve" model="workflow.transition">
+        <field name="template_id" ref="workflow_template_high_value"/>
+        <field name="name">Final Approval</field>
+        <field name="sequence">30</field>
+        <field name="from_state">cho_phe_duyet</field>
+        <field name="to_state">da_duyet</field>
+        <field name="required_group" ref="group_giam_doc_ky"/>
+        <field name="action_method">action_phe_duyet</field>
+        <field name="auto_transition">False</field>
+        <field name="active">True</field>
+    </record>
+
+</odoo>

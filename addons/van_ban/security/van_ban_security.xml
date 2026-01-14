@@ -75,5 +75,45 @@
             <field name="groups" eval="[(4, ref('group_quan_tri_van_ban'))]"/>
         </record>
 
+        <!-- OCR Security: Only admins can create/modify OCR records -->
+        <record id="van_ban_ocr_rule_admin_only" model="ir.rule">
+            <field name="name">OCR: Chỉ admin truy cập</field>
+            <field name="model_id" ref="model_van_ban_ocr"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_quan_tri_van_ban'))]"/>
+        </record>
+
+        <!-- AI Features Security: Restrict AI analysis to authorized users -->
+        <record id="van_ban_ai_rule_restricted" model="ir.rule">
+            <field name="name">AI Features: Giới hạn truy cập</field>
+            <field name="model_id" ref="model_van_ban"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_truong_phong_duyet')), (4, ref('group_giam_doc_ky')), (4, ref('group_quan_tri_van_ban'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Workflow Template Security: Only admins can modify workflows -->
+        <record id="workflow_template_rule_admin" model="ir.rule">
+            <field name="name">Workflow Template: Chỉ admin</field>
+            <field name="model_id" ref="model_workflow_template"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_quan_tri_van_ban'))]"/>
+        </record>
+
+        <!-- Audit Trail Security: Read-only for all authorized users -->
+        <record id="lich_su_van_ban_rule_readonly" model="ir.rule">
+            <field name="name">Lịch sử: Chỉ đọc</field>
+            <field name="model_id" ref="model_lich_su_van_ban"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_nhan_vien_soan_thao')), (4, ref('group_truong_phong_duyet')), (4, ref('group_giam_doc_ky')), (4, ref('group_quan_tri_van_ban'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
     </data>
 </odoo>
