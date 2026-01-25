@@ -1,0 +1,470 @@
+/** @odoo-module **/
+
+import { qweb as QWeb, _t } from 'web.core';
+import core from 'web.core';
+import Widget from 'web.Widget';
+import rpc from 'web.rpc';
+import session from 'web.session';
+
+    /**
+     * AI Chat Widget - Panel chat thông minh
+     */
+    var AIChatWidget = Widget.extend({
+        template: 'ai_integration.ChatPanel',
+        events: {
+            'click .ai-chat-toggle': '_onToggleChat',
+            'click .ai-chat-close': '_onCloseChat',
+            'click .ai-chat-send': '_onSendMessage',
+            'keypress .ai-chat-input': '_onInputKeypress',
+            'click .ai-quick-action': '_onQuickAction',
+            'click .ai-confirm-btn': '_onConfirmAction',
+            'click .ai-reject-btn': '_onRejectAction',
+            'click .ai-clear-chat': '_onClearChat',
+            'click .ai-new-session': '_onNewSession',
+        },
+
+        /**
+         * @override
+         */
+        init: function (parent, options) {
+            this._super.apply(this, arguments);
+            this.options = options || {};
+            this.sessionId = null;
+            this.messages = [];
+            this.isOpen = false;
+            this.isLoading = false;
+            this.activeModel = null;
+            this.activeResId = null;
+            this.quickActions = [];
+        },
+
+        /**
+         * @override
+         */
+        start: function () {
+            var self = this;
+            return this._super.apply(this, arguments).then(function () {
+                self._initChat();
+            });
+        },
+
+        /**
+         * Required for Client Action compatibility
+         */
+        getState: function () {
+            return {};
+        },
+
+        getTitle: function () {
+            return _t('AI Assistant');
+        },
+        
+        getOwnedQueryParams: function () {
+            return [];
+        },
+
+        /**
+         * Initialize chat
+         */
+        _initChat: function () {
+            this._updateContext();
+            this._loadQuickActions();
+        },
+
+        /**
+         * Set context from current view
+         */
+        setContext: function (model, resId) {
+            this.activeModel = model;
+            this.activeResId = resId;
+            // Reset session when context changes
+            this.sessionId = null;
+            this.messages = [];
+            this._loadQuickActions();
+            this._renderMessages();
+        },
+
+        /**
+         * Update context from parent
+         */
+        _updateContext: function () {
+            if (this.options.activeModel) {
+                this.activeModel = this.options.activeModel;
+                this.activeResId = this.options.activeResId;
+            }
+        },
+
+        /**
+         * Load quick actions for current context
+         */
+        _loadQuickActions: function () {
+            var self = this;
+            rpc.query({
+                route: '/ai/chat/quick_actions',
+                params: {
+                    active_model: this.activeModel,
+                }
+            }).then(function (result) {
+                if (result.success) {
+                    self.quickActions = result.quick_actions;
+                    self._renderQuickActions();
+                }
+            });
+        },
+
+        /**
+         * Render quick action buttons
+         */
+        _renderQuickActions: function () {
+            var $container = this.$('.ai-quick-actions');
+            $container.empty();
+
+            _.each(this.quickActions, function (action) {
+                var $btn = $('<button>')
+                    .addClass('btn btn-sm btn-outline-primary ai-quick-action m-1')
+                    .attr('data-prompt', action.prompt)
+                    .html('<i class="fa ' + (action.icon || 'fa-bolt') + '"></i> ' + action.label);
+                $container.append($btn);
+            });
+        },
+
+        /**
+         * Toggle chat panel open/close
+         */
+        _onToggleChat: function (ev) {
+            ev.preventDefault();
+            this.isOpen = !this.isOpen;
+            this.$('.ai-chat-panel').toggleClass('open', this.isOpen);
+            
+            if (this.isOpen && !this.sessionId) {
+                this._initSession();
+            }
+        },
+
+        /**
+         * Close chat panel
+         */
+        _onCloseChat: function (ev) {
+            ev.preventDefault();
+            this.isOpen = false;
+            this.$('.ai-chat-panel').removeClass('open');
+        },
+
+        /**
+         * Initialize or get existing session
+         */
+        _initSession: function () {
+            var self = this;
+            rpc.query({
+                route: '/ai/chat/session',
+                params: {
+                    active_model: this.activeModel,
+                    active_res_id: this.activeResId,
+                }
+            }).then(function (result) {
+                if (result.success) {
+                    self.sessionId = result.session.id;
+                    self._loadHistory();
+                }
+            });
+        },
+
+        /**
+         * Load chat history
+         */
+        _loadHistory: function () {
+            var self = this;
+            if (!this.sessionId) return;
+
+            rpc.query({
+                route: '/ai/chat/history',
+                params: {
+                    session_id: this.sessionId,
+                    limit: 50,
+                }
+            }).then(function (result) {
+                if (result.success) {
+                    self.messages = result.messages;
+                    self._renderMessages();
+                }
+            });
+        },
+
+        /**
+         * Render messages in chat
+         */
+        _renderMessages: function () {
+            var self = this;
+            var $container = this.$('.ai-chat-messages');
+            $container.empty();
+
+            _.each(this.messages, function (msg) {
+                var $msg = self._createMessageElement(msg);
+                $container.append($msg);
+            });
+
+            // Scroll to bottom
+            $container.scrollTop($container[0].scrollHeight);
+        },
+
+        /**
+         * Create message DOM element
+         */
+        _createMessageElement: function (msg) {
+            var roleClass = 'ai-msg-' + msg.role;
+            var $msg = $('<div>').addClass('ai-message ' + roleClass);
+
+            // Avatar
+            var avatar = msg.role === 'user' ? 'fa-user' : 'fa-robot';
+            $msg.append($('<div>').addClass('ai-msg-avatar').html('<i class="fa ' + avatar + '"></i>'));
+
+            // Content
+            var $content = $('<div>').addClass('ai-msg-content');
+            if (msg.content_html) {
+                $content.html(msg.content_html);
+            } else {
+                $content.text(msg.content);
+            }
+            $msg.append($content);
+
+            // Action buttons if requires confirmation
+            if (msg.requires_confirmation && !msg.action_confirmed) {
+                var $actions = $('<div>').addClass('ai-msg-actions mt-2');
+                $actions.append(
+                    $('<button>')
+                        .addClass('btn btn-sm btn-success ai-confirm-btn mr-2')
+                        .attr('data-message-id', msg.id)
+                        .html('<i class="fa fa-check"></i> Xác nhận')
+                );
+                $actions.append(
+                    $('<button>')
+                        .addClass('btn btn-sm btn-danger ai-reject-btn')
+                        .attr('data-message-id', msg.id)
+                        .html('<i class="fa fa-times"></i> Từ chối')
+                );
+                $content.append($actions);
+            }
+
+            // Time
+            if (msg.created_at) {
+                var time = new Date(msg.created_at).toLocaleTimeString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                $msg.append($('<div>').addClass('ai-msg-time').text(time));
+            }
+
+            return $msg;
+        },
+
+        /**
+         * Handle input keypress
+         */
+        _onInputKeypress: function (ev) {
+            if (ev.which === 13 && !ev.shiftKey) {
+                ev.preventDefault();
+                this._onSendMessage(ev);
+            }
+        },
+
+        /**
+         * Send message
+         */
+        _onSendMessage: function (ev) {
+            ev.preventDefault();
+            var $input = this.$('.ai-chat-input');
+            var message = $input.val().trim();
+
+            if (!message || this.isLoading) return;
+
+            // Clear input
+            $input.val('');
+
+            // Add user message to UI immediately
+            this._addMessage({
+                role: 'user',
+                content: message,
+                created_at: new Date().toISOString(),
+            });
+
+            // Show loading
+            this._setLoading(true);
+
+            // Send to server
+            var self = this;
+            rpc.query({
+                route: '/ai/chat/send',
+                params: {
+                    session_id: this.sessionId,
+                    message: message,
+                    context: {
+                        active_model: this.activeModel,
+                        active_res_id: this.activeResId,
+                    }
+                }
+            }).then(function (result) {
+                self._setLoading(false);
+
+                if (result.success) {
+                    self.sessionId = result.session_id;
+                    
+                    // Add assistant message
+                    self._addMessage({
+                        id: result.message_id,
+                        role: 'assistant',
+                        content: result.message,
+                        created_at: new Date().toISOString(),
+                        requires_confirmation: result.requires_confirmation,
+                        action_type: result.action_type,
+                    });
+                } else {
+                    self._addMessage({
+                        role: 'assistant',
+                        content: '❌ Lỗi: ' + (result.error || 'Không thể xử lý yêu cầu'),
+                        created_at: new Date().toISOString(),
+                    });
+                }
+            }).catch(function (error) {
+                self._setLoading(false);
+                var errorDetail = error.message || error.data?.message || 'Không thể kết nối server';
+                console.error('AI Chat Error:', error);
+                self._addMessage({
+                    role: 'assistant',
+                    content: '❌ Lỗi: ' + errorDetail,
+                    created_at: new Date().toISOString(),
+                });
+            });
+        },
+
+        /**
+         * Add message to UI
+         */
+        _addMessage: function (msg) {
+            this.messages.push(msg);
+            var $container = this.$('.ai-chat-messages');
+            var $msg = this._createMessageElement(msg);
+            $container.append($msg);
+            $container.scrollTop($container[0].scrollHeight);
+        },
+
+        /**
+         * Set loading state
+         */
+        _setLoading: function (loading) {
+            this.isLoading = loading;
+            this.$('.ai-chat-send').prop('disabled', loading);
+            this.$('.ai-chat-loading').toggleClass('d-none', !loading);
+        },
+
+        /**
+         * Handle quick action click
+         */
+        _onQuickAction: function (ev) {
+            ev.preventDefault();
+            var prompt = $(ev.currentTarget).data('prompt');
+            if (prompt) {
+                this.$('.ai-chat-input').val(prompt);
+                this._onSendMessage(ev);
+            }
+        },
+
+        /**
+         * Confirm action
+         */
+        _onConfirmAction: function (ev) {
+            ev.preventDefault();
+            var messageId = $(ev.currentTarget).data('message-id');
+            var self = this;
+
+            $(ev.currentTarget).prop('disabled', true);
+
+            rpc.query({
+                route: '/ai/chat/confirm',
+                params: {
+                    session_id: this.sessionId,
+                    message_id: messageId,
+                }
+            }).then(function (result) {
+                if (result.success) {
+                    // Update message UI
+                    $(ev.currentTarget).closest('.ai-msg-actions').html(
+                        '<span class="text-success"><i class="fa fa-check"></i> Đã thực hiện</span>'
+                    );
+                    
+                    // Reload history to get updated messages
+                    self._loadHistory();
+                } else {
+                    $(ev.currentTarget).prop('disabled', false);
+                    self._addMessage({
+                        role: 'assistant',
+                        content: '❌ Lỗi: ' + (result.error || 'Không thể thực hiện'),
+                        created_at: new Date().toISOString(),
+                    });
+                }
+            });
+        },
+
+        /**
+         * Reject action
+         */
+        _onRejectAction: function (ev) {
+            ev.preventDefault();
+            var messageId = $(ev.currentTarget).data('message-id');
+            var self = this;
+
+            rpc.query({
+                route: '/ai/chat/reject',
+                params: {
+                    session_id: this.sessionId,
+                    message_id: messageId,
+                }
+            }).then(function (result) {
+                if (result.success) {
+                    $(ev.currentTarget).closest('.ai-msg-actions').html(
+                        '<span class="text-muted"><i class="fa fa-times"></i> Đã từ chối</span>'
+                    );
+                }
+            });
+        },
+
+        /**
+         * Clear chat history
+         */
+        _onClearChat: function (ev) {
+            ev.preventDefault();
+            var self = this;
+
+            if (!this.sessionId) return;
+
+            if (confirm(_t('Xóa toàn bộ lịch sử chat?'))) {
+                rpc.query({
+                    route: '/ai/chat/clear',
+                    params: {
+                        session_id: this.sessionId,
+                    }
+                }).then(function (result) {
+                    if (result.success) {
+                        self.messages = [];
+                        self._renderMessages();
+                    }
+                });
+            }
+        },
+
+        /**
+         * Start new session
+         */
+        _onNewSession: function (ev) {
+            ev.preventDefault();
+            this.sessionId = null;
+            this.messages = [];
+            this._renderMessages();
+            this._initSession();
+        },
+    });
+
+    // Đăng ký widget như một Client Action
+    core.action_registry.add('ai_chat_widget', AIChatWidget);
+
+    export default AIChatWidget;
+

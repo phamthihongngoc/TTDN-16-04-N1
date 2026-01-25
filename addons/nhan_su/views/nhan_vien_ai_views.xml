@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI buttons for nhan_vien form -->
+    <record id="view_nhan_vien_form_ai_inherit" model="ir.ui.view">
+        <field name="name">nhan.vien.form.ai.inherit</field>
+        <field name="model">nhan_vien</field>
+        <field name="inherit_id" ref="nhan_su.view_nhan_vien_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_summarize_profile" type="object" 
+                        string="🤖 Tóm tắt hồ sơ" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_check_documents" type="object" 
+                        string="📋 Kiểm tra hồ sơ" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_suggest_training" type="object" 
+                        string="📚 Đề xuất đào tạo" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_write_review" type="object" 
+                        string="⭐ Viết đánh giá" class="btn-secondary"
+                        groups="ai_integration.group_ai_manager"/>
+                <button name="action_ai_assistant" type="object" 
+                        string="💬 Hỏi AI" class="btn-info"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- AI buttons for ho_so.nhan_vien form -->
+    <record id="view_ho_so_nhan_vien_form_ai_inherit" model="ir.ui.view">
+        <field name="name">ho.so.nhan.vien.form.ai.inherit</field>
+        <field name="model">ho_so.nhan_vien</field>
+        <field name="inherit_id" ref="nhan_su.view_ho_so_nhan_vien_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_extract_from_file" type="object" 
+                        string="📄 Trích xuất từ file" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

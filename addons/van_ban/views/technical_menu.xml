@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Thêm tab Technical vào Settings -->
+    <record id="res_config_settings_view_form_technical" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.technical</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Technical" string="Technical" data-key="technical_menu">
+                    <h2>🔧 Technical Settings</h2>
+                    
+                    <!-- Email Section -->
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12">
+                            <h3 class="mt16">📧 Email Configuration</h3>
+                        </div>
+                        
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <i class="fa fa-envelope fa-2x text-primary"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Outgoing Mail Servers</span>
+                                <div class="text-muted">Cấu hình SMTP server để gửi email (OTP, thông báo...)</div>
+                                <div class="mt8">
+                                    <button name="%(base.action_ir_mail_server_list)d" type="action" 
+                                            string="→ Cấu hình Mail Server" class="btn-link" icon="fa-arrow-right"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <i class="fa fa-inbox fa-2x text-success"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Email Templates</span>
+                                <div class="text-muted">Quản lý các mẫu email hệ thống</div>
+                                <div class="mt8">
+                                    <button name="%(mail.action_email_template_tree_all)d" type="action" 
+                                            string="→ Xem Email Templates" class="btn-link" icon="fa-arrow-right"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- System Section -->
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12">
+                            <h3 class="mt16">⚙️ System</h3>
+                        </div>
+                        
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <i class="fa fa-users fa-2x text-info"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Users</span>
+                                <div class="text-muted">Quản lý người dùng hệ thống</div>
+                                <div class="mt8">
+                                    <button name="%(base.action_res_users)d" type="action" 
+                                            string="→ Quản lý Users" class="btn-link" icon="fa-arrow-right"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <i class="fa fa-building fa-2x text-warning"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Companies</span>
+                                <div class="text-muted">Cấu hình thông tin công ty</div>
+                                <div class="mt8">
+                                    <button name="%(base.action_res_company_form)d" type="action" 
+                                            string="→ Cấu hình Company" class="btn-link" icon="fa-arrow-right"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Developer Tools -->
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12">
+                            <h3 class="mt16">🛠️ Developer Tools</h3>
+                        </div>
+                        
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <i class="fa fa-clock-o fa-2x text-danger"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Scheduled Actions (Cron)</span>
+                                <div class="text-muted">Quản lý các tác vụ tự động chạy định kỳ</div>
+                                <div class="mt8">
+                                    <button name="%(base.ir_cron_act)d" type="action" 
+                                            string="→ Xem Scheduled Actions" class="btn-link" icon="fa-arrow-right"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <i class="fa fa-database fa-2x text-secondary"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">System Parameters</span>
+                                <div class="text-muted">Cấu hình tham số hệ thống</div>
+                                <div class="mt8">
+                                    <button name="%(base.ir_config_list_action)d" type="action" 
+                                            string="→ Xem System Parameters" class="btn-link" icon="fa-arrow-right"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

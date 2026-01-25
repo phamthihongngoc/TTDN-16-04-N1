@@ -1,0 +1,455 @@
+2026-01-24 17:26:03,073 64397 INFO ? odoo: Odoo version 15.0 
+2026-01-24 17:26:03,073 64397 INFO ? odoo: Using configuration file at /home/hongngoc/odoo-fitdnu/odoo.conf 
+2026-01-24 17:26:03,073 64397 INFO ? odoo: addons paths: ['/home/hongngoc/odoo-fitdnu/odoo/addons', '/home/hongngoc/.local/share/Odoo/addons/15.0', '/home/hongngoc/odoo-fitdnu/addons'] 
+2026-01-24 17:26:03,073 64397 INFO ? odoo: database: odoo@localhost:5432 
+2026-01-24 17:26:03,337 64397 INFO ? odoo.addons.base.models.ir_actions_report: You need Wkhtmltopdf to print a pdf version of the reports. 
+2026-01-24 17:26:03,535 64397 WARNING ? odoo.addons.base.models.res_currency: The num2words python library is not installed, amount-to-text features won't be fully available. 
+2026-01-24 17:26:03,608 64397 INFO ngoc odoo.modules.loading: loading 1 modules... 
+2026-01-24 17:26:03,613 64397 INFO ngoc odoo.modules.loading: 1 modules loaded in 0.00s, 0 queries (+0 extra) 
+2026-01-24 17:26:03,633 64397 INFO ngoc odoo.modules.loading: updating modules list 
+2026-01-24 17:26:03,638 64397 INFO ngoc odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2026-01-24 17:26:04,667 64397 INFO ngoc odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['AI Integration - OpenAI'] to user __system__ #1 via n/a 
+2026-01-24 17:26:04,667 64397 INFO ngoc odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['AI Integration - OpenAI'] to user __system__ #1 via n/a 
+2026-01-24 17:26:05,454 64397 INFO ngoc odoo.modules.module: python external dependency on 'docx' does not appear to be a valid PyPI package. Using a PyPI package name is recommended. 
+2026-01-24 17:26:06,903 64397 INFO ngoc odoo.modules.module: python external dependency on 'sklearn' does not appear to be a valid PyPI package. Using a PyPI package name is recommended. 
+2026-01-24 17:26:06,924 64397 INFO ngoc odoo.modules.module: python external dependency on 'sklearn' does not appear to be a valid PyPI package. Using a PyPI package name is recommended. 
+2026-01-24 17:26:06,945 64397 INFO ngoc odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user __system__ #1 via n/a 
+2026-01-24 17:26:07,022 64397 INFO ngoc odoo.modules.loading: loading 25 modules... 
+2026-01-24 17:26:07,153 64397 INFO ngoc odoo.modules.loading: Loading module ai_integration (13/25) 
+2026-01-24 17:26:08,218 64397 INFO ngoc odoo.modules.registry: module ai_integration: creating or updating database tables 
+2026-01-24 17:26:08,377 64397 WARNING ngoc py.warnings: /home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py:134: DeprecationWarning: nodes.Node.traverse() is obsoleted by Node.findall().
+  File "/home/hongngoc/odoo-fitdnu/odoo-bin", line 8, in <module>
+    odoo.cli.main()
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/command.py", line 61, in main
+    o.run(args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/server.py", line 179, in run
+    main(args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/server.py", line 173, in main
+    rc = odoo.service.server.start(preload=preload, stop=stop)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 1356, in start
+    rc = server.run(preload, stop)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 557, in run
+    rc = preload_registries(preload)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 1260, in preload_registries
+    registry = Registry.new(dbname, update_module=update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/registry.py", line 87, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 470, in load_modules
+    processed_modules += load_marked_modules(cr, graph,
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 363, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 217, in load_module_graph
+    module._check()
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 941, in _check
+    if not module.description_html:
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 1132, in __get__
+    self.compute_value(recs)
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 1295, in compute_value
+    records._compute_field_value(self)
+  File "/home/hongngoc/odoo-fitdnu/odoo/models.py", line 4277, in _compute_field_value
+    fields.determine(field.compute, self)
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 88, in determine
+    return needle(*args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 219, in _get_desc
+    output = publish_string(source=module.description if not module.application and module.description else '', settings_overrides=overrides, writer=MyWriter())
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 507, in publish_string
+    output, _publisher = publish_programmatically(
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 794, in publish_programmatically
+    output = publisher.publish(enable_exit_status=enable_exit_status)
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 271, in publish
+    self.apply_transforms()
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 251, in apply_transforms
+    self.document.transformer.apply_transforms()
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/transforms/__init__.py", line 193, in apply_transforms
+    transform.apply(**kwargs)
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 134, in apply
+    for node in self.document.traverse(nodes.system_message):
+ 
+2026-01-24 17:26:08,384 64397 INFO ngoc odoo.modules.loading: loading ai_integration/security/ai_security.xml 
+2026-01-24 17:26:08,751 64397 INFO ngoc odoo.modules.loading: loading ai_integration/security/ir.model.access.csv 
+2026-01-24 17:26:08,839 64397 INFO ngoc odoo.modules.loading: loading ai_integration/data/ai_config_data.xml 
+2026-01-24 17:26:08,857 64397 INFO ngoc odoo.modules.loading: loading ai_integration/data/ai_chat_tools_data.xml 
+2026-01-24 17:26:08,872 64397 INFO ngoc odoo.modules.loading: loading ai_integration/data/ai_chat_tools_nhan_su.xml 
+2026-01-24 17:26:08,914 64397 INFO ngoc odoo.modules.loading: loading ai_integration/views/ai_config_settings_views.xml 
+2026-01-24 17:26:08,927 64397 INFO ngoc odoo.modules.loading: loading ai_integration/views/ai_job_views.xml 
+2026-01-24 17:26:08,965 64397 INFO ngoc odoo.modules.loading: loading ai_integration/views/ai_log_views.xml 
+2026-01-24 17:26:08,999 64397 INFO ngoc odoo.modules.loading: loading ai_integration/views/ai_chat_views.xml 
+2026-01-24 17:26:09,063 64397 INFO ngoc odoo.modules.loading: loading ai_integration/wizard/ai_assistant_wizard_views.xml 
+2026-01-24 17:26:09,079 64397 INFO ngoc odoo.modules.loading: loading ai_integration/views/menu.xml 
+2026-01-24 17:26:09,151 64397 INFO ngoc odoo.addons.base.models.ir_translation: module ai_integration: no translation for language vi_VN 
+2026-01-24 17:26:09,164 64397 INFO ngoc odoo.modules.loading: Module ai_integration loaded in 2.01s, 646 queries 
+2026-01-24 17:26:09,207 64397 INFO ngoc odoo.modules.loading: Loading module nhan_su (21/25) 
+2026-01-24 17:26:09,283 64397 INFO ngoc odoo.modules.registry: module nhan_su: creating or updating database tables 
+2026-01-24 17:26:09,374 64397 WARNING ngoc py.warnings: /home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py:134: DeprecationWarning: nodes.Node.traverse() is obsoleted by Node.findall().
+  File "/home/hongngoc/odoo-fitdnu/odoo-bin", line 8, in <module>
+    odoo.cli.main()
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/command.py", line 61, in main
+    o.run(args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/server.py", line 179, in run
+    main(args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/server.py", line 173, in main
+    rc = odoo.service.server.start(preload=preload, stop=stop)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 1356, in start
+    rc = server.run(preload, stop)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 557, in run
+    rc = preload_registries(preload)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 1260, in preload_registries
+    registry = Registry.new(dbname, update_module=update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/registry.py", line 87, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 470, in load_modules
+    processed_modules += load_marked_modules(cr, graph,
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 363, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 217, in load_module_graph
+    module._check()
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 941, in _check
+    if not module.description_html:
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 1132, in __get__
+    self.compute_value(recs)
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 1295, in compute_value
+    records._compute_field_value(self)
+  File "/home/hongngoc/odoo-fitdnu/odoo/models.py", line 4277, in _compute_field_value
+    fields.determine(field.compute, self)
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 88, in determine
+    return needle(*args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 219, in _get_desc
+    output = publish_string(source=module.description if not module.application and module.description else '', settings_overrides=overrides, writer=MyWriter())
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 507, in publish_string
+    output, _publisher = publish_programmatically(
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 794, in publish_programmatically
+    output = publisher.publish(enable_exit_status=enable_exit_status)
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 271, in publish
+    self.apply_transforms()
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 251, in apply_transforms
+    self.document.transformer.apply_transforms()
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/transforms/__init__.py", line 193, in apply_transforms
+    transform.apply(**kwargs)
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 134, in apply
+    for node in self.document.traverse(nodes.system_message):
+ 
+2026-01-24 17:26:09,389 64397 INFO ngoc odoo.modules.loading: loading nhan_su/security/nhan_su_security.xml 
+2026-01-24 17:26:09,579 64397 INFO ngoc odoo.modules.loading: loading nhan_su/security/ir.model.access.csv 
+2026-01-24 17:26:09,690 64397 INFO ngoc odoo.modules.loading: loading nhan_su/data/vai_tro_data.xml 
+2026-01-24 17:26:09,698 64397 INFO ngoc odoo.modules.loading: loading nhan_su/data/sequence.xml 
+2026-01-24 17:26:09,704 64397 INFO ngoc odoo.modules.loading: loading nhan_su/data/cron.xml 
+2026-01-24 17:26:09,708 64397 INFO ngoc odoo.modules.loading: loading nhan_su/data/cron_ho_so.xml 
+2026-01-24 17:26:09,731 64397 INFO ngoc odoo.modules.loading: loading nhan_su/data/email_template.xml 
+2026-01-24 17:26:09,742 64397 INFO ngoc odoo.modules.loading: loading nhan_su/data/email_template_ho_so.xml 
+2026-01-24 17:26:09,768 64397 INFO ngoc odoo.modules.loading: loading nhan_su/views/res_config_settings_views.xml 
+2026-01-24 17:26:09,798 64397 INFO ngoc odoo.modules.loading: loading nhan_su/views/nhan_vien.xml 
+2026-01-24 17:26:09,846 64397 INFO ngoc odoo.modules.loading: loading nhan_su/views/phong_ban.xml 
+2026-01-24 17:26:09,880 64397 INFO ngoc odoo.modules.loading: loading nhan_su/views/chuc_vu.xml 
+2026-01-24 17:26:09,911 64397 INFO ngoc odoo.modules.loading: loading nhan_su/views/vai_tro.xml 
+2026-01-24 17:26:09,954 64397 INFO ngoc odoo.modules.loading: loading nhan_su/views/cham_cong.xml 
+2026-01-24 17:26:10,007 64397 INFO ngoc odoo.modules.loading: loading nhan_su/views/bang_luong.xml 
+2026-01-24 17:26:10,052 64397 INFO ngoc odoo.modules.loading: loading nhan_su/views/ho_so_nhan_vien_views.xml 
+2026-01-24 17:26:10,080 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: A <i> with fa class (fa fa-tag) must have title in its tag, parents, descendants or have text
+View error context:
+{'file': '/home/hongngoc/odoo-fitdnu/addons/nhan_su/views/ho_so_nhan_vien_views.xml',
+ 'line': 35,
+ 'name': 'ho.so.nhan.vien.kanban',
+ 'view': ir.ui.view(780,),
+ 'view.model': 'ho_so.nhan_vien',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_ho_so_nhan_vien_kanban'} 
+2026-01-24 17:26:10,081 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: A <i> with fa class (fa fa-file) must have title in its tag, parents, descendants or have text
+View error context:
+{'file': '/home/hongngoc/odoo-fitdnu/addons/nhan_su/views/ho_so_nhan_vien_views.xml',
+ 'line': 38,
+ 'name': 'ho.so.nhan.vien.kanban',
+ 'view': ir.ui.view(780,),
+ 'view.model': 'ho_so.nhan_vien',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_ho_so_nhan_vien_kanban'} 
+2026-01-24 17:26:10,102 64397 INFO ngoc odoo.modules.loading: loading nhan_su/wizard/wizard_tu_choi_ho_so_views.xml 
+2026-01-24 17:26:10,112 64397 INFO ngoc odoo.modules.loading: loading nhan_su/views/nhan_vien_ai_views.xml 
+2026-01-24 17:26:10,140 64397 INFO ngoc odoo.modules.loading: loading nhan_su/views/menu.xml 
+2026-01-24 17:26:10,237 64397 INFO ngoc odoo.addons.base.models.ir_translation: module nhan_su: no translation for language vi_VN 
+2026-01-24 17:26:10,265 64397 INFO ngoc odoo.modules.loading: Module nhan_su loaded in 1.06s, 989 queries 
+2026-01-24 17:26:10,311 64397 INFO ngoc odoo.modules.loading: Loading module khach_hang (24/25) 
+2026-01-24 17:26:10,677 64397 INFO ngoc odoo.modules.registry: module khach_hang: creating or updating database tables 
+2026-01-24 17:26:10,774 64397 WARNING ngoc py.warnings: /home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py:134: DeprecationWarning: nodes.Node.traverse() is obsoleted by Node.findall().
+  File "/home/hongngoc/odoo-fitdnu/odoo-bin", line 8, in <module>
+    odoo.cli.main()
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/command.py", line 61, in main
+    o.run(args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/server.py", line 179, in run
+    main(args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/server.py", line 173, in main
+    rc = odoo.service.server.start(preload=preload, stop=stop)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 1356, in start
+    rc = server.run(preload, stop)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 557, in run
+    rc = preload_registries(preload)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 1260, in preload_registries
+    registry = Registry.new(dbname, update_module=update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/registry.py", line 87, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 470, in load_modules
+    processed_modules += load_marked_modules(cr, graph,
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 363, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 217, in load_module_graph
+    module._check()
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 941, in _check
+    if not module.description_html:
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 1132, in __get__
+    self.compute_value(recs)
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 1295, in compute_value
+    records._compute_field_value(self)
+  File "/home/hongngoc/odoo-fitdnu/odoo/models.py", line 4277, in _compute_field_value
+    fields.determine(field.compute, self)
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 88, in determine
+    return needle(*args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 219, in _get_desc
+    output = publish_string(source=module.description if not module.application and module.description else '', settings_overrides=overrides, writer=MyWriter())
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 507, in publish_string
+    output, _publisher = publish_programmatically(
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 794, in publish_programmatically
+    output = publisher.publish(enable_exit_status=enable_exit_status)
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 271, in publish
+    self.apply_transforms()
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 251, in apply_transforms
+    self.document.transformer.apply_transforms()
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/transforms/__init__.py", line 193, in apply_transforms
+    transform.apply(**kwargs)
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 134, in apply
+    for node in self.document.traverse(nodes.system_message):
+ 
+2026-01-24 17:26:10,793 64397 INFO ngoc odoo.modules.loading: loading khach_hang/security/khach_hang_security.xml 
+2026-01-24 17:26:10,868 64397 INFO ngoc odoo.modules.loading: loading khach_hang/security/ir.model.access.csv 
+2026-01-24 17:26:10,939 64397 INFO ngoc odoo.modules.loading: loading khach_hang/data/sequence_data.xml 
+2026-01-24 17:26:10,962 64397 INFO ngoc odoo.modules.loading: loading khach_hang/data/san_pham_data.xml 
+2026-01-24 17:26:10,967 64397 INFO ngoc odoo.modules.loading: loading khach_hang/data/cron.xml 
+2026-01-24 17:26:10,982 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/khach_hang_views.xml 
+2026-01-24 17:26:11,030 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/ho_tro_khach_hang_views.xml 
+2026-01-24 17:26:11,067 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/don_hang_views.xml 
+2026-01-24 17:26:11,098 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/san_pham_views.xml 
+2026-01-24 17:26:11,138 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/email_khach_hang_views.xml 
+2026-01-24 17:26:11,172 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/dashboard_views.xml 
+2026-01-24 17:26:11,266 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/dashboard_chart_views.xml 
+2026-01-24 17:26:11,312 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/dashboard_advanced_views.xml 
+2026-01-24 17:26:11,379 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: Error-prone use of @class in view khach.hang.kanban.rfm (khach_hang.view_khach_hang_kanban_rfm): use the hasclass(*classes) function to filter elements by their classes 
+2026-01-24 17:26:11,388 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/dashboard_modern_views.xml 
+2026-01-24 17:26:11,410 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/kanban_advanced_views.xml 
+2026-01-24 17:26:11,421 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: A <i> with fa class (fa fa-clock-o) must have title in its tag, parents, descendants or have text
+View error context:
+{'file': '/home/hongngoc/odoo-fitdnu/addons/khach_hang/views/kanban_advanced_views.xml',
+ 'line': 42,
+ 'name': 'don.hang.kanban.enhanced',
+ 'view': ir.ui.view(682,),
+ 'view.model': 'don_hang',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_don_hang_kanban_enhanced'} 
+2026-01-24 17:26:11,421 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: A <i> with fa class (fa fa-money) must have title in its tag, parents, descendants or have text
+View error context:
+{'file': '/home/hongngoc/odoo-fitdnu/addons/khach_hang/views/kanban_advanced_views.xml',
+ 'line': 46,
+ 'name': 'don.hang.kanban.enhanced',
+ 'view': ir.ui.view(682,),
+ 'view.model': 'don_hang',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_don_hang_kanban_enhanced'} 
+2026-01-24 17:26:11,421 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: A <i> with fa class (fa fa-user) must have title in its tag, parents, descendants or have text
+View error context:
+{'file': '/home/hongngoc/odoo-fitdnu/addons/khach_hang/views/kanban_advanced_views.xml',
+ 'line': 50,
+ 'name': 'don.hang.kanban.enhanced',
+ 'view': ir.ui.view(682,),
+ 'view.model': 'don_hang',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_don_hang_kanban_enhanced'} 
+2026-01-24 17:26:11,428 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: A <i> with fa class (fa fa-user) must have title in its tag, parents, descendants or have text
+View error context:
+{'file': '/home/hongngoc/odoo-fitdnu/addons/khach_hang/views/kanban_advanced_views.xml',
+ 'line': 27,
+ 'name': 'ho.tro.khach.hang.kanban.enhanced',
+ 'view': ir.ui.view(683,),
+ 'view.model': 'ho_tro_khach_hang',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_ho_tro_khach_hang_kanban_enhanced'} 
+2026-01-24 17:26:11,430 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: A <i> with fa class (fa fa-clock-o) must have title in its tag, parents, descendants or have text
+View error context:
+{'file': '/home/hongngoc/odoo-fitdnu/addons/khach_hang/views/kanban_advanced_views.xml',
+ 'line': 53,
+ 'name': 'ho.tro.khach.hang.kanban.enhanced',
+ 'view': ir.ui.view(683,),
+ 'view.model': 'ho_tro_khach_hang',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_ho_tro_khach_hang_kanban_enhanced'} 
+2026-01-24 17:26:11,431 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: A <i> with fa class (fa fa-user-circle) must have title in its tag, parents, descendants or have text
+View error context:
+{'file': '/home/hongngoc/odoo-fitdnu/addons/khach_hang/views/kanban_advanced_views.xml',
+ 'line': 57,
+ 'name': 'ho.tro.khach.hang.kanban.enhanced',
+ 'view': ir.ui.view(683,),
+ 'view.model': 'ho_tro_khach_hang',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_ho_tro_khach_hang_kanban_enhanced'} 
+2026-01-24 17:26:11,474 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/khach_hang_ai_views.xml 
+2026-01-24 17:26:11,503 64397 INFO ngoc odoo.modules.loading: loading khach_hang/views/menu.xml 
+2026-01-24 17:26:11,606 64397 INFO ngoc odoo.addons.base.models.ir_translation: module khach_hang: no translation for language vi_VN 
+2026-01-24 17:26:11,627 64397 INFO ngoc odoo.modules.loading: Module khach_hang loaded in 1.32s, 1035 queries 
+2026-01-24 17:26:11,627 64397 INFO ngoc odoo.modules.loading: Loading module van_ban (25/25) 
+2026-01-24 17:26:12,044 64397 WARNING ngoc odoo.addons.van_ban.models.external_storage: boto3 not available. S3 storage will not work. Install: pip install boto3 
+2026-01-24 17:26:12,591 64397 WARNING ngoc py.warnings: /home/hongngoc/.local/lib/python3.10/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+  File "/home/hongngoc/odoo-fitdnu/odoo-bin", line 8, in <module>
+    odoo.cli.main()
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/command.py", line 61, in main
+    o.run(args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/server.py", line 179, in run
+    main(args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/server.py", line 173, in main
+    rc = odoo.service.server.start(preload=preload, stop=stop)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 1356, in start
+    rc = server.run(preload, stop)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 557, in run
+    rc = preload_registries(preload)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 1260, in preload_registries
+    registry = Registry.new(dbname, update_module=update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/registry.py", line 87, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 470, in load_modules
+    processed_modules += load_marked_modules(cr, graph,
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 363, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 179, in load_module_graph
+    load_openerp_module(package.name)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/module.py", line 407, in load_openerp_module
+    __import__('odoo.addons.' + module_name)
+  File "/home/hongngoc/odoo-fitdnu/addons/van_ban/__init__.py", line 4, in <module>
+    from . import wizard
+  File "/home/hongngoc/odoo-fitdnu/addons/van_ban/wizard/__init__.py", line 3, in <module>
+    from . import wizard_ky_dien_tu
+  File "/home/hongngoc/odoo-fitdnu/addons/van_ban/wizard/wizard_ky_dien_tu.py", line 15, in <module>
+    from web3 import Web3
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/web3/__init__.py", line 8, in <module>
+    from web3.main import (
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/web3/main.py", line 80, in <module>
+    from web3._utils.module import (
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/web3/_utils/module.py", line 19, in <module>
+    from web3.module import (
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/web3/module.py", line 31, in <module>
+    from web3.providers.persistent import (
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/web3/providers/__init__.py", line 21, in <module>
+    from .legacy_websocket import (
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/web3/providers/legacy_websocket.py", line 24, in <module>
+    from websockets.legacy.client import (
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/websockets/legacy/__init__.py", line 6, in <module>
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+ 
+2026-01-24 17:26:12,705 64397 INFO ngoc odoo.modules.registry: module van_ban: creating or updating database tables 
+2026-01-24 17:26:12,852 64397 WARNING ngoc py.warnings: /home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py:134: DeprecationWarning: nodes.Node.traverse() is obsoleted by Node.findall().
+  File "/home/hongngoc/odoo-fitdnu/odoo-bin", line 8, in <module>
+    odoo.cli.main()
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/command.py", line 61, in main
+    o.run(args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/server.py", line 179, in run
+    main(args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/cli/server.py", line 173, in main
+    rc = odoo.service.server.start(preload=preload, stop=stop)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 1356, in start
+    rc = server.run(preload, stop)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 557, in run
+    rc = preload_registries(preload)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 1260, in preload_registries
+    registry = Registry.new(dbname, update_module=update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/registry.py", line 87, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 470, in load_modules
+    processed_modules += load_marked_modules(cr, graph,
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 363, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 217, in load_module_graph
+    module._check()
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 941, in _check
+    if not module.description_html:
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 1132, in __get__
+    self.compute_value(recs)
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 1295, in compute_value
+    records._compute_field_value(self)
+  File "/home/hongngoc/odoo-fitdnu/odoo/models.py", line 4277, in _compute_field_value
+    fields.determine(field.compute, self)
+  File "/home/hongngoc/odoo-fitdnu/odoo/fields.py", line 88, in determine
+    return needle(*args)
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 219, in _get_desc
+    output = publish_string(source=module.description if not module.application and module.description else '', settings_overrides=overrides, writer=MyWriter())
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 507, in publish_string
+    output, _publisher = publish_programmatically(
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 794, in publish_programmatically
+    output = publisher.publish(enable_exit_status=enable_exit_status)
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 271, in publish
+    self.apply_transforms()
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/core.py", line 251, in apply_transforms
+    self.document.transformer.apply_transforms()
+  File "/home/hongngoc/.local/lib/python3.10/site-packages/docutils/transforms/__init__.py", line 193, in apply_transforms
+    transform.apply(**kwargs)
+  File "/home/hongngoc/odoo-fitdnu/odoo/addons/base/models/ir_module.py", line 134, in apply
+    for node in self.document.traverse(nodes.system_message):
+ 
+2026-01-24 17:26:12,872 64397 INFO ngoc odoo.modules.loading: loading van_ban/security/van_ban_security.xml 
+2026-01-24 17:26:13,027 64397 INFO ngoc odoo.modules.loading: loading van_ban/security/ir.model.access.csv 
+2026-01-24 17:26:13,195 64397 INFO ngoc odoo.modules.loading: loading van_ban/data/loai_van_ban_data.xml 
+2026-01-24 17:26:13,198 64397 INFO ngoc odoo.modules.loading: loading van_ban/data/workflow_template_data.xml 
+2026-01-24 17:26:13,222 64397 INFO ngoc odoo.modules.loading: loading van_ban/data/sequence_data.xml 
+2026-01-24 17:26:13,228 64397 INFO ngoc odoo.modules.loading: loading van_ban/data/cron.xml 
+2026-01-24 17:26:13,231 64397 INFO ngoc odoo.modules.loading: loading van_ban/data/cron_advanced.xml 
+2026-01-24 17:26:13,275 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/res_config_settings_views.xml 
+2026-01-24 17:26:13,303 64397 INFO ngoc odoo.modules.loading: loading van_ban/wizard/wizard_ky_dien_tu_views.xml 
+2026-01-24 17:26:13,314 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: A <i> with fa class (fa fa-check-circle) must have title in its tag, parents, descendants or have text
+View error context:
+{'file': '/home/hongngoc/odoo-fitdnu/addons/van_ban/wizard/wizard_ky_dien_tu_views.xml',
+ 'line': 48,
+ 'name': 'wizard.ky.dien.tu.form',
+ 'view': ir.ui.view(509,),
+ 'view.model': 'wizard.ky.dien.tu',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_wizard_ky_dien_tu_form'} 
+2026-01-24 17:26:13,315 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: A <i> with fa class (fa fa-shield) must have title in its tag, parents, descendants or have text
+View error context:
+{'file': '/home/hongngoc/odoo-fitdnu/addons/van_ban/wizard/wizard_ky_dien_tu_views.xml',
+ 'line': 69,
+ 'name': 'wizard.ky.dien.tu.form',
+ 'view': ir.ui.view(509,),
+ 'view.model': 'wizard.ky.dien.tu',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_wizard_ky_dien_tu_form'} 
+2026-01-24 17:26:13,316 64397 WARNING ngoc odoo.addons.base.models.ir_ui_view: A <i> with fa class (fa fa-check-circle) must have title in its tag, parents, descendants or have text
+View error context:
+{'file': '/home/hongngoc/odoo-fitdnu/addons/van_ban/wizard/wizard_ky_dien_tu_views.xml',
+ 'line': 88,
+ 'name': 'wizard.ky.dien.tu.form',
+ 'view': ir.ui.view(509,),
+ 'view.model': 'wizard.ky.dien.tu',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_wizard_ky_dien_tu_form'} 
+2026-01-24 17:26:13,326 64397 INFO ngoc odoo.modules.loading: loading van_ban/wizard/wizard_ky_khach_hang_views.xml 
+2026-01-24 17:26:13,336 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/loai_van_ban_views.xml 
+2026-01-24 17:26:13,371 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/yeu_cau_ky_views.xml 
+2026-01-24 17:26:13,406 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/lich_su_van_ban_views.xml 
+2026-01-24 17:26:13,431 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/van_ban_signature_log_views.xml 
+2026-01-24 17:26:13,454 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/pki_certificate_views.xml 
+2026-01-24 17:26:13,490 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/pki_advanced_views.xml 
+2026-01-24 17:26:13,548 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/workflow_template_views.xml 
+2026-01-24 17:26:13,586 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/van_ban_views.xml 
+2026-01-24 17:26:13,643 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/van_ban_den_views.xml 
+2026-01-24 17:26:13,693 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/van_ban_di_views.xml 
+2026-01-24 17:26:13,756 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/van_ban_ocr_views.xml 
+2026-01-24 17:26:13,805 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/dashboard_views.xml 
+2026-01-24 17:26:13,857 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/van_ban_ai_views.xml 
+2026-01-24 17:26:13,898 64397 INFO ngoc odoo.modules.loading: loading van_ban/views/menu.xml 
+2026-01-24 17:26:14,035 64397 INFO ngoc odoo.addons.base.models.ir_translation: module van_ban: no translation for language vi_VN 
+2026-01-24 17:26:14,063 64397 INFO ngoc odoo.modules.loading: Module van_ban loaded in 2.44s, 1521 queries 
+2026-01-24 17:26:14,063 64397 INFO ngoc odoo.modules.loading: 25 modules loaded in 7.04s, 4191 queries (+0 extra) 
+2026-01-24 17:26:14,215 64397 INFO ngoc odoo.modules.loading: Model snailmail.confirm is declared but cannot be loaded! (Perhaps a module was partially removed or renamed) 
+2026-01-24 17:26:14,215 64397 INFO ngoc odoo.modules.loading: Model snailmail.letter is declared but cannot be loaded! (Perhaps a module was partially removed or renamed) 
+2026-01-24 17:26:14,215 64397 INFO ngoc odoo.modules.loading: Model snailmail.letter.cancel is declared but cannot be loaded! (Perhaps a module was partially removed or renamed) 
+2026-01-24 17:26:14,216 64397 INFO ngoc odoo.modules.loading: Model snailmail.letter.format.error is declared but cannot be loaded! (Perhaps a module was partially removed or renamed) 
+2026-01-24 17:26:14,216 64397 INFO ngoc odoo.modules.loading: Model snailmail.letter.missing.required.fields is declared but cannot be loaded! (Perhaps a module was partially removed or renamed) 
+2026-01-24 17:26:14,241 64397 INFO ngoc odoo.modules.registry: verifying fields for every extended model 
+2026-01-24 17:26:14,520 64397 INFO ngoc odoo.modules.loading: Modules loaded. 
+2026-01-24 17:26:14,524 64397 INFO ngoc odoo.modules.registry: Registry loaded in 10.941s 
+2026-01-24 17:26:14,525 64397 INFO ngoc odoo.service.server: Initiating shutdown 
+2026-01-24 17:26:14,525 64397 INFO ngoc odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-01-24 17:26:14,525 64397 INFO ngoc odoo.sql_db: ConnectionPool(used=0/count=0/max=64): Closed 1 connections  

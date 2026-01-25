@@ -27,3 +27,12 @@ access_chuc_vu_user,chuc_vu.user,model_nhan_su_chuc_vu,group_nhan_vien_kinh_doan
 access_chuc_vu_truong_phong,chuc_vu.truong_phong,model_nhan_su_chuc_vu,group_truong_phong,1,0,0,0
 access_chuc_vu_quan_tri,chuc_vu.quan_tri,model_nhan_su_chuc_vu,group_quan_tri_nhan_su,1,1,1,1
 access_chuc_vu_admin,chuc_vu.admin,model_nhan_su_chuc_vu,base.group_system,1,1,1,1
+
+access_ho_so_nhan_vien_user,ho_so_nhan_vien.user,model_ho_so_nhan_vien,group_nhan_vien_kinh_doanh,1,1,1,0
+access_ho_so_nhan_vien_manager,ho_so_nhan_vien.manager,model_ho_so_nhan_vien,group_quan_tri_nhan_su,1,1,1,1
+access_ho_so_nhan_vien_quan_tri,ho_so_nhan_vien.quan_tri,model_ho_so_nhan_vien,group_quan_tri_nhan_su,1,1,1,1
+access_ho_so_nhan_vien_admin,ho_so_nhan_vien.admin,model_ho_so_nhan_vien,base.group_system,1,1,1,1
+
+access_wizard_tu_choi_ho_so_manager,wizard_tu_choi_ho_so.manager,model_wizard_tu_choi_ho_so,group_quan_tri_nhan_su,1,1,1,1
+access_wizard_tu_choi_ho_so_quan_tri,wizard_tu_choi_ho_so.quan_tri,model_wizard_tu_choi_ho_so,group_quan_tri_nhan_su,1,1,1,1
+access_wizard_tu_choi_ho_so_admin,wizard_tu_choi_ho_so.admin,model_wizard_tu_choi_ho_so,base.group_system,1,1,1,1

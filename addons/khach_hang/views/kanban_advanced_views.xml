@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================ -->
+    <!-- KANBAN VIEW NÂNG CẤP cho Đơn Hàng -->
+    <!-- ============================================ -->
+    
+    <record id="view_don_hang_kanban_enhanced" model="ir.ui.view">
+        <field name="name">don.hang.kanban.enhanced</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="trang_thai" class="o_kanban_small_column" quick_create="false">
+                <field name="color"/>
+                <field name="priority"/>
+                <field name="trang_thai"/>
+                <field name="khach_hang_id"/>
+                <field name="tong_tien"/>
+                <field name="ngay_dat_hang"/>
+                <field name="nhan_vien_xu_ly_id"/>
+                <field name="kanban_state"/>
+                
+                <progressbar field="kanban_state" colors='{"done": "success", "blocked": "danger"}'/>
+                
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong><field name="ma_don_hang"/></strong>
+                                    </div>
+                                    <div class="o_secondary">
+                                        <field name="khach_hang_id"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="o_dropdown_kanban dropdown" groups="base.group_user">
+                                    <a class="dropdown-toggle o-no-caret btn" role="button" data-toggle="dropdown" data-display="static" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                        <span class="fa fa-ellipsis-v"/>
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <a role="menuitem" type="edit" class="dropdown-item">Edit</a>
+                                        <a role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                                        <ul class="oe_kanban_colorpicker" data-field="color"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="o_kanban_card_content">
+                                <div class="o_kanban_record_body">
+                                    <div class="mt8">
+                                        <i class="fa fa-clock-o"/> <field name="ngay_dat_hang"/>
+                                    </div>
+                                    
+                                    <div class="mt8">
+                                        <i class="fa fa-money"/> <field name="tong_tien" widget="monetary"/>
+                                    </div>
+                                    
+                                    <div class="mt8" t-if="record.nhan_vien_xu_ly_id.raw_value">
+                                        <i class="fa fa-user"/> <field name="nhan_vien_xu_ly_id"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="o_kanban_card_footer">
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="priority" widget="priority"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="kanban_state" widget="state_selection"/>
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    
+    <!-- ============================================ -->
+    <!-- KANBAN VIEW NÂNG CẤP cho Hỗ Trợ Khách Hàng -->
+    <!-- ============================================ -->
+    
+    <record id="view_ho_tro_khach_hang_kanban_enhanced" model="ir.ui.view">
+        <field name="name">ho.tro.khach.hang.kanban.enhanced</field>
+        <field name="model">ho_tro_khach_hang</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="trang_thai" class="o_kanban_small_column" quick_create="false">
+                <field name="color"/>
+                <field name="priority"/>
+                <field name="trang_thai"/>
+                <field name="khach_hang_id"/>
+                <field name="ngay_tao"/>
+                <field name="nhan_vien_id"/>
+                <field name="sla_exceeded"/>
+                <field name="sla_hours_remaining"/>
+                <field name="category_id"/>
+                
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click">
+                            <!-- SLA Warning Badge -->
+                            <div t-if="record.sla_exceeded.raw_value" class="ribbon ribbon-top-right">
+                                <span class="bg-danger">SLA!</span>
+                            </div>
+                            
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong><field name="ten_yeu_cau"/></strong>
+                                    </div>
+                                    <div class="o_secondary">
+                                        <i class="fa fa-user"/> <field name="khach_hang_id"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="o_dropdown_kanban dropdown" groups="base.group_user">
+                                    <a class="dropdown-toggle o-no-caret btn" role="button" data-toggle="dropdown" href="#" aria-label="Dropdown menu">
+                                        <span class="fa fa-ellipsis-v"/>
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <a role="menuitem" type="edit" class="dropdown-item">Edit</a>
+                                        <a role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                                        <a name="action_escalate" type="object" class="dropdown-item">Escalate</a>
+                                        <ul class="oe_kanban_colorpicker" data-field="color"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="o_kanban_card_content">
+                                <div class="o_kanban_record_body">
+                                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                    
+                                    <div class="mt8" t-if="record.category_id.raw_value">
+                                        <span class="badge badge-info"><field name="category_id"/></span>
+                                    </div>
+                                    
+                                    <div class="mt8">
+                                        <i class="fa fa-clock-o"/> <field name="ngay_tao"/>
+                                    </div>
+                                    
+                                    <div class="mt8" t-if="record.nhan_vien_id.raw_value">
+                                        <i class="fa fa-user-circle"/> <field name="nhan_vien_id"/>
+                                    </div>
+                                    
+                                    <!-- SLA Timer -->
+                                    <div class="mt8" t-if="record.sla_hours_remaining.raw_value">
+                                        <t t-if="record.sla_hours_remaining.raw_value > 0">
+                                            <i class="fa fa-hourglass-half text-warning"/> 
+                                            <t t-esc="Math.floor(record.sla_hours_remaining.raw_value)"/>h còn lại
+                                        </t>
+                                        <t t-else="">
+                                            <i class="fa fa-exclamation-triangle text-danger"/> 
+                                            Quá hạn <t t-esc="Math.floor(Math.abs(record.sla_hours_remaining.raw_value))"/>h
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="o_kanban_card_footer">
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="priority" widget="priority"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    
+    <!-- Form View với CSAT/NPS -->
+    <record id="view_ho_tro_khach_hang_form_csat" model="ir.ui.view">
+        <field name="name">ho.tro.khach.hang.form.csat</field>
+        <field name="model">ho_tro_khach_hang</field>
+        <field name="inherit_id" ref="khach_hang.view_ho_tro_form"/>
+        <field name="arch" type="xml">
+            <!-- Add priority and SLA fields -->
+            <xpath expr="//field[@name='phuong_thuc']" position="after">
+                <field name="priority" widget="priority"/>
+                <field name="category_id"/>
+                <field name="team_id"/>
+            </xpath>
+            
+            <!-- Add SLA information -->
+            <xpath expr="//field[@name='ngay_tao']" position="after">
+                <field name="ngay_phan_hoi"/>
+                <field name="sla_deadline"/>
+                <field name="sla_exceeded" invisible="1"/>
+                <field name="sla_hours_remaining" widget="float_time" attrs="{'invisible': [('sla_exceeded', '=', False)]}"/>
+            </xpath>
+            
+            <!-- Add CSAT/NPS fields -->
+            <xpath expr="//field[@name='danh_gia']" position="after">
+                <field name="csat_score" widget="radio" options="{'horizontal': true}"/>
+                <field name="nps_score" widget="radio" options="{'horizontal': true}"/>
+            </xpath>
+            
+            <!-- Add solution field -->
+            <xpath expr="//field[@name='mo_ta']" position="after">
+                <field name="giai_phap" placeholder="Mô tả giải pháp đã áp dụng..."/>
+            </xpath>
+            
+            <!-- Add tags inside notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Tags &amp; Categories">
+                    <group>
+                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Add actions for enhanced views -->
+    <record id="action_don_hang_kanban" model="ir.actions.act_window">
+        <field name="name">Pipeline Đơn Hàng</field>
+        <field name="res_model">don_hang</field>
+        <field name="view_mode">kanban,tree,form,graph,pivot</field>
+        <field name="context">{'search_default_open_orders': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo đơn hàng mới
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_ho_tro_kanban" model="ir.actions.act_window">
+        <field name="name">Support Tickets</field>
+        <field name="res_model">ho_tro_khach_hang</field>
+        <field name="view_mode">kanban,tree,form,graph,pivot</field>
+        <field name="context">{'search_default_open_tickets': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo ticket hỗ trợ mới
+            </p>
+        </field>
+    </record>
+    
+    <!-- Menu items -->
+    <menuitem id="menu_don_hang_pipeline" name="Pipeline Đơn Hàng" parent="khach_hang.menu_don_hang" sequence="1" action="action_don_hang_kanban"/>
+    
+    <menuitem id="menu_ho_tro_kanban" name="Support Kanban" parent="khach_hang.menu_ho_tro" sequence="1" action="action_ho_tro_kanban"/>
+    
+</odoo>

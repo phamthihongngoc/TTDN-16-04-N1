@@ -109,4 +109,17 @@
               sequence="100"
               groups="group_khach_hang_manager"/>
 
+    <!-- AI Chat -->
+    <record id="action_ai_chat_khach_hang" model="ir.actions.client">
+        <field name="name">AI Assistant - Khách hàng</field>
+        <field name="tag">ai_chat_widget</field>
+        <field name="context">{'default_module': 'khach_hang'}</field>
+    </record>
+
+    <menuitem id="menu_ai_chat_khach_hang"
+              name="🤖 AI Assistant"
+              parent="menu_khach_hang_root"
+              action="action_ai_chat_khach_hang"
+              sequence="5"/>
+
 </odoo>

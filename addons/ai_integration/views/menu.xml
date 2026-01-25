@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI Integration Menu (under Settings) -->
+    <menuitem id="menu_ai_integration_root"
+              name="AI Integration"
+              parent="base.menu_administration"
+              sequence="100"/>
+    
+    <menuitem id="menu_ai_jobs"
+              name="AI Jobs"
+              parent="menu_ai_integration_root"
+              action="action_ai_job"
+              sequence="10"/>
+    
+    <menuitem id="menu_ai_logs"
+              name="AI Logs"
+              parent="menu_ai_integration_root"
+              action="action_ai_log"
+              sequence="20"/>
+    
+    <menuitem id="menu_ai_assistant"
+              name="AI Assistant"
+              parent="menu_ai_integration_root"
+              action="action_ai_assistant"
+              sequence="30"/>
+    
+    <!-- Chatbot Menu Items -->
+    <menuitem id="menu_ai_chatbot"
+              name="AI Chatbot"
+              parent="menu_ai_integration_root"
+              sequence="40"/>
+    
+    <menuitem id="menu_ai_chat_sessions"
+              name="Chat Sessions"
+              parent="menu_ai_chatbot"
+              action="action_ai_chat_session"
+              sequence="10"/>
+    
+    <menuitem id="menu_ai_chat_messages"
+              name="Chat Messages"
+              parent="menu_ai_chatbot"
+              action="action_ai_chat_message"
+              sequence="20"/>
+    
+    <menuitem id="menu_ai_chat_tools"
+              name="Chat Tools"
+              parent="menu_ai_chatbot"
+              action="action_ai_chat_tool"
+              sequence="30"/>
+</odoo>

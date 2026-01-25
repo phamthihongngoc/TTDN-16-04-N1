@@ -1,0 +1,839 @@
+nohup: ignoring input
+2026-01-25 21:12:15,818 44263 INFO ? odoo: Odoo version 15.0 
+2026-01-25 21:12:15,818 44263 INFO ? odoo: Using configuration file at /home/hongngoc/odoo-fitdnu/odoo.conf 
+2026-01-25 21:12:15,818 44263 INFO ? odoo: addons paths: ['/home/hongngoc/odoo-fitdnu/odoo/addons', '/home/hongngoc/.local/share/Odoo/addons/15.0', '/home/hongngoc/odoo-fitdnu/addons'] 
+2026-01-25 21:12:15,818 44263 INFO ? odoo: database: odoo@localhost:5432 
+2026-01-25 21:12:15,953 44263 INFO ? odoo.addons.base.models.ir_actions_report: You need Wkhtmltopdf to print a pdf version of the reports. 
+2026-01-25 21:12:16,067 44263 INFO ? odoo.service.server: HTTP service (werkzeug) running on localhost:8069 
+2026-01-25 21:13:07,462 44263 INFO ? odoo.http: HTTP Configuring static files 
+2026-01-25 21:13:07,530 44263 INFO ngoc odoo.modules.loading: loading 1 modules... 
+2026-01-25 21:13:07,547 44263 INFO ngoc odoo.modules.loading: 1 modules loaded in 0.02s, 0 queries (+0 extra) 
+2026-01-25 21:13:07,603 44263 INFO ngoc odoo.modules.loading: loading 25 modules... 
+2026-01-25 21:13:09,798 44263 WARNING ngoc odoo.addons.khach_hang.models.khach_hang: Missing libraries for advanced features: No module named 'stripe' 
+2026-01-25 21:13:09,800 44263 WARNING ngoc odoo.addons.khach_hang.models.don_hang: Missing payment libraries: No module named 'stripe' 
+2026-01-25 21:13:10,137 44263 WARNING ngoc odoo.addons.van_ban.models.external_storage: boto3 not available. S3 storage will not work. Install: pip install boto3 
+2026-01-25 21:13:10,548 44263 WARNING ngoc py.warnings: /home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+  File "/usr/lib/python3.10/threading.py", line 973, in _bootstrap
+    self._bootstrap_inner()
+  File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.10/threading.py", line 953, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python3.10/socketserver.py", line 683, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.10/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.10/socketserver.py", line 747, in __init__
+    self.handle()
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/werkzeug/serving.py", line 342, in handle
+    BaseHTTPRequestHandler.handle(self)
+  File "/usr/lib/python3.10/http/server.py", line 433, in handle
+    self.handle_one_request()
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/werkzeug/serving.py", line 374, in handle_one_request
+    self.run_wsgi()
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/werkzeug/serving.py", line 319, in run_wsgi
+    execute(self.server.app)
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/werkzeug/serving.py", line 308, in execute
+    application_iter = app(environ, start_response)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 482, in app
+    return self.app(e, s)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/wsgi_server.py", line 112, in application
+    return application_unproxied(environ, start_response)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/wsgi_server.py", line 87, in application_unproxied
+    result = odoo.http.root(environ, start_response)
+  File "/home/hongngoc/odoo-fitdnu/odoo/http.py", line 1355, in __call__
+    return self.dispatch(environ, start_response)
+  File "/home/hongngoc/odoo-fitdnu/odoo/http.py", line 1321, in __call__
+    return self.app(environ, start_wrapped)
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/werkzeug/middleware/shared_data.py", line 287, in __call__
+    return self.app(environ, start_response)
+  File "/home/hongngoc/odoo-fitdnu/odoo/http.py", line 1530, in dispatch
+    odoo.registry(db).check_signaling()
+  File "/home/hongngoc/odoo-fitdnu/odoo/__init__.py", line 125, in registry
+    return modules.registry.Registry(database_name)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/registry.py", line 63, in __new__
+    return cls.new(db_name)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/registry.py", line 87, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 470, in load_modules
+    processed_modules += load_marked_modules(cr, graph,
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 363, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 179, in load_module_graph
+    load_openerp_module(package.name)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/module.py", line 407, in load_openerp_module
+    __import__('odoo.addons.' + module_name)
+  File "/home/hongngoc/odoo-fitdnu/addons/van_ban/__init__.py", line 4, in <module>
+    from . import wizard
+  File "/home/hongngoc/odoo-fitdnu/addons/van_ban/wizard/__init__.py", line 3, in <module>
+    from . import wizard_ky_dien_tu
+  File "/home/hongngoc/odoo-fitdnu/addons/van_ban/wizard/wizard_ky_dien_tu.py", line 15, in <module>
+    from web3 import Web3
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/__init__.py", line 8, in <module>
+    from web3.main import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/main.py", line 80, in <module>
+    from web3._utils.module import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/_utils/module.py", line 19, in <module>
+    from web3.module import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/module.py", line 31, in <module>
+    from web3.providers.persistent import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/providers/__init__.py", line 21, in <module>
+    from .legacy_websocket import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/providers/legacy_websocket.py", line 24, in <module>
+    from websockets.legacy.client import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/websockets/legacy/__init__.py", line 6, in <module>
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+ 
+2026-01-25 21:13:10,588 44263 INFO ngoc odoo.modules.loading: 25 modules loaded in 2.98s, 0 queries (+0 extra) 
+2026-01-25 21:13:10,651 44263 INFO ngoc odoo.modules.loading: Modules loaded. 
+2026-01-25 21:13:10,653 44263 INFO ngoc odoo.modules.registry: Registry loaded in 3.177s 
+2026-01-25 21:13:10,665 44263 INFO ngoc odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-01-25 21:13:10,682 44263 INFO ngoc odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-01-25 21:13:10,907 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:13:10] "POST /web/webclient/version_info HTTP/1.1" 200 - 2 0.013 1.730
+2026-01-25 21:13:10,946 44263 INFO ? odoo.addons.bus.models.bus: Bus.loop listen imbus on db postgres 
+2026-01-25 21:13:19,431 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:13:19,437 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:13:19,447 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:13:19,456 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:13:19,465 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Kiểm tra SLA Violations`. 
+2026-01-25 21:13:19,468 44263 ERROR ngoc odoo.osv.expression: Non-stored field ho_tro_khach_hang.sla_exceeded cannot be searched. 
+NoneType: None
+2026-01-25 21:13:19,551 44263 INFO ngoc odoo.addons.khach_hang.models.ho_tro_khach_hang: Checked SLA for 1 violated tickets 
+2026-01-25 21:13:19,552 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Kiểm tra SLA Violations` done. 
+2026-01-25 21:13:19,580 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Tự động phân công tickets`. 
+2026-01-25 21:13:19,595 44263 INFO ngoc odoo.addons.khach_hang.models.ho_tro_khach_hang: Auto-assigned 0 tickets 
+2026-01-25 21:13:19,596 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Tự động phân công tickets` done. 
+2026-01-25 21:14:02,576 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:02] "POST /longpolling/poll HTTP/1.1" 200 - 29 0.063 55.037
+2026-01-25 21:14:22,945 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:14:22,948 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:14:22,955 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:14:22,959 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:14:27,421 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:14:27,425 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:14:30,172 44263 ERROR ngoc odoo.addons.base.models.ir_model: Missing model snailmail.letter 
+2026-01-25 21:14:30,551 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:30] "GET /web HTTP/1.1" 200 - 286 0.202 0.384
+2026-01-25 21:14:31,293 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:31] "POST /ai/chat/quick_actions HTTP/1.1" 200 - 5 0.007 0.018
+2026-01-25 21:14:31,348 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:31] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 13 0.038 0.037
+2026-01-25 21:14:31,359 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:31] "[36mGET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1[0m" 304 - 18 0.034 0.043
+2026-01-25 21:14:31,490 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:31] "POST /web/dataset/call_kw/van_ban/load_views HTTP/1.1" 200 - 96 0.119 0.097
+2026-01-25 21:14:31,578 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:31] "POST /mail/init_messaging HTTP/1.1" 200 - 64 0.041 0.024
+2026-01-25 21:14:31,716 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:31] "GET /web/image/res.company/1/favicon HTTP/1.1" 200 - 10 0.005 0.007
+2026-01-25 21:14:31,753 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:31] "POST /web/dataset/call_kw/mail.activity/load_views HTTP/1.1" 200 - 28 0.019 0.015
+2026-01-25 21:14:31,834 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:31] "POST /web/dataset/call_kw/mail.followers/load_views HTTP/1.1" 200 - 14 0.012 0.009
+2026-01-25 21:14:31,837 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:31] "POST /web/dataset/call_kw/mail.message/load_views HTTP/1.1" 200 - 16 0.011 0.011
+2026-01-25 21:14:31,894 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:31] "POST /mail/load_message_failures HTTP/1.1" 200 - 3 0.002 0.004
+2026-01-25 21:14:32,027 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:32] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.006
+2026-01-25 21:14:32,225 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:32] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 53 0.042 0.035
+2026-01-25 21:14:32,577 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:32] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.006 0.017
+2026-01-25 21:14:32,578 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:32] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.008 0.019
+2026-01-25 21:14:32,578 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:32] "POST /web/dataset/call_kw/van_ban.signature.log/read HTTP/1.1" 200 - 5 0.011 0.016
+2026-01-25 21:14:32,584 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:32] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.011 0.015
+2026-01-25 21:14:34,716 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:34] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.006 0.016
+2026-01-25 21:14:35,029 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:35] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.002 0.017
+2026-01-25 21:14:35,660 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:35] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 7 0.924 0.028
+2026-01-25 21:14:35,677 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:35] "POST /mail/thread/data HTTP/1.1" 200 - 11 0.939 0.025
+2026-01-25 21:14:35,701 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:35] "POST /mail/read_followers HTTP/1.1" 200 - 18 0.964 0.035
+2026-01-25 21:14:35,711 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:35] "POST /mail/read_followers HTTP/1.1" 200 - 16 0.357 0.017
+2026-01-25 21:14:35,721 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:35] "POST /mail/thread/messages HTTP/1.1" 200 - 22 0.976 0.047
+2026-01-25 21:14:35,968 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:35] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.003
+2026-01-25 21:14:35,980 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:35] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.003 0.003
+2026-01-25 21:14:36,010 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:36] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.001 0.004
+2026-01-25 21:14:36,012 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:36] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.000 0.005
+2026-01-25 21:14:36,042 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:36] "POST /web/dataset/call_kw/mail.message/mark_all_as_read HTTP/1.1" 200 - 5 0.002 0.004
+2026-01-25 21:14:36,278 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:36] "GET /web/image/res.partner/3/avatar_128 HTTP/1.1" 200 - 7 0.005 0.007
+2026-01-25 21:14:37,471 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:37] "GET /web HTTP/1.1" 200 - 18 0.011 0.067
+2026-01-25 21:14:38,174 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:38] "POST /ai/chat/quick_actions HTTP/1.1" 200 - 3 0.011 0.032
+2026-01-25 21:14:38,201 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:38] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 5 0.019 0.050
+2026-01-25 21:14:38,211 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:38] "GET /web/image/res.company/1/favicon HTTP/1.1" 200 - 4 0.012 0.054
+2026-01-25 21:14:38,230 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:38] "POST /mail/init_messaging HTTP/1.1" 200 - 36 0.089 0.030
+2026-01-25 21:14:38,260 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:38] "POST /web/dataset/call_kw/van_ban/load_views HTTP/1.1" 200 - 13 0.026 0.093
+2026-01-25 21:14:38,483 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:38] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.006
+2026-01-25 21:14:38,648 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:38] "POST /mail/load_message_failures HTTP/1.1" 200 - 3 0.003 0.011
+2026-01-25 21:14:38,656 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:38] "POST /web/dataset/call_kw/mail.followers/load_views HTTP/1.1" 200 - 6 0.007 0.013
+2026-01-25 21:14:38,679 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:38] "POST /web/dataset/call_kw/mail.activity/load_views HTTP/1.1" 200 - 6 0.006 0.009
+2026-01-25 21:14:38,689 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:38] "POST /web/dataset/call_kw/mail.message/load_views HTTP/1.1" 200 - 6 0.008 0.008
+2026-01-25 21:14:38,812 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:38] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 28 0.016 0.020
+2026-01-25 21:14:39,000 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:39] "POST /web/dataset/call_kw/van_ban.signature.log/read HTTP/1.1" 200 - 5 0.004 0.005
+2026-01-25 21:14:39,143 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:39] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.009 0.010
+2026-01-25 21:14:39,149 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:39] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.011 0.013
+2026-01-25 21:14:39,155 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:39] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.014 0.014
+2026-01-25 21:14:39,161 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:39] "[36mGET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1[0m" 304 - 6 0.009 0.019
+2026-01-25 21:14:48,488 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:48] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.002 0.027
+2026-01-25 21:14:48,492 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:48] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.005 0.029
+2026-01-25 21:14:48,499 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:48] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.016 0.018
+2026-01-25 21:14:48,500 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:48] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.021 0.022
+2026-01-25 21:14:48,519 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:48] "POST /mail/thread/messages HTTP/1.1" 200 - 20 0.036 0.028
+2026-01-25 21:14:48,805 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:48] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.003 0.008
+2026-01-25 21:14:48,812 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:48] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.002 0.008
+2026-01-25 21:14:48,819 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:48] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.004 0.011
+2026-01-25 21:14:48,822 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:48] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.013 0.013
+2026-01-25 21:14:48,825 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:48] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.001 0.004
+2026-01-25 21:14:49,131 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:49] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.003 0.014
+2026-01-25 21:14:49,132 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:49] "POST /web/dataset/call_kw/mail.message/mark_all_as_read HTTP/1.1" 200 - 5 0.013 0.009
+2026-01-25 21:14:49,152 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:49] "GET /web/image/res.partner/3/avatar_128 HTTP/1.1" 200 - 7 0.008 0.020
+2026-01-25 21:14:49,632 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:49] "GET /web HTTP/1.1" 200 - 18 0.008 0.034
+2026-01-25 21:14:50,151 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "POST /ai/chat/quick_actions HTTP/1.1" 200 - 3 0.008 0.016
+2026-01-25 21:14:50,170 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 5 0.018 0.021
+2026-01-25 21:14:50,180 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "GET /web/image/res.company/1/favicon HTTP/1.1" 200 - 4 0.004 0.030
+2026-01-25 21:14:50,186 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "POST /mail/init_messaging HTTP/1.1" 200 - 36 0.056 0.025
+2026-01-25 21:14:50,211 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "POST /web/dataset/call_kw/van_ban/load_views HTTP/1.1" 200 - 13 0.020 0.052
+2026-01-25 21:14:50,465 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.004 0.008
+2026-01-25 21:14:50,514 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "POST /mail/load_message_failures HTTP/1.1" 200 - 3 0.004 0.010
+2026-01-25 21:14:50,546 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "POST /web/dataset/call_kw/mail.followers/load_views HTTP/1.1" 200 - 6 0.022 0.021
+2026-01-25 21:14:50,553 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "POST /web/dataset/call_kw/mail.message/load_views HTTP/1.1" 200 - 6 0.011 0.024
+2026-01-25 21:14:50,559 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "POST /web/dataset/call_kw/mail.activity/load_views HTTP/1.1" 200 - 6 0.011 0.021
+2026-01-25 21:14:50,791 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 28 0.016 0.016
+2026-01-25 21:14:50,873 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:50] "POST /web/dataset/call_kw/van_ban.signature.log/read HTTP/1.1" 200 - 5 0.004 0.006
+2026-01-25 21:14:51,125 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.008 0.013
+2026-01-25 21:14:51,132 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.009 0.016
+2026-01-25 21:14:51,136 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.009 0.016
+2026-01-25 21:14:51,137 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "[36mGET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1[0m" 304 - 6 0.006 0.017
+2026-01-25 21:14:51,525 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.002 0.018
+2026-01-25 21:14:51,531 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.000 0.020
+2026-01-25 21:14:51,535 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.004 0.018
+2026-01-25 21:14:51,541 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.015 0.018
+2026-01-25 21:14:51,552 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /mail/thread/messages HTTP/1.1" 200 - 20 0.029 0.024
+2026-01-25 21:14:51,825 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.001 0.005
+2026-01-25 21:14:51,840 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.006
+2026-01-25 21:14:51,849 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.005 0.009
+2026-01-25 21:14:51,854 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.000 0.006
+2026-01-25 21:14:51,855 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:51] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.010 0.013
+2026-01-25 21:14:52,149 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:52] "POST /web/dataset/call_kw/mail.message/mark_all_as_read HTTP/1.1" 200 - 5 0.009 0.009
+2026-01-25 21:14:52,151 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:52] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.002 0.005
+2026-01-25 21:14:52,162 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:52] "GET /web/image/res.partner/3/avatar_128 HTTP/1.1" 200 - 7 0.005 0.010
+2026-01-25 21:14:52,586 44263 WARNING ngoc odoo.http: Không tìm thấy thông tin chữ ký số! 
+2026-01-25 21:14:52,590 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:52] "POST /web/dataset/call_button HTTP/1.1" 200 - 3 0.002 0.008
+2026-01-25 21:14:52,956 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:52] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.004 0.008
+2026-01-25 21:14:52,963 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:52] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.004 0.012
+2026-01-25 21:14:52,971 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:52] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.003 0.011
+2026-01-25 21:14:52,974 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:52] "POST /mail/thread/messages HTTP/1.1" 200 - 4 0.004 0.010
+2026-01-25 21:14:52,978 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:52] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.010 0.014
+2026-01-25 21:14:53,271 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:53] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.001 0.005
+2026-01-25 21:14:56,208 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:14:56] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.009 53.303
+2026-01-25 21:15:00,404 44263 WARNING ngoc odoo.http: Không tìm thấy thông tin chữ ký số! 
+2026-01-25 21:15:00,405 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:15:00] "POST /web/dataset/call_button HTTP/1.1" 200 - 3 0.003 0.005
+2026-01-25 21:15:00,752 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:15:00] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.013
+2026-01-25 21:15:00,760 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:15:00] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.003 0.020
+2026-01-25 21:15:00,768 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:15:00] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.006 0.019
+2026-01-25 21:15:00,770 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:15:00] "POST /mail/thread/messages HTTP/1.1" 200 - 4 0.009 0.019
+2026-01-25 21:15:00,776 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:15:00] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.014 0.022
+2026-01-25 21:15:01,065 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:15:01] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.001 0.004
+2026-01-25 21:15:24,574 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:15:24] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.013 53.291
+2026-01-25 21:15:26,244 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:15:26,249 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:15:26,260 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:15:26,264 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:15:31,457 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:15:31] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.013 53.311
+2026-01-25 21:15:40,192 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:15:40] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.007
+2026-01-25 21:15:41,797 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:15:41] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.019 51.642
+2026-01-25 21:16:29,572 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:16:29,576 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:16:29,583 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:16:29,589 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:16:30,907 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:30] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.005
+2026-01-25 21:16:35,378 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:35] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.005 53.271
+2026-01-25 21:16:36,435 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:36] "POST /web/action/load HTTP/1.1" 200 - 15 0.014 0.014
+2026-01-25 21:16:36,790 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:36] "POST /web/dataset/call_kw/van_ban/load_views HTTP/1.1" 200 - 22 0.014 0.031
+2026-01-25 21:16:37,104 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:37] "POST /web/dataset/search_read HTTP/1.1" 200 - 2 0.002 0.005
+2026-01-25 21:16:37,412 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:37] "POST /web/dataset/call_kw/res.users/has_group HTTP/1.1" 200 - 2 0.002 0.005
+2026-01-25 21:16:38,980 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:38] "POST /web/dataset/call_kw/mail.followers/load_views HTTP/1.1" 200 - 6 0.007 0.012
+2026-01-25 21:16:38,988 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:38] "POST /web/dataset/call_kw/mail.activity/load_views HTTP/1.1" 200 - 6 0.007 0.019
+2026-01-25 21:16:38,989 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:38] "POST /web/dataset/call_kw/mail.message/load_views HTTP/1.1" 200 - 6 0.007 0.017
+2026-01-25 21:16:39,309 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:39] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 15 0.009 0.011
+2026-01-25 21:16:48,405 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:48] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 1 0.001 0.009
+2026-01-25 21:16:49,335 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: === SIGNER DETECTION === 
+2026-01-25 21:16:49,335 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Last 20 lines: ['ĐIỀU 5: TRÁCH NHIỆM CỦA CÁC BÊN', '1. Bên A cam kết:', '- Giao hàng đúng chất lượng, số lượng, thời gian.', '- Hỗ trợ bảo hành, hậu mãi theo đúng cam kết.', '- Cung cấp hóa đơn VAT và chứng từ liên quan.', '2. Bên B cam kết:', '- Thanh toán đầy đủ, đúng hạn.', '- Sử dụng sản phẩm đúng cách, không làm mất giá trị bảo hành.', 'ĐIỀU 6: ĐIỀU KHOẢN CHUNG', '1. Hai bên cam kết thực hiện đúng các điều khoản trong hợp đồng này.', '2. Mọi sửa đổi, bổ sung phải được lập thành văn bản và có chữ ký của cả hai bên.', '3. Hợp đồng này được lập thành 02 bản có giá trị pháp lý ngang nhau, mỗi bên giữ 01', 'bản.', '4. Tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng. Nếu không', 'thương lượng được thì đưa ra Tòa án nhân dân quận Đống Đa, thành phố Hà Nội.', 'ĐIỀU 7: HIỆU LỰC HỢP ĐỒNG', 'Hợp đồng có hiệu lực từ ngày ký và chấm dứt khi hai bên hoàn thành nghĩa vụ.', 'ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B', '(Ký, ghi rõ họ tên, đóng dấu công ty) (Ký, ghi rõ họ tên)', 'Phạm Thị Hồng Ngọc Phạm Văn Bình'] 
+2026-01-25 21:16:49,335 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN A at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:16:49,336 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN B at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:16:49,336 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: A and B on same line - 2 column PDF 
+2026-01-25 21:16:49,336 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Single name found but ambiguous: Phạm Thị Hồng Ngọc Phạm Văn Bình 
+2026-01-25 21:16:49,336 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Final: signer_a=False, signer_b=False 
+2026-01-25 21:16:49,341 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: === SIGNER DETECTION === 
+2026-01-25 21:16:49,342 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Last 20 lines: ['ĐIỀU 5: TRÁCH NHIỆM CỦA CÁC BÊN', '1. Bên A cam kết:', '- Giao hàng đúng chất lượng, số lượng, thời gian.', '- Hỗ trợ bảo hành, hậu mãi theo đúng cam kết.', '- Cung cấp hóa đơn VAT và chứng từ liên quan.', '2. Bên B cam kết:', '- Thanh toán đầy đủ, đúng hạn.', '- Sử dụng sản phẩm đúng cách, không làm mất giá trị bảo hành.', 'ĐIỀU 6: ĐIỀU KHOẢN CHUNG', '1. Hai bên cam kết thực hiện đúng các điều khoản trong hợp đồng này.', '2. Mọi sửa đổi, bổ sung phải được lập thành văn bản và có chữ ký của cả hai bên.', '3. Hợp đồng này được lập thành 02 bản có giá trị pháp lý ngang nhau, mỗi bên giữ 01', 'bản.', '4. Tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng. Nếu không', 'thương lượng được thì đưa ra Tòa án nhân dân quận Đống Đa, thành phố Hà Nội.', 'ĐIỀU 7: HIỆU LỰC HỢP ĐỒNG', 'Hợp đồng có hiệu lực từ ngày ký và chấm dứt khi hai bên hoàn thành nghĩa vụ.', 'ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B', '(Ký, ghi rõ họ tên, đóng dấu công ty) (Ký, ghi rõ họ tên)', 'Phạm Thị Hồng Ngọc Phạm Văn Bình'] 
+2026-01-25 21:16:49,342 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN A at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:16:49,342 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN B at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:16:49,342 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: A and B on same line - 2 column PDF 
+2026-01-25 21:16:49,342 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Single name found but ambiguous: Phạm Thị Hồng Ngọc Phạm Văn Bình 
+2026-01-25 21:16:49,342 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Final: signer_a=False, signer_b=False 
+2026-01-25 21:16:49,358 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:49] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 26 0.012 0.614
+2026-01-25 21:16:51,642 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:51] "POST /web/dataset/call_kw/nhan_vien/name_search HTTP/1.1" 200 - 3 0.003 0.008
+2026-01-25 21:16:53,441 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:53] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 2 0.001 0.006
+2026-01-25 21:16:54,700 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:54] "POST /web/dataset/call_kw/nhan_vien/name_search HTTP/1.1" 200 - 3 0.002 0.005
+2026-01-25 21:16:57,069 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:57] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 3 0.004 0.011
+2026-01-25 21:16:59,315 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:59] "POST /web/dataset/call_kw/van_ban/create HTTP/1.1" 200 - 46 0.037 0.026
+2026-01-25 21:16:59,654 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:59] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 25 0.015 0.017
+2026-01-25 21:16:59,973 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:59] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.004 0.008
+2026-01-25 21:16:59,976 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:59] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.003 0.009
+2026-01-25 21:16:59,980 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:16:59] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.006 0.009
+2026-01-25 21:17:03,059 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Mail with ID 333 and Message-Id '<872440813348471.1769375820.306340694427490-openerp-private@HAYCAUBAN>' successfully sent 
+2026-01-25 21:17:03,059 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Sent batch 1 emails via mail server ID #2 
+2026-01-25 21:17:03,230 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:03] "POST /web/dataset/call_button HTTP/1.1" 200 - 44 0.035 2.915
+2026-01-25 21:17:03,551 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:03] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 25 0.010 0.011
+2026-01-25 21:17:03,866 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:03] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.003 0.008
+2026-01-25 21:17:03,866 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:03] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.005 0.008
+2026-01-25 21:17:03,871 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:03] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.005 0.010
+2026-01-25 21:17:04,266 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.002 0.021
+2026-01-25 21:17:04,267 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.016
+2026-01-25 21:17:04,276 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.006 0.016
+2026-01-25 21:17:04,283 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.014 0.020
+2026-01-25 21:17:04,291 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /mail/thread/messages HTTP/1.1" 200 - 20 0.022 0.028
+2026-01-25 21:17:04,593 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.004 0.018
+2026-01-25 21:17:04,602 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.006 0.019
+2026-01-25 21:17:04,608 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.004 0.020
+2026-01-25 21:17:04,610 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.014 0.022
+2026-01-25 21:17:04,611 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.004 0.026
+2026-01-25 21:17:04,899 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.005 0.007
+2026-01-25 21:17:04,924 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.003 0.012
+2026-01-25 21:17:04,932 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.003 0.016
+2026-01-25 21:17:04,934 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.008 0.015
+2026-01-25 21:17:04,938 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:04] "POST /web/dataset/call_kw/mail.message/mark_all_as_read HTTP/1.1" 200 - 5 0.007 0.015
+2026-01-25 21:17:05,195 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:05] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.000 0.003
+2026-01-25 21:17:05,225 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:05] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.000 0.003
+2026-01-25 21:17:11,135 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Mail with ID 334 and Message-Id '<334635093742732.1769375827.622767686843872-openerp-private@HAYCAUBAN>' successfully sent 
+2026-01-25 21:17:11,135 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Sent batch 1 emails via mail server ID #2 
+2026-01-25 21:17:11,325 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:11] "POST /web/dataset/call_button HTTP/1.1" 200 - 35 0.028 3.688
+2026-01-25 21:17:11,652 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:11] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 25 0.010 0.011
+2026-01-25 21:17:11,978 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:11] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.002 0.010
+2026-01-25 21:17:11,979 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:11] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.006 0.010
+2026-01-25 21:17:11,981 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:11] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.006 0.007
+2026-01-25 21:17:12,355 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:12] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.006 0.018
+2026-01-25 21:17:12,357 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:12] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.020
+2026-01-25 21:17:12,359 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:12] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.003 0.013
+2026-01-25 21:17:12,366 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:12] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.016 0.018
+2026-01-25 21:17:12,375 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:12] "POST /mail/thread/messages HTTP/1.1" 200 - 20 0.016 0.018
+2026-01-25 21:17:12,662 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:12] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.001 0.003
+2026-01-25 21:17:20,794 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Mail with ID 335 and Message-Id '<218097011743388.1769375834.166302919387817-openerp-private@HAYCAUBAN>' successfully sent 
+2026-01-25 21:17:20,794 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Sent batch 1 emails via mail server ID #2 
+2026-01-25 21:17:20,967 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:20] "POST /web/dataset/call_button HTTP/1.1" 200 - 25 0.017 6.796
+2026-01-25 21:17:21,296 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:21] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 25 0.014 0.016
+2026-01-25 21:17:21,617 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:21] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.004 0.011
+2026-01-25 21:17:21,621 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:21] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.008 0.014
+2026-01-25 21:17:21,624 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:21] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.005 0.013
+2026-01-25 21:17:21,906 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:21] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.002 0.004
+2026-01-25 21:17:21,994 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:21] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.005 0.017
+2026-01-25 21:17:21,999 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:21] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.004 0.014
+2026-01-25 21:17:22,000 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:22] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.005 0.014
+2026-01-25 21:17:22,004 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:22] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.016 0.013
+2026-01-25 21:17:22,232 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:22] "POST /mail/thread/messages HTTP/1.1" 200 - 20 0.016 0.014
+2026-01-25 21:17:22,297 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:22] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.000 0.004
+2026-01-25 21:17:22,612 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:22] "POST /web/dataset/call_button HTTP/1.1" 200 - 5 0.004 0.007
+2026-01-25 21:17:22,938 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:22] "POST /web/dataset/call_kw/wizard.ky.dien.tu/load_views HTTP/1.1" 200 - 17 0.013 0.013
+2026-01-25 21:17:23,260 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:23] "POST /web/dataset/call_kw/wizard.ky.dien.tu/onchange HTTP/1.1" 200 - 8 0.008 0.012
+2026-01-25 21:17:28,963 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:28] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.006 53.277
+2026-01-25 21:17:30,452 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: Sinh Private/Public Key từ ảnh chữ ký... 
+2026-01-25 21:17:30,535 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: ✓ Đã sinh Private/Public Key thành công 
+2026-01-25 21:17:30,538 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:30] "POST /web/dataset/call_kw/wizard.ky.dien.tu/onchange HTTP/1.1" 200 - 2 0.002 0.090
+2026-01-25 21:17:32,909 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:17:32,913 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:17:32,920 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:17:32,924 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:17:33,585 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: Sinh Private/Public Key từ ảnh chữ ký... 
+2026-01-25 21:17:33,614 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: ✓ Đã sinh Private/Public Key thành công 
+2026-01-25 21:17:33,622 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:33] "POST /web/dataset/call_kw/wizard.ky.dien.tu/create HTTP/1.1" 200 - 14 0.013 0.042
+2026-01-25 21:17:33,930 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:33] "POST /web/dataset/call_kw/wizard.ky.dien.tu/read HTTP/1.1" 200 - 10 0.005 0.007
+2026-01-25 21:17:38,053 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Mail with ID 336 and Message-Id '<127483458468410.1769375854.242875099182129-openerp-private@HAYCAUBAN>' successfully sent 
+2026-01-25 21:17:38,053 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Sent batch 1 emails via mail server ID #2 
+2026-01-25 21:17:38,211 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: OTP email sent successfully to phamnogc887@gmail.com 
+2026-01-25 21:17:38,218 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:38] "POST /web/dataset/call_button HTTP/1.1" 200 - 17 0.013 3.976
+2026-01-25 21:17:38,540 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:38] "POST /web/dataset/call_kw/wizard.ky.dien.tu/load_views HTTP/1.1" 200 - 6 0.005 0.011
+2026-01-25 21:17:38,855 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:38] "POST /web/dataset/call_kw/wizard.ky.dien.tu/read HTTP/1.1" 200 - 9 0.003 0.006
+2026-01-25 21:17:39,184 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:17:39] "GET /web/image?model=wizard.ky.dien.tu&id=42&field=chu_ky&unique=01262026041734 HTTP/1.1" 200 - 5 0.006 0.008
+2026-01-25 21:18:00,146 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:00] "POST /web/dataset/call_kw/wizard.ky.dien.tu/write HTTP/1.1" 200 - 3 0.002 0.005
+2026-01-25 21:18:00,474 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:00] "POST /web/dataset/call_kw/wizard.ky.dien.tu/read HTTP/1.1" 200 - 9 0.010 0.012
+2026-01-25 21:18:00,790 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:00] "POST /web/dataset/call_button HTTP/1.1" 200 - 5 0.002 0.005
+2026-01-25 21:18:02,709 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: File SHA256 hash: d7da6a4ac46a12b843221bebd8012e1ebfa3b7c8afdc4197549c37d09e60aa50 
+2026-01-25 21:18:02,739 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: ✓ Chữ ký số đã được tạo (length: 256 bytes) 
+2026-01-25 21:18:03,860 44263 ERROR ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: Cannot connect to blockchain 
+2026-01-25 21:18:04,393 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: === SIGNER DETECTION === 
+2026-01-25 21:18:04,393 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Last 20 lines: ['ĐIỀU 5: TRÁCH NHIỆM CỦA CÁC BÊN', '1. Bên A cam kết:', '- Giao hàng đúng chất lượng, số lượng, thời gian.', '- Hỗ trợ bảo hành, hậu mãi theo đúng cam kết.', '- Cung cấp hóa đơn VAT và chứng từ liên quan.', '2. Bên B cam kết:', '- Thanh toán đầy đủ, đúng hạn.', '- Sử dụng sản phẩm đúng cách, không làm mất giá trị bảo hành.', 'ĐIỀU 6: ĐIỀU KHOẢN CHUNG', '1. Hai bên cam kết thực hiện đúng các điều khoản trong hợp đồng này.', '2. Mọi sửa đổi, bổ sung phải được lập thành văn bản và có chữ ký của cả hai bên.', '3. Hợp đồng này được lập thành 02 bản có giá trị pháp lý ngang nhau, mỗi bên giữ 01', 'bản.', '4. Tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng. Nếu không', 'thương lượng được thì đưa ra Tòa án nhân dân quận Đống Đa, thành phố Hà Nội.', 'ĐIỀU 7: HIỆU LỰC HỢP ĐỒNG', 'Hợp đồng có hiệu lực từ ngày ký và chấm dứt khi hai bên hoàn thành nghĩa vụ.', 'ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B', '(Ký, ghi rõ họ tên, đóng dấu công ty) (Ký, ghi rõ họ tên)', 'Phạm Thị Hồng Ngọc Phạm Văn Bình'] 
+2026-01-25 21:18:04,393 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN A at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:18:04,393 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN B at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:18:04,393 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: A and B on same line - 2 column PDF 
+2026-01-25 21:18:04,393 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Single name found but ambiguous: Phạm Thị Hồng Ngọc Phạm Văn Bình 
+2026-01-25 21:18:04,393 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Final: signer_a=False, signer_b=False 
+2026-01-25 21:18:04,424 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:04] "POST /web/dataset/call_button HTTP/1.1" 200 - 42 0.024 1.699
+2026-01-25 21:18:04,770 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:04] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 28 0.017 0.018
+2026-01-25 21:18:04,773 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:04] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 28 0.018 0.021
+2026-01-25 21:18:05,101 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.011 0.018
+2026-01-25 21:18:05,103 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.003 0.024
+2026-01-25 21:18:05,111 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /web/dataset/call_kw/van_ban.signature.log/read HTTP/1.1" 200 - 5 0.011 0.029
+2026-01-25 21:18:05,111 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.009 0.023
+2026-01-25 21:18:05,113 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /web/dataset/call_kw/van_ban.signature.log/read HTTP/1.1" 200 - 5 0.012 0.020
+2026-01-25 21:18:05,404 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.003 0.006
+2026-01-25 21:18:05,406 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.003 0.007
+2026-01-25 21:18:05,417 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.003 0.005
+2026-01-25 21:18:05,444 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /web/dataset/call_kw/mail.message/mark_all_as_read HTTP/1.1" 200 - 5 0.003 0.005
+2026-01-25 21:18:05,457 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.001 0.003
+2026-01-25 21:18:05,704 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.005
+2026-01-25 21:18:05,720 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.008 0.012
+2026-01-25 21:18:05,742 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /mail/thread/messages HTTP/1.1" 200 - 20 0.017 0.014
+2026-01-25 21:18:05,748 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.003 0.006
+2026-01-25 21:18:05,759 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:05] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.001 0.004
+2026-01-25 21:18:06,009 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.004 0.006
+2026-01-25 21:18:06,017 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.000 0.003
+2026-01-25 21:18:06,060 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.002 0.008
+2026-01-25 21:18:06,060 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.005 0.007
+2026-01-25 21:18:06,074 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.006 0.011
+2026-01-25 21:18:06,318 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.005
+2026-01-25 21:18:06,323 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.003 0.007
+2026-01-25 21:18:06,362 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.000 0.007
+2026-01-25 21:18:06,373 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.001 0.005
+2026-01-25 21:18:06,374 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /mail/read_followers HTTP/1.1" 200 - 10 0.010 0.008
+2026-01-25 21:18:06,626 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.003 0.007
+2026-01-25 21:18:06,633 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.003 0.009
+2026-01-25 21:18:06,663 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.000 0.003
+2026-01-25 21:18:06,672 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.002 0.004
+2026-01-25 21:18:06,673 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.001 0.003
+2026-01-25 21:18:06,943 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:06] "GET /web/image?model=van_ban&id=150&field=chu_ky_noi_bo&unique=01262026041802 HTTP/1.1" 200 - 4 0.002 0.006
+2026-01-25 21:18:11,093 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:11] "POST /web/dataset/call_button HTTP/1.1" 200 - 14 0.005 0.009
+2026-01-25 21:18:11,282 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:11] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.007
+2026-01-25 21:18:21,671 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:18:21] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.007 52.394
+2026-01-25 21:18:36,202 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:18:36,208 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:18:36,221 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:18:36,228 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:19:02,002 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:19:02] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.004 0.008
+2026-01-25 21:19:09,420 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:19:09] "POST /web/content HTTP/1.1" 200 - 4 0.002 0.006
+2026-01-25 21:19:14,521 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:19:14] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.010 51.660
+2026-01-25 21:19:39,550 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:19:39,557 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:19:39,567 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:19:39,570 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:19:51,923 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:19:51] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.002 0.005
+2026-01-25 21:20:08,083 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:20:08] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.011 53.252
+2026-01-25 21:20:42,896 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:20:42,903 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:20:42,912 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:20:42,916 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:20:42,924 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `AI: Xử lý tác vụ AI chờ`. 
+2026-01-25 21:20:42,929 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `AI: Xử lý tác vụ AI chờ` done. 
+2026-01-25 21:20:43,571 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:20:43] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.005
+2026-01-25 21:21:01,681 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:21:01] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.010 53.280
+2026-01-25 21:21:35,206 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:21:35] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.004 0.018
+2026-01-25 21:21:46,255 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:21:46,262 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:21:46,272 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:21:46,275 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:21:53,625 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:21:53] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.006 51.635
+2026-01-25 21:22:25,177 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:22:25] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.007
+2026-01-25 21:22:47,194 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:22:47] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.005 53.254
+2026-01-25 21:22:49,572 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:22:49,576 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:22:49,586 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:22:49,591 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:23:16,799 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:23:16] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.005
+2026-01-25 21:23:40,775 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:23:40] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.004 53.275
+2026-01-25 21:23:52,875 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:23:52,881 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:23:52,891 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:23:52,894 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:24:06,834 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:24:06] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.005 0.009
+2026-01-25 21:24:32,711 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:24:32] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.007 51.630
+2026-01-25 21:24:56,201 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:24:56,206 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:24:56,213 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:24:56,216 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:24:58,439 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:24:58] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.004 0.006
+2026-01-25 21:25:26,313 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:25:26] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.006 53.284
+2026-01-25 21:25:50,072 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:25:50] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.006
+2026-01-25 21:25:59,507 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `AI: Xử lý tác vụ AI chờ`. 
+2026-01-25 21:25:59,510 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `AI: Xử lý tác vụ AI chờ` done. 
+2026-01-25 21:25:59,521 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:25:59,525 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:25:59,531 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:25:59,533 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:26:19,884 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:26:19] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.004 53.257
+2026-01-25 21:26:40,081 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:26:40] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.005
+2026-01-25 21:27:02,835 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:27:02,839 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:27:02,849 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:27:02,851 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:27:11,815 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:27:11] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.005 51.621
+2026-01-25 21:27:25,733 44263 INFO ? odoo.service.server: Initiating server reload 
+2026-01-25 21:27:26,022 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:27:26] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.004 13.906
+2026-01-25 21:27:26,832 44263 INFO ? odoo.sql_db: ConnectionPool(used=0/count=0/max=64): Closed 9 connections  
+2026-01-25 21:27:27,260 44263 INFO ? odoo: Odoo version 15.0 
+2026-01-25 21:27:27,260 44263 INFO ? odoo: Using configuration file at /home/hongngoc/odoo-fitdnu/odoo.conf 
+2026-01-25 21:27:27,260 44263 INFO ? odoo: addons paths: ['/home/hongngoc/odoo-fitdnu/odoo/addons', '/home/hongngoc/.local/share/Odoo/addons/15.0', '/home/hongngoc/odoo-fitdnu/addons'] 
+2026-01-25 21:27:27,261 44263 INFO ? odoo: database: odoo@localhost:5432 
+2026-01-25 21:27:27,374 44263 INFO ? odoo.addons.base.models.ir_actions_report: You need Wkhtmltopdf to print a pdf version of the reports. 
+2026-01-25 21:27:27,509 44263 INFO ? odoo.service.server: HTTP service (werkzeug) running on localhost:8069 
+2026-01-25 21:27:36,777 44263 INFO ? odoo.http: HTTP Configuring static files 
+2026-01-25 21:27:36,804 44263 INFO ngoc odoo.modules.loading: loading 1 modules... 
+2026-01-25 21:27:36,809 44263 INFO ngoc odoo.modules.loading: 1 modules loaded in 0.00s, 0 queries (+0 extra) 
+2026-01-25 21:27:36,815 44263 INFO ngoc odoo.modules.loading: loading 25 modules... 
+2026-01-25 21:27:37,932 44263 WARNING ngoc odoo.addons.khach_hang.models.khach_hang: Missing libraries for advanced features: No module named 'stripe' 
+2026-01-25 21:27:37,934 44263 WARNING ngoc odoo.addons.khach_hang.models.don_hang: Missing payment libraries: No module named 'stripe' 
+2026-01-25 21:27:38,146 44263 WARNING ngoc odoo.addons.van_ban.models.external_storage: boto3 not available. S3 storage will not work. Install: pip install boto3 
+2026-01-25 21:27:38,460 44263 WARNING ngoc py.warnings: /home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+  File "/usr/lib/python3.10/threading.py", line 973, in _bootstrap
+    self._bootstrap_inner()
+  File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.10/threading.py", line 953, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python3.10/socketserver.py", line 683, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.10/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.10/socketserver.py", line 747, in __init__
+    self.handle()
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/werkzeug/serving.py", line 342, in handle
+    BaseHTTPRequestHandler.handle(self)
+  File "/usr/lib/python3.10/http/server.py", line 433, in handle
+    self.handle_one_request()
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/werkzeug/serving.py", line 374, in handle_one_request
+    self.run_wsgi()
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/werkzeug/serving.py", line 319, in run_wsgi
+    execute(self.server.app)
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/werkzeug/serving.py", line 308, in execute
+    application_iter = app(environ, start_response)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/server.py", line 482, in app
+    return self.app(e, s)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/wsgi_server.py", line 112, in application
+    return application_unproxied(environ, start_response)
+  File "/home/hongngoc/odoo-fitdnu/odoo/service/wsgi_server.py", line 87, in application_unproxied
+    result = odoo.http.root(environ, start_response)
+  File "/home/hongngoc/odoo-fitdnu/odoo/http.py", line 1355, in __call__
+    return self.dispatch(environ, start_response)
+  File "/home/hongngoc/odoo-fitdnu/odoo/http.py", line 1321, in __call__
+    return self.app(environ, start_wrapped)
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/werkzeug/middleware/shared_data.py", line 287, in __call__
+    return self.app(environ, start_response)
+  File "/home/hongngoc/odoo-fitdnu/odoo/http.py", line 1530, in dispatch
+    odoo.registry(db).check_signaling()
+  File "/home/hongngoc/odoo-fitdnu/odoo/__init__.py", line 125, in registry
+    return modules.registry.Registry(database_name)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/registry.py", line 63, in __new__
+    return cls.new(db_name)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/registry.py", line 87, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 470, in load_modules
+    processed_modules += load_marked_modules(cr, graph,
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 363, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/loading.py", line 179, in load_module_graph
+    load_openerp_module(package.name)
+  File "/home/hongngoc/odoo-fitdnu/odoo/modules/module.py", line 407, in load_openerp_module
+    __import__('odoo.addons.' + module_name)
+  File "/home/hongngoc/odoo-fitdnu/addons/van_ban/__init__.py", line 4, in <module>
+    from . import wizard
+  File "/home/hongngoc/odoo-fitdnu/addons/van_ban/wizard/__init__.py", line 3, in <module>
+    from . import wizard_ky_dien_tu
+  File "/home/hongngoc/odoo-fitdnu/addons/van_ban/wizard/wizard_ky_dien_tu.py", line 15, in <module>
+    from web3 import Web3
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/__init__.py", line 8, in <module>
+    from web3.main import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/main.py", line 80, in <module>
+    from web3._utils.module import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/_utils/module.py", line 19, in <module>
+    from web3.module import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/module.py", line 31, in <module>
+    from web3.providers.persistent import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/providers/__init__.py", line 21, in <module>
+    from .legacy_websocket import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/web3/providers/legacy_websocket.py", line 24, in <module>
+    from websockets.legacy.client import (
+  File "/home/hongngoc/odoo-fitdnu/venv/lib/python3.10/site-packages/websockets/legacy/__init__.py", line 6, in <module>
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+ 
+2026-01-25 21:27:38,483 44263 INFO ngoc odoo.modules.loading: 25 modules loaded in 1.67s, 0 queries (+0 extra) 
+2026-01-25 21:27:38,542 44263 INFO ngoc odoo.modules.loading: Modules loaded. 
+2026-01-25 21:27:38,546 44263 INFO ngoc odoo.modules.registry: Registry loaded in 1.766s 
+2026-01-25 21:27:38,548 44263 INFO ngoc odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-01-25 21:27:38,646 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:27:38] "POST /web/webclient/version_info HTTP/1.1" 200 - 17 0.017 1.850
+2026-01-25 21:27:56,129 44263 INFO ? odoo.addons.bus.models.bus: Bus.loop listen imbus on db postgres 
+2026-01-25 21:28:30,879 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Partner Autocomplete : Sync with remote DB`. 
+2026-01-25 21:28:30,886 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Partner Autocomplete : Sync with remote DB` done. 
+2026-01-25 21:28:30,897 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Snailmail: process letters queue`. 
+2026-01-25 21:28:30,900 44263 WARNING ngoc odoo.addons.base.models.ir_cron: Skipping cron 'Snailmail: process letters queue' because model referenced by server action #148 is missing: 'snailmail.letter' 
+2026-01-25 21:28:30,907 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:28:30,910 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:28:30,915 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `SMS: SMS Queue Manager`. 
+2026-01-25 21:28:30,917 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `SMS: SMS Queue Manager` done. 
+2026-01-25 21:28:30,922 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:28:30,927 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:28:47,749 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:28:47] "POST /longpolling/poll HTTP/1.1" 200 - 13 1.923 51.644
+2026-01-25 21:29:13,418 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:13] "GET /web/login HTTP/1.1" 200 - 83 0.058 0.132
+2026-01-25 21:29:13,733 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:13] "GET /web/webclient/translations/1769376553876 HTTP/1.1" 200 - 5 0.007 0.006
+2026-01-25 21:29:14,070 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:14] "GET /web/webclient/qweb/1769376553919?bundle=web.assets_frontend HTTP/1.1" 200 - 10 0.005 0.013
+2026-01-25 21:29:14,316 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:14] "GET /web/webclient/translations/1769376554258 HTTP/1.1" 200 - 3 0.005 0.007
+2026-01-25 21:29:15,742 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:15] "POST /web/dataset/call_kw/web_tour.tour/get_consumed_tours HTTP/1.1" 200 - 9 0.010 0.012
+2026-01-25 21:29:20,065 44263 INFO ngoc odoo.addons.base.models.res_users: Login successful for db:ngoc login:phamnogc887@gmail.com from 127.0.0.1 
+2026-01-25 21:29:20,073 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:20] "[32mPOST /web/login HTTP/1.1[0m" 303 - 41 0.026 0.345
+2026-01-25 21:29:20,198 44263 ERROR ngoc odoo.addons.base.models.ir_model: Missing model snailmail.letter 
+2026-01-25 21:29:20,356 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:20] "GET /web HTTP/1.1" 200 - 264 0.122 0.155
+2026-01-25 21:29:20,603 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:20] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 13 0.015 0.011
+2026-01-25 21:29:20,902 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:20] "POST /ai/chat/quick_actions HTTP/1.1" 200 - 5 0.013 0.016
+2026-01-25 21:29:20,921 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:20] "POST /web/action/load HTTP/1.1" 200 - 8 0.013 0.027
+2026-01-25 21:29:20,935 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:20] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 200 - 12 0.016 0.036
+2026-01-25 21:29:21,335 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:21] "POST /mail/init_messaging HTTP/1.1" 200 - 64 0.045 0.025
+2026-01-25 21:29:21,661 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:21] "POST /mail/load_message_failures HTTP/1.1" 200 - 3 0.005 0.007
+2026-01-25 21:29:21,667 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:21] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.007 0.010
+2026-01-25 21:29:21,668 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:21] "POST /mail/inbox/messages HTTP/1.1" 200 - 9 0.012 0.005
+2026-01-25 21:29:21,681 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:21] "GET /web/image/res.partner/2/avatar_128 HTTP/1.1" 200 - 7 0.007 0.010
+2026-01-25 21:29:33,969 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:33] "POST /web/action/load HTTP/1.1" 200 - 44 0.034 0.023
+2026-01-25 21:29:34,259 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:29:34,263 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:29:34,275 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:29:34,281 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:29:34,352 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:34] "POST /web/dataset/call_kw/van_ban/load_views HTTP/1.1" 200 - 77 0.044 0.039
+2026-01-25 21:29:34,680 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:34] "POST /web/dataset/search_read HTTP/1.1" 200 - 11 0.012 0.010
+2026-01-25 21:29:34,989 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:34] "POST /web/dataset/call_kw/res.users/has_group HTTP/1.1" 200 - 2 0.002 0.005
+2026-01-25 21:29:36,650 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:36] "POST /web/dataset/call_kw/mail.followers/load_views HTTP/1.1" 200 - 14 0.019 0.012
+2026-01-25 21:29:36,656 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:36] "POST /web/dataset/call_kw/mail.message/load_views HTTP/1.1" 200 - 16 0.020 0.015
+2026-01-25 21:29:36,664 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:36] "POST /web/dataset/call_kw/mail.activity/load_views HTTP/1.1" 200 - 28 0.028 0.022
+2026-01-25 21:29:36,987 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:36] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 21 0.009 0.011
+2026-01-25 21:29:37,374 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:37] "GET /web/image/res.partner/3/avatar_128 HTTP/1.1" 200 - 7 0.007 0.010
+2026-01-25 21:29:41,328 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:41] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.006 53.270
+2026-01-25 21:29:42,946 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:42] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 1 0.001 0.007
+2026-01-25 21:29:43,787 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: === SIGNER DETECTION === 
+2026-01-25 21:29:43,788 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Last 20 lines: ['ĐIỀU 5: TRÁCH NHIỆM CỦA CÁC BÊN', '1. Bên A cam kết:', '- Giao hàng đúng chất lượng, số lượng, thời gian.', '- Hỗ trợ bảo hành, hậu mãi theo đúng cam kết.', '- Cung cấp hóa đơn VAT và chứng từ liên quan.', '2. Bên B cam kết:', '- Thanh toán đầy đủ, đúng hạn.', '- Sử dụng sản phẩm đúng cách, không làm mất giá trị bảo hành.', 'ĐIỀU 6: ĐIỀU KHOẢN CHUNG', '1. Hai bên cam kết thực hiện đúng các điều khoản trong hợp đồng này.', '2. Mọi sửa đổi, bổ sung phải được lập thành văn bản và có chữ ký của cả hai bên.', '3. Hợp đồng này được lập thành 02 bản có giá trị pháp lý ngang nhau, mỗi bên giữ 01', 'bản.', '4. Tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng. Nếu không', 'thương lượng được thì đưa ra Tòa án nhân dân quận Đống Đa, thành phố Hà Nội.', 'ĐIỀU 7: HIỆU LỰC HỢP ĐỒNG', 'Hợp đồng có hiệu lực từ ngày ký và chấm dứt khi hai bên hoàn thành nghĩa vụ.', 'ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B', '(Ký, ghi rõ họ tên, đóng dấu công ty) (Ký, ghi rõ họ tên)', 'Phạm Thị Hồng Ngọc Phạm Văn Bình'] 
+2026-01-25 21:29:43,788 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN A at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:29:43,788 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN B at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:29:43,788 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: A and B on same line - 2 column PDF 
+2026-01-25 21:29:43,789 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Single name found but ambiguous: Phạm Thị Hồng Ngọc Phạm Văn Bình 
+2026-01-25 21:29:43,789 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Final: signer_a=False, signer_b=False 
+2026-01-25 21:29:43,793 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: === SIGNER DETECTION === 
+2026-01-25 21:29:43,793 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Last 20 lines: ['ĐIỀU 5: TRÁCH NHIỆM CỦA CÁC BÊN', '1. Bên A cam kết:', '- Giao hàng đúng chất lượng, số lượng, thời gian.', '- Hỗ trợ bảo hành, hậu mãi theo đúng cam kết.', '- Cung cấp hóa đơn VAT và chứng từ liên quan.', '2. Bên B cam kết:', '- Thanh toán đầy đủ, đúng hạn.', '- Sử dụng sản phẩm đúng cách, không làm mất giá trị bảo hành.', 'ĐIỀU 6: ĐIỀU KHOẢN CHUNG', '1. Hai bên cam kết thực hiện đúng các điều khoản trong hợp đồng này.', '2. Mọi sửa đổi, bổ sung phải được lập thành văn bản và có chữ ký của cả hai bên.', '3. Hợp đồng này được lập thành 02 bản có giá trị pháp lý ngang nhau, mỗi bên giữ 01', 'bản.', '4. Tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng. Nếu không', 'thương lượng được thì đưa ra Tòa án nhân dân quận Đống Đa, thành phố Hà Nội.', 'ĐIỀU 7: HIỆU LỰC HỢP ĐỒNG', 'Hợp đồng có hiệu lực từ ngày ký và chấm dứt khi hai bên hoàn thành nghĩa vụ.', 'ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B', '(Ký, ghi rõ họ tên, đóng dấu công ty) (Ký, ghi rõ họ tên)', 'Phạm Thị Hồng Ngọc Phạm Văn Bình'] 
+2026-01-25 21:29:43,793 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN A at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:29:43,794 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN B at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:29:43,794 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: A and B on same line - 2 column PDF 
+2026-01-25 21:29:43,794 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Single name found but ambiguous: Phạm Thị Hồng Ngọc Phạm Văn Bình 
+2026-01-25 21:29:43,794 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Final: signer_a=False, signer_b=False 
+2026-01-25 21:29:47,595 44263 INFO ngoc httpx: HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK" 
+2026-01-25 21:29:47,628 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:47] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 28 0.018 4.349
+2026-01-25 21:29:50,131 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:50] "POST /web/dataset/call_kw/nhan_vien/name_search HTTP/1.1" 200 - 3 0.004 0.007
+2026-01-25 21:29:52,255 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:52] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 2 0.002 0.007
+2026-01-25 21:29:53,201 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:53] "POST /web/dataset/call_kw/nhan_vien/name_search HTTP/1.1" 200 - 3 0.002 0.005
+2026-01-25 21:29:54,769 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:29:54] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 3 0.002 0.008
+2026-01-25 21:30:00,658 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:00] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 1 0.000 0.005
+2026-01-25 21:30:02,142 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:02] "POST /web/dataset/call_kw/van_ban/create HTTP/1.1" 200 - 47 0.040 0.033
+2026-01-25 21:30:02,489 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:02] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 37 0.021 0.014
+2026-01-25 21:30:02,825 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:02] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.005 0.015
+2026-01-25 21:30:02,827 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:02] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.002 0.013
+2026-01-25 21:30:02,829 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:02] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.006 0.015
+2026-01-25 21:30:05,819 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Mail with ID 337 and Message-Id '<808879953281376.1769376603.159577131271362-openerp-private@HAYCAUBAN>' successfully sent 
+2026-01-25 21:30:05,819 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Sent batch 1 emails via mail server ID #2 
+2026-01-25 21:30:05,977 44263 WARNING ngoc odoo.addons.mail.models.mail_activity_mixin: Scheduled deadline should be a date (got 2026-01-27 21:30:05) 
+2026-01-25 21:30:10,746 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Mail with ID 338 and Message-Id '<106797993797772.1769376606.004401445388794-openerp-message-notify@HAYCAUBAN>' successfully sent 
+2026-01-25 21:30:10,763 44263 INFO ngoc odoo.models.unlink: User #1 deleted mail.mail records with IDs: [338] 
+2026-01-25 21:30:10,763 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Sent batch 1 emails via mail server ID #2 
+2026-01-25 21:30:10,930 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:10] "POST /web/dataset/call_button HTTP/1.1" 200 - 111 0.076 7.713
+2026-01-25 21:30:11,274 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:11] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 28 0.019 0.016
+2026-01-25 21:30:11,594 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:11] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.006 0.012
+2026-01-25 21:30:11,596 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:11] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.005 0.013
+2026-01-25 21:30:11,600 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:11] "POST /web/dataset/call_kw/mail.activity/read HTTP/1.1" 200 - 4 0.007 0.013
+2026-01-25 21:30:11,602 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:11] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.009 0.011
+2026-01-25 21:30:11,989 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:11] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 5 0.007 0.023
+2026-01-25 21:30:11,996 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:11] "POST /mail/thread/messages HTTP/1.1" 200 - 20 0.028 0.019
+2026-01-25 21:30:12,006 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 7 0.011 0.026
+2026-01-25 21:30:12,018 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /mail/thread/data HTTP/1.1" 200 - 11 0.016 0.030
+2026-01-25 21:30:12,025 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /mail/read_followers HTTP/1.1" 200 - 19 0.026 0.037
+2026-01-25 21:30:12,296 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 5 0.004 0.009
+2026-01-25 21:30:12,299 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.002 0.007
+2026-01-25 21:30:12,308 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.007
+2026-01-25 21:30:12,334 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 5 0.004 0.009
+2026-01-25 21:30:12,336 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /mail/read_followers HTTP/1.1" 200 - 12 0.011 0.011
+2026-01-25 21:30:12,603 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /mail/read_followers HTTP/1.1" 200 - 12 0.006 0.008
+2026-01-25 21:30:12,611 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.004
+2026-01-25 21:30:12,613 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.002 0.006
+2026-01-25 21:30:12,638 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /web/dataset/call_kw/mail.message/mark_all_as_read HTTP/1.1" 200 - 5 0.005 0.005
+2026-01-25 21:30:12,647 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 16 0.011 0.010
+2026-01-25 21:30:12,926 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.006 0.008
+2026-01-25 21:30:12,935 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 11 0.013 0.016
+2026-01-25 21:30:12,935 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 11 0.013 0.013
+2026-01-25 21:30:12,996 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:12] "GET /web/image/res.users/12/avatar_128 HTTP/1.1" 200 - 5 0.006 0.019
+2026-01-25 21:30:14,215 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:14] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.013 53.317
+2026-01-25 21:30:15,930 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Mail with ID 339 and Message-Id '<141324493282696.1769376612.991518974304199-openerp-private@HAYCAUBAN>' successfully sent 
+2026-01-25 21:30:15,930 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Sent batch 1 emails via mail server ID #2 
+2026-01-25 21:30:16,145 44263 INFO ngoc odoo.models.unlink: User #2 deleted mail.activity records with IDs: [110] 
+2026-01-25 21:30:16,159 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:16] "POST /web/dataset/call_button HTTP/1.1" 200 - 53 0.041 3.151
+2026-01-25 21:30:16,476 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:16] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 25 0.006 0.010
+2026-01-25 21:30:16,793 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:16] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.005 0.013
+2026-01-25 21:30:16,799 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:16] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.008 0.012
+2026-01-25 21:30:16,800 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:16] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.005 0.011
+2026-01-25 21:30:17,160 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:17] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.003 0.011
+2026-01-25 21:30:17,167 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:17] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.004 0.010
+2026-01-25 21:30:17,170 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:17] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.017
+2026-01-25 21:30:17,177 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:17] "POST /mail/read_followers HTTP/1.1" 200 - 12 0.017 0.012
+2026-01-25 21:30:17,183 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:17] "POST /mail/thread/messages HTTP/1.1" 200 - 20 0.020 0.016
+2026-01-25 21:30:17,476 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:17] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.001 0.004
+2026-01-25 21:30:20,530 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Mail with ID 340 and Message-Id '<377209646513112.1769376618.116741180419922-openerp-private@HAYCAUBAN>' successfully sent 
+2026-01-25 21:30:20,530 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Sent batch 1 emails via mail server ID #2 
+2026-01-25 21:30:20,700 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:20] "POST /web/dataset/call_button HTTP/1.1" 200 - 25 0.017 2.579
+2026-01-25 21:30:21,046 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:21] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 25 0.022 0.019
+2026-01-25 21:30:21,363 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:21] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.004 0.009
+2026-01-25 21:30:21,366 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:21] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.004 0.009
+2026-01-25 21:30:21,367 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:21] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.006 0.010
+2026-01-25 21:30:21,741 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:21] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.005 0.019
+2026-01-25 21:30:21,745 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:21] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.018
+2026-01-25 21:30:21,752 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:21] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.005 0.018
+2026-01-25 21:30:21,756 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:21] "POST /mail/read_followers HTTP/1.1" 200 - 12 0.016 0.018
+2026-01-25 21:30:21,764 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:21] "POST /mail/thread/messages HTTP/1.1" 200 - 20 0.022 0.015
+2026-01-25 21:30:22,052 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:22] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.001 0.004
+2026-01-25 21:30:22,869 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:22] "POST /web/dataset/call_button HTTP/1.1" 200 - 5 0.002 0.004
+2026-01-25 21:30:23,192 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:23] "POST /web/dataset/call_kw/wizard.ky.dien.tu/load_views HTTP/1.1" 200 - 17 0.011 0.011
+2026-01-25 21:30:23,512 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:23] "POST /web/dataset/call_kw/wizard.ky.dien.tu/onchange HTTP/1.1" 200 - 8 0.007 0.009
+2026-01-25 21:30:33,202 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: Sinh Private/Public Key từ ảnh chữ ký... 
+2026-01-25 21:30:33,284 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: ✓ Đã sinh Private/Public Key thành công 
+2026-01-25 21:30:33,287 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:33] "POST /web/dataset/call_kw/wizard.ky.dien.tu/onchange HTTP/1.1" 200 - 2 0.002 0.088
+2026-01-25 21:30:36,918 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: Sinh Private/Public Key từ ảnh chữ ký... 
+2026-01-25 21:30:36,947 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: ✓ Đã sinh Private/Public Key thành công 
+2026-01-25 21:30:36,953 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:36] "POST /web/dataset/call_kw/wizard.ky.dien.tu/create HTTP/1.1" 200 - 14 0.013 0.041
+2026-01-25 21:30:37,276 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:37] "POST /web/dataset/call_kw/wizard.ky.dien.tu/read HTTP/1.1" 200 - 10 0.008 0.010
+2026-01-25 21:30:37,597 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:30:37,605 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:30:37,613 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:30:37,617 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:30:37,622 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `AI: Xử lý tác vụ AI chờ`. 
+2026-01-25 21:30:37,624 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `AI: Xử lý tác vụ AI chờ` done. 
+2026-01-25 21:30:40,759 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Mail with ID 341 and Message-Id '<322658241208448.1769376637.599043130874634-openerp-private@HAYCAUBAN>' successfully sent 
+2026-01-25 21:30:40,760 44263 INFO ngoc odoo.addons.mail.models.mail_mail: Sent batch 1 emails via mail server ID #2 
+2026-01-25 21:30:40,920 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: OTP email sent successfully to phamnogc887@gmail.com 
+2026-01-25 21:30:40,930 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:40] "POST /web/dataset/call_button HTTP/1.1" 200 - 17 0.015 3.327
+2026-01-25 21:30:41,249 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:41] "POST /web/dataset/call_kw/wizard.ky.dien.tu/load_views HTTP/1.1" 200 - 6 0.005 0.009
+2026-01-25 21:30:41,561 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:41] "POST /web/dataset/call_kw/wizard.ky.dien.tu/read HTTP/1.1" 200 - 9 0.003 0.008
+2026-01-25 21:30:41,878 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:41] "GET /web/image?model=wizard.ky.dien.tu&id=43&field=chu_ky&unique=01262026043037 HTTP/1.1" 200 - 5 0.003 0.008
+2026-01-25 21:30:51,263 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:51] "POST /web/dataset/call_kw/wizard.ky.dien.tu/write HTTP/1.1" 200 - 3 0.003 0.009
+2026-01-25 21:30:51,576 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:51] "POST /web/dataset/call_kw/wizard.ky.dien.tu/read HTTP/1.1" 200 - 9 0.005 0.009
+2026-01-25 21:30:51,894 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:51] "POST /web/dataset/call_button HTTP/1.1" 200 - 5 0.003 0.008
+2026-01-25 21:30:55,245 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: File SHA256 hash: d7da6a4ac46a12b843221bebd8012e1ebfa3b7c8afdc4197549c37d09e60aa50 
+2026-01-25 21:30:55,276 44263 INFO ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: ✓ Chữ ký số đã được tạo (length: 256 bytes) 
+2026-01-25 21:30:56,387 44263 ERROR ngoc odoo.addons.van_ban.wizard.wizard_ky_dien_tu: Cannot connect to blockchain 
+2026-01-25 21:30:56,941 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: === SIGNER DETECTION === 
+2026-01-25 21:30:56,942 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Last 20 lines: ['ĐIỀU 5: TRÁCH NHIỆM CỦA CÁC BÊN', '1. Bên A cam kết:', '- Giao hàng đúng chất lượng, số lượng, thời gian.', '- Hỗ trợ bảo hành, hậu mãi theo đúng cam kết.', '- Cung cấp hóa đơn VAT và chứng từ liên quan.', '2. Bên B cam kết:', '- Thanh toán đầy đủ, đúng hạn.', '- Sử dụng sản phẩm đúng cách, không làm mất giá trị bảo hành.', 'ĐIỀU 6: ĐIỀU KHOẢN CHUNG', '1. Hai bên cam kết thực hiện đúng các điều khoản trong hợp đồng này.', '2. Mọi sửa đổi, bổ sung phải được lập thành văn bản và có chữ ký của cả hai bên.', '3. Hợp đồng này được lập thành 02 bản có giá trị pháp lý ngang nhau, mỗi bên giữ 01', 'bản.', '4. Tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng. Nếu không', 'thương lượng được thì đưa ra Tòa án nhân dân quận Đống Đa, thành phố Hà Nội.', 'ĐIỀU 7: HIỆU LỰC HỢP ĐỒNG', 'Hợp đồng có hiệu lực từ ngày ký và chấm dứt khi hai bên hoàn thành nghĩa vụ.', 'ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B', '(Ký, ghi rõ họ tên, đóng dấu công ty) (Ký, ghi rõ họ tên)', 'Phạm Thị Hồng Ngọc Phạm Văn Bình'] 
+2026-01-25 21:30:56,942 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN A at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:30:56,942 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN B at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:30:56,942 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: A and B on same line - 2 column PDF 
+2026-01-25 21:30:56,942 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Single name found but ambiguous: Phạm Thị Hồng Ngọc Phạm Văn Bình 
+2026-01-25 21:30:56,942 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Final: signer_a=False, signer_b=False 
+2026-01-25 21:30:56,975 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:56] "POST /web/dataset/call_button HTTP/1.1" 200 - 42 0.029 1.715
+2026-01-25 21:30:57,315 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:57] "POST /web/dataset/call_kw/van_ban/load_views HTTP/1.1" 200 - 13 0.010 0.028
+2026-01-25 21:30:57,331 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:57] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 28 0.032 0.024
+2026-01-25 21:30:57,663 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:57] "POST /web/dataset/call_kw/mail.activity/load_views HTTP/1.1" 200 - 6 0.008 0.028
+2026-01-25 21:30:57,667 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:57] "POST /web/dataset/call_kw/mail.followers/load_views HTTP/1.1" 200 - 6 0.016 0.026
+2026-01-25 21:30:57,672 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:57] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.013 0.025
+2026-01-25 21:30:57,677 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:57] "POST /web/dataset/call_kw/van_ban.signature.log/read HTTP/1.1" 200 - 5 0.018 0.029
+2026-01-25 21:30:57,679 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:57] "POST /web/dataset/call_kw/mail.message/load_views HTTP/1.1" 200 - 6 0.015 0.035
+2026-01-25 21:30:57,994 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:57] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.004 0.015
+2026-01-25 21:30:58,001 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.012 0.011
+2026-01-25 21:30:58,022 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 28 0.015 0.019
+2026-01-25 21:30:58,352 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /web/dataset/call_kw/van_ban.signature.log/read HTTP/1.1" 200 - 5 0.007 0.013
+2026-01-25 21:30:58,366 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.006 0.012
+2026-01-25 21:30:58,370 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.004 0.013
+2026-01-25 21:30:58,373 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.004 0.009
+2026-01-25 21:30:58,377 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.007 0.012
+2026-01-25 21:30:58,677 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.002 0.012
+2026-01-25 21:30:58,694 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.001 0.013
+2026-01-25 21:30:58,694 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /mail/read_followers HTTP/1.1" 200 - 12 0.022 0.024
+2026-01-25 21:30:58,697 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.006 0.014
+2026-01-25 21:30:58,716 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /mail/thread/messages HTTP/1.1" 200 - 20 0.022 0.020
+2026-01-25 21:30:58,979 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.002 0.005
+2026-01-25 21:30:58,998 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:58] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.002 0.004
+2026-01-25 21:30:59,006 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:59] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.002 0.010
+2026-01-25 21:30:59,017 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:59] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.003 0.006
+2026-01-25 21:30:59,019 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:59] "POST /mail/read_followers HTTP/1.1" 200 - 12 0.015 0.016
+2026-01-25 21:30:59,332 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:59] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.002 0.021
+2026-01-25 21:30:59,334 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:59] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.010 0.024
+2026-01-25 21:30:59,335 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:59] "POST /mail/read_followers HTTP/1.1" 200 - 12 0.030 0.025
+2026-01-25 21:30:59,339 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:59] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.006 0.014
+2026-01-25 21:30:59,341 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:59] "POST /web/dataset/call_kw/mail.message/mark_all_as_read HTTP/1.1" 200 - 5 0.012 0.014
+2026-01-25 21:30:59,646 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:59] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.002 0.007
+2026-01-25 21:30:59,654 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:30:59] "GET /web/image?model=van_ban&id=151&field=chu_ky_noi_bo&unique=01262026043055 HTTP/1.1" 200 - 4 0.003 0.010
+2026-01-25 21:31:00,805 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:31:00] "POST /web/dataset/call_button HTTP/1.1" 200 - 14 0.006 0.010
+2026-01-25 21:31:03,904 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:31:03] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.002 0.007
+2026-01-25 21:31:07,779 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:31:07] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.008 53.244
+2026-01-25 21:31:40,927 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:31:40,933 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:31:40,945 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:31:40,951 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:31:53,242 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:31:53] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.004 0.008
+2026-01-25 21:31:59,735 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:31:59] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.009 51.640
+2026-01-25 21:32:44,891 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:32:44] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.004 0.009
+2026-01-25 21:32:53,315 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:32:53] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.007 53.260
+2026-01-25 21:33:34,861 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:33:34] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.002 0.007
+2026-01-25 21:33:46,894 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:33:46] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.008 53.251
+2026-01-25 21:34:26,524 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:34:26] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.008
+2026-01-25 21:34:38,867 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:34:38] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.005 51.652
+2026-01-25 21:35:18,136 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:35:18] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.004 0.007
+2026-01-25 21:35:32,452 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:35:32] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.006 53.264
+2026-01-25 21:36:08,144 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:36:08] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.010
+2026-01-25 21:36:26,015 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:36:26] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.007 53.254
+2026-01-25 21:36:59,854 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:36:59] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.004 0.009
+2026-01-25 21:37:18,026 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:37:18] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.008 51.694
+2026-01-25 21:37:49,786 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:37:49] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.002 0.004
+2026-01-25 21:38:02,326 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:02] "POST /web/dataset/call_button HTTP/1.1" 200 - 11 0.007 0.014
+2026-01-25 21:38:04,111 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:04] "GET /web HTTP/1.1" 200 - 18 0.010 0.041
+2026-01-25 21:38:04,757 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:04] "POST /web/dataset/call_kw/res.users/systray_get_activities HTTP/1.1" 200 - 5 0.010 0.012
+2026-01-25 21:38:04,757 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:04] "POST /ai/chat/quick_actions HTTP/1.1" 200 - 3 0.005 0.013
+2026-01-25 21:38:04,780 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:04] "[36mGET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1[0m" 304 - 6 0.011 0.016
+2026-01-25 21:38:04,809 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:04] "POST /web/dataset/call_kw/van_ban/load_views HTTP/1.1" 200 - 13 0.018 0.041
+2026-01-25 21:38:05,011 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "POST /mail/init_messaging HTTP/1.1" 200 - 36 0.017 0.017
+2026-01-25 21:38:05,112 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "POST /web/dataset/call_kw/mail.followers/load_views HTTP/1.1" 200 - 6 0.002 0.006
+2026-01-25 21:38:05,159 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "POST /web/dataset/call_kw/mail.activity/load_views HTTP/1.1" 200 - 6 0.011 0.013
+2026-01-25 21:38:05,166 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "POST /web/dataset/call_kw/mail.message/load_views HTTP/1.1" 200 - 6 0.011 0.017
+2026-01-25 21:38:05,168 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "GET /web/image/res.company/1/favicon HTTP/1.1" 200 - 10 0.014 0.013
+2026-01-25 21:38:05,331 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "POST /longpolling/im_status HTTP/1.1" 200 - 4 0.003 0.008
+2026-01-25 21:38:05,422 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "POST /mail/load_message_failures HTTP/1.1" 200 - 3 0.003 0.005
+2026-01-25 21:38:05,498 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 28 0.012 0.016
+2026-01-25 21:38:05,823 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "POST /web/dataset/call_kw/mail.followers/read HTTP/1.1" 200 - 3 0.005 0.012
+2026-01-25 21:38:05,823 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "POST /web/dataset/call_kw/lich_su_van_ban/read HTTP/1.1" 200 - 4 0.007 0.013
+2026-01-25 21:38:05,824 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "POST /web/dataset/call_kw/van_ban.signature.log/read HTTP/1.1" 200 - 5 0.008 0.013
+2026-01-25 21:38:05,830 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:05] "POST /web/dataset/call_kw/mail.message/read HTTP/1.1" 200 - 5 0.006 0.014
+2026-01-25 21:38:06,239 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.004 0.024
+2026-01-25 21:38:06,240 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.022
+2026-01-25 21:38:06,247 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.006 0.021
+2026-01-25 21:38:06,247 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /mail/read_followers HTTP/1.1" 200 - 12 0.017 0.017
+2026-01-25 21:38:06,257 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /mail/thread/messages HTTP/1.1" 200 - 20 0.030 0.018
+2026-01-25 21:38:06,535 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /web/dataset/call_kw/van_ban/read HTTP/1.1" 200 - 2 0.002 0.004
+2026-01-25 21:38:06,553 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /mail/get_suggested_recipients HTTP/1.1" 200 - 1 0.001 0.011
+2026-01-25 21:38:06,554 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /mail/thread/data HTTP/1.1" 200 - 3 0.003 0.008
+2026-01-25 21:38:06,558 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.002 0.008
+2026-01-25 21:38:06,570 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /mail/read_followers HTTP/1.1" 200 - 12 0.013 0.018
+2026-01-25 21:38:06,868 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /web/dataset/call_kw/mail.message/mark_all_as_read HTTP/1.1" 200 - 5 0.008 0.012
+2026-01-25 21:38:06,874 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /web/dataset/call_kw/mail.activity/activity_format HTTP/1.1" 200 - 1 0.001 0.014
+2026-01-25 21:38:06,883 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "GET /web/image/res.partner/3/avatar_128 HTTP/1.1" 200 - 7 0.007 0.014
+2026-01-25 21:38:06,885 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:06] "POST /web/dataset/call_button HTTP/1.1" 200 - 11 0.011 0.022
+2026-01-25 21:38:07,883 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:07] "POST /web/dataset/call_button HTTP/1.1" 200 - 11 0.007 0.013
+2026-01-25 21:38:11,367 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:11] "POST /web/action/load HTTP/1.1" 200 - 14 0.008 0.010
+2026-01-25 21:38:11,587 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:11] "POST /longpolling/poll HTTP/1.1" 200 - 9 0.006 53.253
+2026-01-25 21:38:11,700 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:11] "POST /web/dataset/call_kw/van_ban/load_views HTTP/1.1" 200 - 22 0.009 0.024
+2026-01-25 21:38:12,009 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:12] "POST /web/dataset/search_read HTTP/1.1" 200 - 2 0.001 0.005
+2026-01-25 21:38:12,323 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:12] "POST /web/dataset/call_kw/res.users/has_group HTTP/1.1" 200 - 1 0.001 0.007
+2026-01-25 21:38:13,406 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:13] "POST /web/dataset/call_kw/mail.activity/load_views HTTP/1.1" 200 - 6 0.007 0.016
+2026-01-25 21:38:13,411 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:13] "POST /web/dataset/call_kw/mail.followers/load_views HTTP/1.1" 200 - 6 0.009 0.015
+2026-01-25 21:38:13,416 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:13] "POST /web/dataset/call_kw/mail.message/load_views HTTP/1.1" 200 - 6 0.006 0.012
+2026-01-25 21:38:13,754 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:13] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 12 0.009 0.014
+2026-01-25 21:38:21,982 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:21] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 1 0.000 0.006
+2026-01-25 21:38:22,740 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: === SIGNER DETECTION === 
+2026-01-25 21:38:22,741 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Last 20 lines: ['ĐIỀU 5: TRÁCH NHIỆM CỦA CÁC BÊN', '1. Bên A cam kết:', '- Giao hàng đúng chất lượng, số lượng, thời gian.', '- Hỗ trợ bảo hành, hậu mãi theo đúng cam kết.', '- Cung cấp hóa đơn VAT và chứng từ liên quan.', '2. Bên B cam kết:', '- Thanh toán đầy đủ, đúng hạn.', '- Sử dụng sản phẩm đúng cách, không làm mất giá trị bảo hành.', 'ĐIỀU 6: ĐIỀU KHOẢN CHUNG', '1. Hai bên cam kết thực hiện đúng các điều khoản trong hợp đồng này.', '2. Mọi sửa đổi, bổ sung phải được lập thành văn bản và có chữ ký của cả hai bên.', '3. Hợp đồng này được lập thành 02 bản có giá trị pháp lý ngang nhau, mỗi bên giữ 01', 'bản.', '4. Tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng. Nếu không', 'thương lượng được thì đưa ra Tòa án nhân dân quận Đống Đa, thành phố Hà Nội.', 'ĐIỀU 7: HIỆU LỰC HỢP ĐỒNG', 'Hợp đồng có hiệu lực từ ngày ký và chấm dứt khi hai bên hoàn thành nghĩa vụ.', 'ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B', '(Ký, ghi rõ họ tên, đóng dấu công ty) (Ký, ghi rõ họ tên)', 'Phạm Thị Hồng Ngọc Phạm Văn Bình'] 
+2026-01-25 21:38:22,741 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN A at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:38:22,741 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN B at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:38:22,741 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: A and B on same line - 2 column PDF 
+2026-01-25 21:38:22,741 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Single name found but ambiguous: Phạm Thị Hồng Ngọc Phạm Văn Bình 
+2026-01-25 21:38:22,741 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Final: signer_a=False, signer_b=False 
+2026-01-25 21:38:22,743 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: === SIGNER DETECTION === 
+2026-01-25 21:38:22,743 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Last 20 lines: ['ĐIỀU 5: TRÁCH NHIỆM CỦA CÁC BÊN', '1. Bên A cam kết:', '- Giao hàng đúng chất lượng, số lượng, thời gian.', '- Hỗ trợ bảo hành, hậu mãi theo đúng cam kết.', '- Cung cấp hóa đơn VAT và chứng từ liên quan.', '2. Bên B cam kết:', '- Thanh toán đầy đủ, đúng hạn.', '- Sử dụng sản phẩm đúng cách, không làm mất giá trị bảo hành.', 'ĐIỀU 6: ĐIỀU KHOẢN CHUNG', '1. Hai bên cam kết thực hiện đúng các điều khoản trong hợp đồng này.', '2. Mọi sửa đổi, bổ sung phải được lập thành văn bản và có chữ ký của cả hai bên.', '3. Hợp đồng này được lập thành 02 bản có giá trị pháp lý ngang nhau, mỗi bên giữ 01', 'bản.', '4. Tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng. Nếu không', 'thương lượng được thì đưa ra Tòa án nhân dân quận Đống Đa, thành phố Hà Nội.', 'ĐIỀU 7: HIỆU LỰC HỢP ĐỒNG', 'Hợp đồng có hiệu lực từ ngày ký và chấm dứt khi hai bên hoàn thành nghĩa vụ.', 'ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B', '(Ký, ghi rõ họ tên, đóng dấu công ty) (Ký, ghi rõ họ tên)', 'Phạm Thị Hồng Ngọc Phạm Văn Bình'] 
+2026-01-25 21:38:22,743 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN A at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:38:22,743 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Found DAI DIEN BEN B at line 37: ĐẠI DIỆN BÊN A ĐẠI DIỆN BÊN B 
+2026-01-25 21:38:22,743 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: A and B on same line - 2 column PDF 
+2026-01-25 21:38:22,744 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Single name found but ambiguous: Phạm Thị Hồng Ngọc Phạm Văn Bình 
+2026-01-25 21:38:22,744 44263 INFO ngoc odoo.addons.van_ban.models.van_ban: Final: signer_a=False, signer_b=False 
+2026-01-25 21:38:22,755 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:22] "POST /web/dataset/call_kw/van_ban/onchange HTTP/1.1" 200 - 15 0.008 0.456
+2026-01-25 21:38:27,694 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:27] "POST /web/dataset/search_read HTTP/1.1" 200 - 2 0.002 0.006
+2026-01-25 21:38:29,114 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:29] "POST /web/dataset/search_read HTTP/1.1" 200 - 16 0.008 0.011
+2026-01-25 21:38:39,947 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:39] "POST /web/dataset/call_kw/van_ban/web_read_group HTTP/1.1" 200 - 2 0.002 0.004
+2026-01-25 21:38:40,263 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:40] "POST /web/dataset/search_read HTTP/1.1" 200 - 4 0.005 0.010
+2026-01-25 21:38:40,270 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:40] "POST /web/dataset/search_read HTTP/1.1" 200 - 4 0.006 0.014
+2026-01-25 21:38:40,272 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:40] "POST /web/dataset/search_read HTTP/1.1" 200 - 4 0.005 0.015
+2026-01-25 21:38:40,278 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:40] "POST /web/dataset/search_read HTTP/1.1" 200 - 4 0.007 0.016
+2026-01-25 21:38:40,279 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:40] "POST /web/dataset/search_read HTTP/1.1" 200 - 5 0.006 0.016
+2026-01-25 21:38:40,571 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:40] "POST /web/dataset/search_read HTTP/1.1" 200 - 4 0.002 0.008
+2026-01-25 21:38:41,086 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:41] "POST /web/dataset/call_kw/van_ban/web_read_group HTTP/1.1" 200 - 2 0.002 0.004
+2026-01-25 21:38:41,421 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:41] "POST /web/dataset/search_read HTTP/1.1" 200 - 4 0.004 0.016
+2026-01-25 21:38:41,423 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:41] "POST /web/dataset/search_read HTTP/1.1" 200 - 4 0.006 0.022
+2026-01-25 21:38:41,425 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:41] "POST /web/dataset/search_read HTTP/1.1" 200 - 4 0.007 0.027
+2026-01-25 21:38:41,428 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:41] "POST /web/dataset/search_read HTTP/1.1" 200 - 5 0.005 0.020
+2026-01-25 21:38:41,431 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:41] "POST /web/dataset/search_read HTTP/1.1" 200 - 4 0.007 0.025
+2026-01-25 21:38:41,731 44263 INFO ngoc werkzeug: 127.0.0.1 - - [25/Jan/2026 21:38:41] "POST /web/dataset/search_read HTTP/1.1" 200 - 4 0.002 0.005

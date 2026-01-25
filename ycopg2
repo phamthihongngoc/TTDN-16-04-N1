@@ -1,8 +1,5 @@
- id  |                name                 |                res_model                 
------+-------------------------------------+------------------------------------------
- 149 | Snailmail Letters                   | snailmail.letter
- 150 | Discard snailmail delivery failures | snailmail.letter.cancel
- 151 | Format Error                        | snailmail.letter.format.error
- 152 | Failed letter                       | snailmail.letter.missing.required.fields
-(4 rows)
+ id | van_ban_id | van_ban_di_id | van_ban_den_id | verification_status |      signed_at      | has_sig | certificate_id 
+----+------------+---------------+----------------+---------------------+---------------------+---------+----------------
+ 22 |        149 |               |                | invalid             | 2026-01-25 21:07:11 | t       |             12
+(1 row)
 

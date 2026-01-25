@@ -25,7 +25,7 @@
     """,
     'author': 'FitDNU',
     'website': 'https://www.fitdnu.com',
-    'depends': ['base', 'mail', 'nhan_su'],
+    'depends': ['base', 'mail', 'nhan_su', 'ai_integration'],
     'data': [
         'security/khach_hang_security.xml',
         'security/ir.model.access.csv',
@@ -38,16 +38,26 @@
         'views/san_pham_views.xml',
         'views/email_khach_hang_views.xml',
         'views/dashboard_views.xml',
+        'views/dashboard_chart_views.xml',
+        'views/dashboard_advanced_views.xml',
+        'views/dashboard_modern_views.xml',
+        'views/kanban_advanced_views.xml',
+        'views/khach_hang_ai_views.xml',
         'views/menu.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'khach_hang/static/src/css/dashboard.css',
+        ],
+    },
     'demo': [],
     'external_dependencies': {
         'python': [
             'pandas',
             'numpy',
-            'scikit-learn',
-            'stripe',
-            'paypalrestsdk',
+            'sklearn',  # scikit-learn
+            # 'stripe',  # Optional payment gateways
+            # 'paypalrestsdk',
         ],
     },
     'installable': True,

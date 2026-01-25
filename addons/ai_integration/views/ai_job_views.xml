@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI Job Tree View -->
+    <record id="view_ai_job_tree" model="ir.ui.view">
+        <field name="name">ai.job.tree</field>
+        <field name="model">ai.job</field>
+        <field name="arch" type="xml">
+            <tree string="AI Jobs" decoration-success="state=='done'" 
+                  decoration-danger="state=='failed'" decoration-info="state=='running'"
+                  decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="job_type"/>
+                <field name="state"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="model_name"/>
+                <field name="user_id"/>
+                <field name="create_date"/>
+                <field name="duration"/>
+                <field name="cost_usd"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- AI Job Form View -->
+    <record id="view_ai_job_form" model="ir.ui.view">
+        <field name="name">ai.job.form</field>
+        <field name="model">ai.job</field>
+        <field name="arch" type="xml">
+            <form string="AI Job">
+                <header>
+                    <button name="action_run" type="object" string="Chạy ngay" 
+                            class="btn-primary" states="pending"/>
+                    <button name="action_retry" type="object" string="Thử lại" 
+                            class="btn-warning" states="failed"/>
+                    <button name="action_cancel" type="object" string="Hủy" 
+                            states="pending,running"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="pending,running,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_record" type="object" 
+                                class="oe_stat_button" icon="fa-external-link"
+                                attrs="{'invisible': [('model_name', '=', False)]}">
+                            <span>Xem bản ghi</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Tên tác vụ"/></h1>
+                    </div>
+                    <group>
+                        <group string="Thông tin">
+                            <field name="job_type"/>
+                            <field name="priority"/>
+                            <field name="model_name"/>
+                            <field name="record_id"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group string="Tiến độ">
+                            <field name="progress" widget="progressbar"/>
+                            <field name="processed_items"/>
+                            <field name="total_items"/>
+                            <field name="retry_count"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Thời gian">
+                            <field name="scheduled_date"/>
+                            <field name="started_date"/>
+                            <field name="finished_date"/>
+                            <field name="duration"/>
+                        </group>
+                        <group string="Chi phí">
+                            <field name="input_tokens"/>
+                            <field name="output_tokens"/>
+                            <field name="cost_usd"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Dữ liệu đầu vào" name="input">
+                            <field name="input_params"/>
+                            <field name="input_data"/>
+                        </page>
+                        <page string="Kết quả" name="output">
+                            <field name="output_summary" readonly="1"/>
+                            <field name="output_data" readonly="1"/>
+                        </page>
+                        <page string="Lỗi" name="error" attrs="{'invisible': [('state', '!=', 'failed')]}">
+                            <field name="error_message"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- AI Job Search View -->
+    <record id="view_ai_job_search" model="ir.ui.view">
+        <field name="name">ai.job.search</field>
+        <field name="model">ai.job</field>
+        <field name="arch" type="xml">
+            <search string="AI Jobs">
+                <field name="name"/>
+                <field name="job_type"/>
+                <field name="model_name"/>
+                <field name="user_id"/>
+                <filter string="Chờ xử lý" name="pending" domain="[('state', '=', 'pending')]"/>
+                <filter string="Đang chạy" name="running" domain="[('state', '=', 'running')]"/>
+                <filter string="Hoàn thành" name="done" domain="[('state', '=', 'done')]"/>
+                <filter string="Lỗi" name="failed" domain="[('state', '=', 'failed')]"/>
+                <separator/>
+                <filter string="Của tôi" name="my_jobs" domain="[('user_id', '=', uid)]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Trạng thái" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Loại" name="group_type" context="{'group_by': 'job_type'}"/>
+                    <filter string="Người tạo" name="group_user" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- AI Job Action -->
+    <record id="action_ai_job" model="ir.actions.act_window">
+        <field name="name">AI Jobs</field>
+        <field name="res_model">ai.job</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_my_jobs': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Chưa có tác vụ AI nào
+            </p>
+            <p>
+                Các tác vụ AI chạy nền sẽ được hiển thị ở đây.
+            </p>
+        </field>
+    </record>
+</odoo>

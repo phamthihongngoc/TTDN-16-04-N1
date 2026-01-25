@@ -11,3 +11,11 @@ access_san_pham_user,san_pham.user,model_san_pham,group_khach_hang_user,1,0,0,0
 access_san_pham_manager,san_pham.manager,model_san_pham,group_khach_hang_manager,1,1,1,1
 access_email_user,email.user,model_email_khach_hang,group_khach_hang_user,1,1,1,0
 access_email_manager,email.manager,model_email_khach_hang,group_khach_hang_manager,1,1,1,1
+access_dashboard_user,dashboard.user,model_dashboard_khach_hang,group_khach_hang_user,1,0,0,0
+access_dashboard_manager,dashboard.manager,model_dashboard_khach_hang,group_khach_hang_manager,1,1,1,0
+access_ho_tro_category_user,ho_tro_category.user,model_ho_tro_khach_hang_category,group_khach_hang_user,1,0,0,0
+access_ho_tro_category_manager,ho_tro_category.manager,model_ho_tro_khach_hang_category,group_khach_hang_manager,1,1,1,1
+access_ho_tro_team_user,ho_tro_team.user,model_ho_tro_khach_hang_team,group_khach_hang_user,1,0,0,0
+access_ho_tro_team_manager,ho_tro_team.manager,model_ho_tro_khach_hang_team,group_khach_hang_manager,1,1,1,1
+access_ho_tro_tag_user,ho_tro_tag.user,model_ho_tro_khach_hang_tag,group_khach_hang_user,1,1,1,0
+access_ho_tro_tag_manager,ho_tro_tag.manager,model_ho_tro_khach_hang_tag,group_khach_hang_manager,1,1,1,1

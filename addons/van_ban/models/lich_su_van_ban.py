@@ -31,6 +31,7 @@ class LichSuVanBan(models.Model):
         ('mo_khoa', 'Mở khóa'),
         ('ai_analyze', 'Phân tích AI'),
         ('ai_apply', 'Áp dụng AI'),
+        ('pdf_signed_extract', 'Trích xuất từ PDF đã ký'),
         ('khac', 'Khác')
     ], string='Hành động', required=True)
     

@@ -78,6 +78,7 @@ class NhanVien(models.Model):
     # Quan hệ
     cham_cong_ids = fields.One2many('cham_cong', 'nhan_vien_id', string='Chấm công')
     bang_luong_ids = fields.One2many('bang_luong', 'nhan_vien_id', string='Bảng lương')
+    ho_so_ids = fields.One2many('ho_so.nhan_vien', 'nhan_vien_id', string='Hồ sơ')
     
     # Thống kê
     so_ngay_lam_thang = fields.Integer("Số ngày làm tháng này", compute='_compute_thong_ke_thang', store=False)
@@ -85,6 +86,15 @@ class NhanVien(models.Model):
     so_ngay_vang = fields.Integer("Số ngày vắng", compute='_compute_thong_ke_thang', store=False)
     luong_thang_nay = fields.Monetary("Lương tháng này", compute='_compute_luong_thang_nay', currency_field='currency_id', store=False)
     ty_le_cham_cong = fields.Float("Tỷ lệ chấm công (%)", compute='_compute_thong_ke_thang', store=False)
+    
+    # Hồ sơ nhân viên
+    ho_so_count = fields.Integer("Số hồ sơ", compute='_compute_ho_so_count')
+    trang_thai_ho_so = fields.Selection([
+        ('day_du', 'Đầy đủ'),
+        ('thieu', 'Thiếu hồ sơ'),
+        ('sap_het_han', 'Sắp hết hạn'),
+        ('het_han', 'Hết hạn'),
+    ], string='Trạng thái hồ sơ', compute='_compute_trang_thai_ho_so', store=True)
     
     # KPI tổng hợp từ các module
     kpi = fields.Float("KPI Tổng hợp", compute='_compute_kpi', store=True, help="KPI dựa trên chấm công")
@@ -259,6 +269,33 @@ class NhanVien(models.Model):
             # Công thức KPI
             record.kpi = ty_le_cham_cong
 
+    def _compute_ho_so_count(self):
+        """Đếm số lượng hồ sơ"""
+        for record in self:
+            record.ho_so_count = len(record.ho_so_ids)
+
+    @api.depends('ho_so_ids', 'ho_so_ids.trang_thai', 'ho_so_ids.bat_buoc', 
+                 'ho_so_ids.ngay_het_han', 'ho_so_ids.con_hieu_luc')
+    def _compute_trang_thai_ho_so(self):
+        """Tính trạng thái hồ sơ nhân viên"""
+        for record in self:
+            # Kiểm tra hồ sơ bắt buộc
+            ho_so_bat_buoc = record.ho_so_ids.filtered(lambda h: h.bat_buoc)
+            ho_so_da_duyet = ho_so_bat_buoc.filtered(lambda h: h.trang_thai == 'da_duyet')
+            
+            # Kiểm tra hồ sơ hết hạn
+            ho_so_het_han = record.ho_so_ids.filtered(lambda h: h.trang_thai == 'het_han')
+            ho_so_sap_het_han = record.ho_so_ids.filtered(lambda h: h.ngay_het_han and h.so_ngay_con_lai <= 30 and h.so_ngay_con_lai > 0)
+            
+            if ho_so_het_han:
+                record.trang_thai_ho_so = 'het_han'
+            elif ho_so_sap_het_han:
+                record.trang_thai_ho_so = 'sap_het_han'
+            elif len(ho_so_da_duyet) < len(ho_so_bat_buoc):
+                record.trang_thai_ho_so = 'thieu'
+            else:
+                record.trang_thai_ho_so = 'day_du'
+
 
     
     @api.model
@@ -379,6 +416,18 @@ class NhanVien(models.Model):
             'view_mode': 'tree,form',
             'domain': [('nhan_vien_phu_trach_id', '=', self.id)],
             'context': {'default_nhan_vien_phu_trach_id': self.id},
+        }
+
+    def action_view_ho_so(self):
+        """Smart button để xem hồ sơ nhân viên"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Hồ sơ nhân viên',
+            'res_model': 'ho_so.nhan_vien',
+            'view_mode': 'tree,form,kanban',
+            'domain': [('nhan_vien_id', '=', self.id)],
+            'context': {'default_nhan_vien_id': self.id},
         }
 
     def action_view_van_ban(self):

@@ -6,6 +6,9 @@ from datetime import datetime, timedelta
 import hashlib
 import base64
 import logging
+import io
+import re
+import unicodedata
 
 _logger = logging.getLogger(__name__)
 
@@ -31,7 +34,8 @@ class VanBan(models.Model):
                               default=lambda self: _('New'), tracking=True)
     ten_van_ban = fields.Char('Tên văn bản', required=True, tracking=True)
     loai_van_ban_id = fields.Many2one('loai_van_ban', string='Loại văn bản', 
-                                       required=True, tracking=True)
+                                       required=True, tracking=True,
+                                       default=lambda self: self._default_loai_van_ban())
     mo_ta = fields.Text('Mô tả')
     
     # === TRẠNG THÁI (WORKFLOW) ===
@@ -68,6 +72,10 @@ class VanBan(models.Model):
     # Liên kết với module Khách hàng
     khach_hang_id = fields.Many2one('khach_hang', string='Khách hàng liên quan',
                                      tracking=True)
+    khach_hang_trong_hop_dong = fields.Char(
+        'Khách hàng (trong hợp đồng)',
+        help='Tên khách hàng/đối tác được trích xuất từ nội dung hợp đồng (PDF).'
+    )
     don_hang_id = fields.Many2one('don_hang', string='Đơn hàng liên quan',
                                    domain="[('khach_hang_id', '=', khach_hang_id)]")
     
@@ -77,7 +85,9 @@ class VanBan(models.Model):
                                     tracking=True)
     nguoi_duyet_id = fields.Many2one('nhan_vien', string='Người duyệt', tracking=True)
     nguoi_phe_duyet_id = fields.Many2one('nhan_vien', string='Người phê duyệt', tracking=True)
-    nguoi_ky_id = fields.Many2one('nhan_vien', string='Người ký nội bộ', tracking=True)
+    nguoi_ky_id = fields.Many2one('nhan_vien', string='Người ký nội bộ',
+                                   default=lambda self: self._get_nhan_vien_hien_tai(),
+                                   tracking=True)
     
     # Computed fields for display
     ten_nguoi_tao = fields.Char('Tên người tạo', compute='_compute_sync_nhan_su', store=True)
@@ -90,11 +100,30 @@ class VanBan(models.Model):
     ten_file = fields.Char('Tên file')
     file_da_ky = fields.Binary('File đã ký', attachment=True, readonly=True)
     ten_file_da_ky = fields.Char('Tên file đã ký')
+
+    # === PDF AUTO-EXTRACTION (AI) ===
+    ai_pdf_source_hash = fields.Char('AI PDF Source Hash', readonly=True)
+    ai_pdf_text = fields.Text('AI PDF Extracted Text', readonly=True)
+    ai_pdf_extracted_at = fields.Datetime('AI PDF Extracted At', readonly=True)
+    ai_pdf_extract_state = fields.Selection([
+        ('none', 'Chưa xử lý'),
+        ('done', 'Đã trích xuất'),
+        ('error', 'Lỗi'),
+    ], string='AI PDF Extract State', default='none', readonly=True)
+    ai_pdf_extract_error = fields.Text('AI PDF Extract Error', readonly=True)
     
     # === KÝ ĐIỆN TỬ ===
     da_ky_noi_bo = fields.Boolean('Đã ký nội bộ', readonly=True)
     ngay_ky_noi_bo = fields.Datetime('Ngày ký nội bộ', readonly=True)
     chu_ky_noi_bo = fields.Binary('Chữ ký nội bộ', readonly=True)
+
+    nguoi_ky_trong_pdf = fields.Char(
+        'Người ký (trong PDF đã ký)',
+        readonly=True,
+        tracking=True,
+        help='Họ tên người ký được trích xuất từ nội dung file PDF sau khi ký.'
+    )
+    nguoi_ky_trong_pdf_extracted_at = fields.Datetime('Trích xuất từ PDF lúc', readonly=True)
     
     da_khach_ky = fields.Boolean('Khách đã ký', readonly=True)
     ngay_khach_ky = fields.Datetime('Ngày khách ký', readonly=True)
@@ -211,6 +240,854 @@ class VanBan(models.Model):
                 return True
         
         return False
+
+    # === PDF AUTO-FILL (ONCHANGE) ===
+
+    @api.onchange('file_dinh_kem', 'ten_file')
+    def _onchange_file_dinh_kem_autofill_from_pdf(self):
+        """Auto-fill fields when user uploads a PDF in the form."""
+        warning = False
+        for record in self:
+            warning = record._ai_autofill_from_uploaded_pdf(force=False, is_onchange=True) or warning
+        return warning
+
+    def _post_sign_autofill_from_signed_pdf(self):
+        """Chạy sau khi ký: trích xuất dữ liệu từ file PDF đã ký.
+
+        - Ưu tiên trích xuất tên người ký (đại diện BÊN A) và ghi lịch sử.
+        - Có thể trích xuất tên khách hàng (BÊN B) để điền `khach_hang_trong_hop_dong` nếu đang trống.
+        - Không raise lỗi để tránh làm fail luồng ký.
+        """
+        self.ensure_one()
+
+        if not self.file_da_ky or not self.ten_file_da_ky:
+            return False
+
+        file_ext = self.ten_file_da_ky.split('.')[-1].lower() if '.' in self.ten_file_da_ky else ''
+        if file_ext != 'pdf':
+            return False
+
+        try:
+            pdf_bytes = base64.b64decode(self.file_da_ky)
+        except Exception:
+            return False
+
+        try:
+            extracted_text = self._ai_extract_text_from_pdf_bytes(pdf_bytes)
+        except Exception as e:
+            _logger.warning("Post-sign PDF extraction failed (read PDF): %s", e)
+            return False
+
+        try:
+            party_info = self._ai_extract_party_names_from_text(extracted_text)
+        except Exception as e:
+            _logger.warning("Post-sign PDF extraction failed (party parse): %s", e)
+            return False
+
+        # Apply customer name (BÊN B) if empty
+        try:
+            self._ai_apply_party_info(party_info)
+        except Exception as e:
+            _logger.warning("Post-sign PDF extraction failed (apply party): %s", e)
+
+        signer_in_pdf = (party_info.get('dai_dien_ben_a') or '').strip() if isinstance(party_info, dict) else False
+        if signer_in_pdf:
+            self.write({
+                'nguoi_ky_trong_pdf': signer_in_pdf,
+                'nguoi_ky_trong_pdf_extracted_at': fields.Datetime.now(),
+            })
+
+        # Log to history
+        try:
+            if hasattr(self, '_ghi_lich_su'):
+                lines = [
+                    '📄 Trích xuất dữ liệu từ PDF đã ký',
+                ]
+                if signer_in_pdf:
+                    lines.append(f'   - Người ký (trong PDF): {signer_in_pdf}')
+                ben_b = (party_info.get('ben_b') or '').strip() if isinstance(party_info, dict) else False
+                if ben_b:
+                    lines.append(f'   - Khách hàng (BÊN B): {ben_b}')
+                self._ghi_lich_su('pdf_signed_extract', "\n".join(lines))
+        except Exception as e:
+            _logger.warning("Post-sign PDF extraction failed (history): %s", e)
+
+        return signer_in_pdf or False
+
+    def action_ai_autofill_from_pdf(self):
+        """Manual re-run (useful after editing, or when onchange didn't run due to caching)."""
+        for record in self:
+            warning = record._ai_autofill_from_uploaded_pdf(force=True, is_onchange=False)
+            if warning:
+                return warning
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('AI Auto-fill'),
+                'message': _('Đã thử tự điền thông tin từ PDF.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    def _ai_autofill_from_uploaded_pdf(self, force=False, is_onchange=False):
+        """Shared implementation for onchange and manual button.
+
+        - Only runs when `file_dinh_kem` is a PDF.
+        - Uses hash caching; set `force=True` to re-run.
+        - Fills only empty fields.
+        """
+        self.ensure_one()
+
+        if not self.file_dinh_kem:
+            return False
+
+        filename = self.ten_file or ''
+
+        # Always provide safe defaults for required fields (avoid "Invalid fields" popups)
+        # NOTE: Do NOT lock the title to filename here; we will prefer PDF-content title later.
+        fallback_title_from_filename = self._ai_title_from_filename(filename) if filename else False
+        placeholder_title = _('Văn bản')
+        if not self.ten_van_ban:
+            self.ten_van_ban = fallback_title_from_filename or placeholder_title
+        if not self.loai_van_ban_id:
+            self.loai_van_ban_id = self._default_loai_van_ban()
+
+        # Fast reject non-PDF by extension (if filename exists)
+        file_ext = filename.split('.')[-1].lower() if '.' in filename else ''
+        if filename and file_ext and file_ext != 'pdf':
+            return False
+
+        try:
+            pdf_bytes = base64.b64decode(self.file_dinh_kem)
+        except Exception:
+            return False
+
+        # If filename is missing, detect PDF by header to still allow onchange autofill.
+        if not filename:
+            if not pdf_bytes.lstrip().startswith(b'%PDF'):
+                return False
+        else:
+            if file_ext != 'pdf':
+                return False
+
+        source_hash = hashlib.md5(pdf_bytes).hexdigest()
+        if not force and self.ai_pdf_source_hash and self.ai_pdf_source_hash == source_hash:
+            return False
+
+        try:
+            extracted_text = self._ai_extract_text_from_pdf_bytes(pdf_bytes)
+        except Exception as e:
+            self.ai_pdf_source_hash = source_hash
+            self.ai_pdf_extract_state = 'error'
+            self.ai_pdf_extract_error = str(e)
+            # Keep defaults for required fields, and attempt to guess doc type from filename.
+            if not self.loai_van_ban_id:
+                self.loai_van_ban_id = self._ai_guess_loai_van_ban_from_text(extracted_text=None, filename=filename)
+            # Fallback title already applied above; keep going with warning.
+            if is_onchange:
+                return {
+                    'warning': {
+                        'title': _('Không thể đọc PDF'),
+                        'message': str(e),
+                    }
+                }
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Không thể đọc PDF'),
+                    'message': str(e),
+                    'type': 'warning',
+                    'sticky': False,
+                }
+            }
+
+        if not extracted_text or len(extracted_text.strip()) < 30:
+            self.ai_pdf_source_hash = source_hash
+            self.ai_pdf_extract_state = 'error'
+            self.ai_pdf_extract_error = 'Không trích xuất được text từ PDF (có thể là PDF scan).'
+            msg = _(
+                'Không trích xuất được text từ PDF (có thể là PDF scan). '
+                'Bạn có thể dùng chức năng OCR trước, hoặc cung cấp PDF có layer chữ.'
+            )
+            if not self.loai_van_ban_id:
+                self.loai_van_ban_id = self._ai_guess_loai_van_ban_from_text(extracted_text=None, filename=filename)
+            # Fallback title already applied above.
+            if is_onchange:
+                return {
+                    'warning': {
+                        'title': _('PDF không có text'),
+                        'message': msg,
+                    }
+                }
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('PDF không có text'),
+                    'message': msg,
+                    'type': 'warning',
+                    'sticky': False,
+                }
+            }
+
+        # Store extraction info (truncate to avoid huge DB text)
+        self.ai_pdf_source_hash = source_hash
+        self.ai_pdf_text = extracted_text[:50000]
+        self.ai_pdf_extracted_at = fields.Datetime.now()
+        self.ai_pdf_extract_state = 'done'
+        self.ai_pdf_extract_error = False
+
+        # Prefer title extracted from PDF content; override placeholder/filename-based fallback.
+        try:
+            extracted_title = self._ai_extract_title_from_text(extracted_text, filename=filename)
+        except Exception:
+            extracted_title = False
+        if extracted_title:
+            current_title = (self.ten_van_ban or '').strip()
+            if (not current_title) or (current_title == placeholder_title) or (fallback_title_from_filename and current_title == fallback_title_from_filename):
+                self.ten_van_ban = extracted_title
+
+        # Rule-based: extract key fields without AI (fast + reliable)
+        if not self.khach_hang_trong_hop_dong:
+            guessed_kh = self._ai_guess_customer_name_from_text(extracted_text)
+            if guessed_kh:
+                self.khach_hang_trong_hop_dong = guessed_kh
+
+        if not self.gia_tri_hop_dong or self.gia_tri_hop_dong == 0:
+            guessed_value = self._ai_extract_contract_value_from_text(extracted_text)
+            if guessed_value:
+                self.gia_tri_hop_dong = guessed_value
+
+        # Rule-based: detect parties/signers from text before AI (avoid wrong customer)
+        party_info = self._ai_extract_party_names_from_text(extracted_text)
+        self._ai_apply_party_info(party_info)
+
+        # Fill document type if still empty
+        if not self.loai_van_ban_id:
+            self.loai_van_ban_id = self._ai_guess_loai_van_ban_from_text(extracted_text=extracted_text, filename=filename)
+
+        # AI: extract structured fields from text
+        try:
+            extracted = self._ai_extract_structured_fields_from_text(extracted_text)
+            self._ai_apply_extracted_fields(extracted)
+        except Exception as e:
+            self.ai_pdf_extract_error = str(e)
+            msg = _(
+                'PDF đã đọc được nội dung nhưng AI không trích xuất được dữ liệu để tự điền. '
+                'Bạn vẫn có thể điền thủ công hoặc thử lại sau.\n\nLỗi: %s'
+            ) % str(e)
+            if is_onchange:
+                return {
+                    'warning': {
+                        'title': _('Không thể trích xuất trường bằng AI'),
+                        'message': msg,
+                    }
+                }
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Không thể trích xuất trường bằng AI'),
+                    'message': msg,
+                    'type': 'warning',
+                    'sticky': False,
+                }
+            }
+
+        # Fallback title from filename if still empty
+        if not self.ten_van_ban:
+            self.ten_van_ban = fallback_title_from_filename or placeholder_title
+
+        return False
+
+    def _ai_extract_title_from_text(self, extracted_text, *, filename=None):
+        """Extract document title from the beginning of PDF text.
+
+        Goal: Use in-document title (e.g. "HỢP ĐỒNG ...", "BÁO GIÁ ...") rather than filename.
+        Returns a cleaned single-line title or False.
+        """
+        if not extracted_text:
+            return False
+
+        text = extracted_text.replace('\u00a0', ' ')
+        raw_lines = [re.sub(r'\s+', ' ', (ln or '')).strip() for ln in text.splitlines()]
+        lines = [ln for ln in raw_lines if ln]
+        if not lines:
+            return False
+
+        # Scan the first part of the document for a title-like line
+        head = lines[:60]
+
+        def _is_header_noise(ln):
+            return bool(re.search(
+                r'(cộng\s*hòa|độc\s*lập|tự\s*do|hạnh\s*phúc|socialist|republic|---+|\*\*\*+)',
+                ln,
+                flags=re.IGNORECASE,
+            ))
+
+        def _is_meta_line(ln):
+            return bool(re.search(r'(số\s*[:：]|ngày\s*\d{1,2}|tháng\s*\d{1,2}|năm\s*\d{4})', ln, flags=re.IGNORECASE))
+
+        # Primary keywords that usually appear in a title
+        kw = (
+            r'(PHỤ\s*LỤC\s*HỢP\s*ĐỒNG|HỢP\s*ĐỒNG|BÁO\s*GIÁ|BIÊN\s*BẢN|CÔNG\s*VĂN|TỜ\s*TRÌNH|QUYẾT\s*ĐỊNH)'
+        )
+
+        for i, ln in enumerate(head):
+            if _is_header_noise(ln):
+                continue
+            if re.search(kw, ln, flags=re.IGNORECASE):
+                cand = ln
+                # Optionally append the next line if it looks like a subtitle
+                nxt = head[i + 1] if i + 1 < len(head) else ''
+                if nxt and (not _is_header_noise(nxt)) and (not _is_meta_line(nxt)) and len(nxt) <= 140:
+                    # common subtitle: all-caps words without too many digits
+                    if len(re.findall(r'\d', nxt)) <= 6:
+                        cand = f"{cand} {nxt}".strip()
+                cand = re.sub(r'\s+', ' ', cand).strip()
+                # Avoid absurdly long lines
+                if 6 <= len(cand) <= 180:
+                    return cand
+
+        # Fallback: pick the first non-noise line that looks like a title
+        for ln in head:
+            if _is_header_noise(ln) or _is_meta_line(ln):
+                continue
+            if len(ln) < 6 or len(ln) > 180:
+                continue
+            # skip lines that are mostly punctuation/digits
+            letters = len(re.findall(r'[A-Za-zÀ-ỹ]', ln))
+            if letters < 6:
+                continue
+            return re.sub(r'\s+', ' ', ln).strip()
+
+        return False
+
+    def _ai_guess_customer_name_from_text(self, extracted_text):
+        """Best-effort customer name extraction (BÊN B/BÊN MUA/BÊN THUÊ) without AI."""
+        if not extracted_text:
+            return False
+
+        text = extracted_text
+        raw_lines = [re.sub(r'\s+', ' ', (ln or '')).strip() for ln in text.splitlines()]
+        lines = [ln for ln in raw_lines if ln]
+
+        def _clean_org(val):
+            v = (val or '').strip()
+            v = re.sub(r'^[-•·]\s*', '', v)
+            v = re.sub(r'^(Tên\s*(đơn\s*vị|công\s*ty|doanh\s*nghiệp)|Đơn\s*vị)\s*[:：]\s*', '', v, flags=re.IGNORECASE)
+            v = re.sub(r'^(BÊN\s*[AB]|BÊN\s*MUA|BÊN\s*BÁN|BÊN\s*THUÊ|BÊN\s*CHO\s*THUÊ)\s*[:：\-–]*\s*', '', v, flags=re.IGNORECASE)
+            v = re.sub(r'\s+', ' ', v).strip()
+            # Stop at common field separators
+            v = re.split(r'\s{2,}|\s+-\s+|\s+\|\s+|\s*;\s*', v)[0].strip()
+            # Avoid picking addresses
+            if re.search(r'địa\s*chỉ|mst|mã\s*số\s*thuế|điện\s*thoại|tel|fax|email', v, flags=re.IGNORECASE):
+                return ''
+            # Too short is usually noise
+            if len(v) < 4:
+                return ''
+            return v
+
+        # 1) Try to leverage existing party extraction first
+        try:
+            party = self._ai_extract_party_names_from_text(extracted_text)
+            ben_b = (party.get('ben_b') or '').strip() if isinstance(party, dict) else ''
+            ben_b = _clean_org(ben_b)
+            if ben_b:
+                return ben_b
+        except Exception:
+            pass
+
+        # 2) Fallback: find BÊN B line and take same/next line as org name
+        for i, ln in enumerate(lines[:200]):
+            if re.search(r'BÊN\s*B\b|BÊN\s*MUA\b|BÊN\s*THUÊ\b', ln, flags=re.IGNORECASE):
+                # Same-line name
+                m = re.search(r'(?:BÊN\s*B|BÊN\s*MUA|BÊN\s*THUÊ)\s*\(?\s*BÊN\s*B\s*\)?\s*[:：\-–]*\s*(.+)$', ln, flags=re.IGNORECASE)
+                if m:
+                    cand = _clean_org(m.group(1))
+                    if cand:
+                        return cand
+                # Next meaningful line
+                for j in range(i + 1, min(i + 6, len(lines))):
+                    cand = _clean_org(lines[j])
+                    if cand:
+                        return cand
+
+        return False
+
+    def _ai_extract_contract_value_from_text(self, extracted_text):
+        """Extract contract value (gia_tri_hop_dong) from Vietnamese contract text without AI."""
+        if not extracted_text:
+            return False
+
+        # Normalize NBSP and whitespace
+        text = (extracted_text or '').replace('\u00a0', ' ')
+        text = re.sub(r'\s+', ' ', text)
+
+        # Keywords that typically precede the contract value
+        keyword = r'(giá\s*trị\s*hợp\s*đồng|tổng\s*giá\s*trị|trị\s*giá|giá\s*trị|tổng\s*tiền|thành\s*tiền|giá\s*bán|giá\s*trị\s*thanh\s*toán)'
+        # Capture a number-like chunk, allow thousand separators '.', ',', spaces
+        pattern = rf"{keyword}[^0-9]{{0,40}}([0-9][0-9\.,\s]{{4,}})\s*(vnd|vnđ|đồng|d|₫)?"
+
+        matches = re.findall(pattern, text, flags=re.IGNORECASE)
+        candidates = []
+        for m in matches:
+            raw_num = (m[1] if isinstance(m, tuple) and len(m) > 1 else '')
+            if not raw_num:
+                continue
+            digits = re.sub(r'[^0-9]', '', raw_num)
+            if not digits:
+                continue
+            # Heuristic: ignore tiny numbers (often article numbers)
+            try:
+                val = int(digits)
+            except Exception:
+                continue
+            if val < 100000:  # < 100k is unlikely contract value
+                continue
+            candidates.append(val)
+
+        if not candidates:
+            return False
+
+        # Choose the largest value found near keywords
+        best = max(candidates)
+        try:
+            return float(best)
+        except Exception:
+            return False
+
+    @api.model
+    def _default_loai_van_ban(self):
+        """Default required doc type to avoid blocking creates."""
+        Loai = self.env['loai_van_ban']
+        domain = [('active', '=', True)]
+        rec = Loai.search(domain + [('ten_loai', 'ilike', 'Hợp đồng')], limit=1, order='thu_tu, id')
+        if rec:
+            return rec
+        rec = Loai.search(domain, limit=1, order='thu_tu, id')
+        return rec
+
+    def _ai_guess_loai_van_ban_from_text(self, extracted_text=None, filename=None):
+        """Heuristic: choose `loai_van_ban` from extracted text or filename."""
+        self.ensure_one()
+
+        probe = f"{filename or ''}\n{extracted_text or ''}"
+        probe = unicodedata.normalize('NFD', probe)
+        probe = ''.join(ch for ch in probe if unicodedata.category(ch) != 'Mn')
+        probe = probe.replace('đ', 'd').replace('Đ', 'D')
+        probe = re.sub(r'\s+', ' ', probe).strip().lower()
+
+        def _find_by_name(name):
+            return self.env['loai_van_ban'].search([
+                ('active', '=', True),
+                ('ten_loai', 'ilike', name),
+            ], limit=1, order='thu_tu, id')
+
+        rules = [
+            (r'phu\s*luc', 'Phụ lục hợp đồng'),
+            (r'bao\s*gia', 'Báo giá'),
+            (r'bien\s*ban', 'Biên bản nghiệm thu'),
+            (r'cong\s*van', 'Công văn'),
+            (r'to\s*trinh', 'Tờ trình'),
+            (r'hop\s*dong', 'Hợp đồng'),
+        ]
+        for pattern, loai_name in rules:
+            if re.search(pattern, probe, flags=re.IGNORECASE):
+                rec = _find_by_name(loai_name)
+                if rec:
+                    return rec
+
+        return self._default_loai_van_ban()
+
+    def _ai_title_from_filename(self, filename):
+        if not filename:
+            return False
+        base = filename.rsplit('/', 1)[-1]
+        base = base.rsplit('\\', 1)[-1]
+        if '.' in base:
+            base = '.'.join(base.split('.')[:-1])
+        return (base or '').strip() or False
+
+    def _ai_extract_party_names_from_text(self, extracted_text):
+        """Try to extract party names (BÊN A/BÊN B, đại diện) from contract text."""
+        if not extracted_text:
+            return {}
+
+        text = extracted_text
+        # Normalize spaces, keep line structure
+        raw_lines = [re.sub(r'\s+', ' ', (ln or '')).strip() for ln in text.splitlines()]
+        lines = [ln for ln in raw_lines if ln]
+
+        def _clean_name(val):
+            """Làm sạch tên: bỏ prefix như '- Họ và tên:', 'Ông', 'Bà', etc. và loại bỏ dấu cách thừa giữa các ký tự."""
+            if not val:
+                return ''
+            v = val.strip()
+            # Bỏ bullet đầu dòng
+            v = re.sub(r'^[-•·]\s*', '', v)
+            # Bỏ prefix "Họ và tên:", "Họ tên:", "Tên:"
+            v = re.sub(r'^(Họ và tên|Họ tên|Tên)\s*[:：]\s*', '', v, flags=re.IGNORECASE)
+            # Bỏ prefix "Ông", "Bà"
+            v = re.sub(r'^(Ông|Bà|Anh|Chị)\s*[:：]?\s*', '', v, flags=re.IGNORECASE)
+            # Nếu tên bị dính liền (không có dấu cách giữa các từ), tách ra theo chữ hoa
+            if v and not ' ' in v and len(v) > 4:
+                v = re.sub(r'(?<=[a-zàáảãạăắằẳẵặâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ])(?=[A-ZÀÁẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬĐÈÉẺẼẸÊẾỀỂỄỆÌÍỈĨỊÒÓỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÙÚỦŨỤƯỨỪỬỮỰỲÝỶỸỴ])', ' ', v)
+            # Chỉ giữ 1 dấu cách giữa các từ
+            v = re.sub(r'\s+', ' ', v)
+            return v.strip()
+
+        def _is_valid_person_name(val):
+            """Kiểm tra xem có phải tên người hợp lệ không."""
+            if not val:
+                return False
+            v = _clean_name(val)
+            v = re.sub(r'[()\[\]"""_\.]+', ' ', v).strip()
+            if len(v) < 4:
+                return False
+            # Skip instruction lines
+            if re.search(r'ký|ghi rõ|đóng dấu|đại diện|bên\s*[ab]|bên mua|bên bán|bên thuê|bên cho thuê', v, flags=re.IGNORECASE):
+                return False
+            # Skip lines with digits
+            if re.search(r'\d', v):
+                return False
+            # Heuristic: at least 2 words
+            if len(v.split()) < 2:
+                return False
+            return True
+
+        def _find_customer_in_ben_b_section():
+            """Tìm tên khách hàng trong phần BÊN MUA (BÊN B)."""
+            in_ben_b = False
+            for i, ln in enumerate(lines):
+                # Bắt đầu phần BÊN B / BÊN MUA
+                if re.search(r'BÊN\s*MUA\s*\(?\s*BÊN\s*B\s*\)?|BÊN\s*B\s*\(?\s*BÊN\s*MUA\s*\)?|BÊN\s*B\s*[:：]|BÊN\s*MUA\s*[:：]', ln, flags=re.IGNORECASE):
+                    in_ben_b = True
+                    continue
+                # Kết thúc khi gặp section khác
+                if in_ben_b and re.search(r'^(ĐIỀU|Điều)\s*\d+|^(II|III|IV|V)\.|NỘI DUNG|THỎA THUẬN|HAI BÊN', ln, flags=re.IGNORECASE):
+                    break
+                if in_ben_b:
+                    # Tìm dòng có "Họ và tên:" hoặc "- Họ và tên:"
+                    m = re.search(r'(Họ và tên|Họ tên)\s*[:：]\s*(.+)$', ln, flags=re.IGNORECASE)
+                    if m:
+                        name = m.group(2).strip()
+                        if len(name) >= 4:
+                            return _clean_name(name)
+            return False
+
+        def _find_signer_at_end():
+            """Tìm tên người ký (ĐẠI DIỆN BÊN A) ở cuối văn bản."""
+            import logging
+            _logger = logging.getLogger(__name__)
+            
+            # Lấy 40 dòng cuối của văn bản (phần chữ ký)
+            end_lines = lines[-40:] if len(lines) > 40 else lines
+            
+            _logger.info("=== SIGNER DETECTION ===")
+            _logger.info(f"Last 20 lines: {end_lines[-20:]}")
+            
+            dai_dien_a_idx = -1
+            dai_dien_b_idx = -1
+            
+            # Tìm vị trí ĐẠI DIỆN BÊN A và ĐẠI DIỆN BÊN B
+            for i, ln in enumerate(end_lines):
+                # Tìm ĐẠI DIỆN BÊN A (có thể cùng dòng với BÊN B nếu PDF 2 cột)
+                if re.search(r'ĐẠI\s*DIỆN\s*BÊN\s*A|DAI\s*DIEN\s*BEN\s*A', ln, flags=re.IGNORECASE):
+                    dai_dien_a_idx = i
+                    _logger.info(f"Found DAI DIEN BEN A at line {i}: {ln}")
+                # Tìm ĐẠI DIỆN BÊN B riêng (không dùng elif vì có thể cùng dòng)
+                if re.search(r'ĐẠI\s*DIỆN\s*BÊN\s*B|DAI\s*DIEN\s*BEN\s*B', ln, flags=re.IGNORECASE):
+                    dai_dien_b_idx = i
+                    _logger.info(f"Found DAI DIEN BEN B at line {i}: {ln}")
+            
+            signer_a = False
+            signer_b = False
+            
+            # Nếu ĐẠI DIỆN BÊN A và BÊN B cùng dòng (PDF 2 cột)
+            if dai_dien_a_idx >= 0 and dai_dien_a_idx == dai_dien_b_idx:
+                _logger.info("A and B on same line - 2 column PDF")
+                # Tìm dòng tiếp theo có 2 tên
+                for j in range(dai_dien_a_idx + 1, min(dai_dien_a_idx + 8, len(end_lines))):
+                    cand = end_lines[j]
+                    # Bỏ qua dòng hướng dẫn
+                    if re.search(r'ký|ghi rõ|đóng dấu', cand, flags=re.IGNORECASE):
+                        continue
+                    # Tìm 2 tên trên cùng dòng (cách nhau bởi khoảng trắng lớn)
+                    parts = re.split(r'\s{3,}', cand)
+                    if len(parts) >= 2:
+                        name_a = _clean_name(parts[0].strip())
+                        name_b = _clean_name(parts[-1].strip())
+                        if len(name_a) >= 4 and len(name_a.split()) >= 2:
+                            signer_a = name_a
+                        if len(name_b) >= 4 and len(name_b.split()) >= 2:
+                            signer_b = name_b
+                        if signer_a or signer_b:
+                            _logger.info(f"Found names on same line: A={signer_a}, B={signer_b}")
+                            break
+                    # Nếu chỉ có 1 tên, kiểm tra xem có phải tên hợp lệ không
+                    elif _is_valid_person_name(cand):
+                        # Không biết là A hay B, bỏ qua
+                        _logger.info(f"Single name found but ambiguous: {cand}")
+                        continue
+            else:
+                # ĐẠI DIỆN BÊN A và BÊN B khác dòng
+                # Tìm tên sau ĐẠI DIỆN BÊN A (trước ĐẠI DIỆN BÊN B nếu có)
+                if dai_dien_a_idx >= 0:
+                    end_idx = dai_dien_b_idx if (dai_dien_b_idx > dai_dien_a_idx) else len(end_lines)
+                    for j in range(dai_dien_a_idx + 1, min(dai_dien_a_idx + 6, end_idx)):
+                        if j < len(end_lines):
+                            cand = end_lines[j]
+                            # Bỏ qua dòng hướng dẫn
+                            if re.search(r'ký|ghi rõ|đóng dấu', cand, flags=re.IGNORECASE):
+                                continue
+                            if _is_valid_person_name(cand):
+                                signer_a = _clean_name(cand)
+                                _logger.info(f"Found signer A: {signer_a}")
+                                break
+                
+                # Tìm tên sau ĐẠI DIỆN BÊN B
+                if dai_dien_b_idx >= 0:
+                    for j in range(dai_dien_b_idx + 1, min(dai_dien_b_idx + 6, len(end_lines))):
+                        cand = end_lines[j]
+                        # Bỏ qua dòng hướng dẫn
+                        if re.search(r'ký|ghi rõ|đóng dấu', cand, flags=re.IGNORECASE):
+                            continue
+                        if _is_valid_person_name(cand):
+                            signer_b = _clean_name(cand)
+                            _logger.info(f"Found signer B: {signer_b}")
+                            break
+            
+            _logger.info(f"Final: signer_a={signer_a}, signer_b={signer_b}")
+            return signer_a, signer_b
+
+        # Trích xuất thông tin
+        ben_b = _find_customer_in_ben_b_section()
+        signer_a, signer_b = _find_signer_at_end()
+
+        return {
+            'ben_a': False,  # Không cần lấy tên công ty BÊN A
+            'ben_b': ben_b,  # Tên khách hàng từ phần BÊN MUA
+            'dai_dien_ben_a': signer_a,  # Người ký nội bộ
+            'dai_dien_ben_b': signer_b,  # Người ký bên B (khách hàng)
+        }
+
+
+    def _ai_apply_party_info(self, party_info):
+        """Apply rule-based party info (prefer BÊN B as customer).
+        
+        Lưu ý: Không auto-fill nguoi_ky_id từ PDF vì dễ sai.
+        Người ký nội bộ sẽ được chọn thủ công hoặc dùng default.
+        """
+        if not isinstance(party_info, dict):
+            return
+
+        ben_b = (party_info.get('ben_b') or '').strip() if party_info.get('ben_b') else False
+        if ben_b and not self.khach_hang_trong_hop_dong:
+            self.khach_hang_trong_hop_dong = ben_b
+            # Không gán khach_hang_id trong onchange - sẽ được xử lý khi save
+
+        # Không auto-fill nguoi_ky_id từ PDF nữa - để người dùng chọn thủ công
+        # hoặc dùng default value
+
+    def _ai_apply_customer_name(self, kh_name):
+        """Find existing customer by name and assign to `khach_hang_id`.
+        
+        Lưu ý: KHÔNG tạo khách hàng mới trong onchange vì sẽ gây lỗi transaction.
+        Chỉ tìm và gán nếu đã tồn tại.
+        """
+        if not kh_name or self.khach_hang_id:
+            return
+        kh = self.env['khach_hang'].sudo().search([('ten_khach_hang', '=ilike', kh_name)], limit=1)
+        if not kh:
+            kh = self.env['khach_hang'].sudo().search([('ten_khach_hang', 'ilike', kh_name)], limit=1)
+        # Không tạo mới khách hàng trong onchange context - chỉ gán nếu tìm thấy
+        if kh:
+            self.khach_hang_id = kh
+
+    def _ai_extract_text_from_pdf_bytes(self, pdf_bytes):
+        """Extract text from PDF bytes.
+
+        Prefer PyPDF2 (already in root requirements), fallback to pdfplumber.
+        """
+        text_parts = []
+
+        # 1) PyPDF2 (supports both old and new API)
+        try:
+            from PyPDF2 import PdfReader  # PyPDF2 >= 2
+            reader = PdfReader(io.BytesIO(pdf_bytes))
+            for page in getattr(reader, 'pages', []) or []:
+                try:
+                    page_text = page.extract_text() or ''
+                except Exception:
+                    page_text = ''
+                if page_text:
+                    text_parts.append(page_text)
+            extracted = "\n".join(text_parts).strip()
+            if extracted:
+                return extracted
+        except Exception:
+            pass
+
+        try:
+            from PyPDF2 import PdfFileReader  # PyPDF2 1.x
+            reader = PdfFileReader(io.BytesIO(pdf_bytes))
+            for i in range(reader.getNumPages()):
+                try:
+                    page_text = reader.getPage(i).extractText() or ''
+                except Exception:
+                    page_text = ''
+                if page_text:
+                    text_parts.append(page_text)
+            extracted = "\n".join(text_parts).strip()
+            if extracted:
+                return extracted
+        except Exception:
+            pass
+
+        # 2) pdfplumber (better for some PDFs)
+        try:
+            import pdfplumber
+            with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+                for page in pdf.pages:
+                    try:
+                        page_text = page.extract_text() or ''
+                    except Exception:
+                        page_text = ''
+                    if page_text:
+                        text_parts.append(page_text)
+            return "\n".join(text_parts).strip()
+        except Exception as e:
+            raise UserError(_(
+                "Không thể trích xuất text từ PDF. Vui lòng kiểm tra thư viện PyPDF2/pdfplumber. Lỗi: %s"
+            ) % str(e))
+
+    def _ai_extract_structured_fields_from_text(self, extracted_text):
+        """Use AI to extract key fields for the van_ban form."""
+        self.ensure_one()
+
+        # Build lightweight hints from existing master data
+        loai_names = []
+        khach_hang_names = []
+        try:
+            loai_names = self.env['loai_van_ban'].sudo().search([], limit=50).mapped('ten_loai')
+        except Exception:
+            loai_names = []
+        try:
+            khach_hang_names = self.env['khach_hang'].sudo().search([], limit=50).mapped('ten_khach_hang')
+        except Exception:
+            khach_hang_names = []
+
+        # Không dùng AI để extract nguoi_ky vì đã có rule-based extraction chính xác hơn
+        schema = {
+            'ten_van_ban': 'string',
+            'loai_van_ban': 'string|null',
+            'khach_hang': 'string|null',
+            'gia_tri_hop_dong': 'number|null',
+            'ngay_hieu_luc': 'string|null',
+            'ngay_het_han': 'string|null',
+            'mo_ta': 'string|null',
+        }
+
+        loai_hint = "; ".join([n for n in loai_names if n])
+        khach_hang_hint = "; ".join([n for n in khach_hang_names if n])
+        instructions = (
+            "Ngôn ngữ: tiếng Việt. "
+            "Trả về JSON đúng schema. "
+            "ngay_hieu_luc/ngay_het_han theo định dạng YYYY-MM-DD (nếu thấy dd/mm/yyyy hãy chuyển). "
+            "gia_tri_hop_dong trả về số (không kèm đơn vị, không dấu chấm/phẩy). "
+            "khach_hang là tên khách hàng/đối tác được nêu trong hợp đồng, ưu tiên BÊN B / BÊN MUA / BÊN THUÊ. "
+            "loai_van_ban nếu có thì ưu tiên chọn 1 trong danh sách loại văn bản hiện có: "
+            f"{loai_hint[:1500]}. "
+            "khach_hang nếu có thì ưu tiên chọn 1 trong danh sách khách hàng hiện có: "
+            f"{khach_hang_hint[:1500]}"
+        )
+
+        ai_service = self.env['ai.service']
+        # record_id có thể là NewId khi onchange; dùng 0 để logging an toàn
+        record_id = self.id if isinstance(self.id, int) else 0
+        return ai_service.extract_structured_data(
+            extracted_text,
+            schema=schema,
+            instructions=instructions,
+            model_name='van_ban',
+            record_id=record_id,
+        )
+
+    def _ai_apply_extracted_fields(self, extracted):
+        """Apply extracted fields onto the record (only fill empty values)."""
+        self.ensure_one()
+        if not isinstance(extracted, dict):
+            return
+
+        # Title
+        title = (extracted.get('ten_van_ban') or '').strip() if extracted.get('ten_van_ban') else False
+        if title and not self.ten_van_ban:
+            self.ten_van_ban = title
+
+        # Description
+        mo_ta = (extracted.get('mo_ta') or '').strip() if extracted.get('mo_ta') else False
+        if mo_ta and not self.mo_ta:
+            self.mo_ta = mo_ta
+
+        # Dates
+        def _normalize_date(val):
+            if not val:
+                return False
+            if isinstance(val, str):
+                v = val.strip()
+                # normalize dd/mm/yyyy -> yyyy-mm-dd if needed
+                m = re.match(r'^(\d{1,2})/(\d{1,2})/(\d{4})$', v)
+                if m:
+                    d, mo, y = m.groups()
+                    return f"{y}-{int(mo):02d}-{int(d):02d}"
+                m = re.match(r'^(\d{4})-(\d{1,2})-(\d{1,2})$', v)
+                if m:
+                    y, mo, d = m.groups()
+                    return f"{y}-{int(mo):02d}-{int(d):02d}"
+            return False
+
+        ngay_hieu_luc = _normalize_date(extracted.get('ngay_hieu_luc'))
+        if ngay_hieu_luc and not self.ngay_hieu_luc:
+            self.ngay_hieu_luc = ngay_hieu_luc
+
+        ngay_het_han = _normalize_date(extracted.get('ngay_het_han'))
+        if ngay_het_han and not self.ngay_het_han:
+            self.ngay_het_han = ngay_het_han
+
+        # Contract value
+        gia_tri = extracted.get('gia_tri_hop_dong')
+        if (gia_tri is not None) and (not self.gia_tri_hop_dong or self.gia_tri_hop_dong == 0):
+            try:
+                if isinstance(gia_tri, str):
+                    digits = re.sub(r'[^0-9]', '', gia_tri)
+                    self.gia_tri_hop_dong = float(digits) if digits else self.gia_tri_hop_dong
+                else:
+                    self.gia_tri_hop_dong = float(gia_tri)
+            except Exception:
+                pass
+
+        # Document type
+        loai_name = (extracted.get('loai_van_ban') or '').strip() if extracted.get('loai_van_ban') else False
+        if loai_name and not self.loai_van_ban_id:
+            loai = self.env['loai_van_ban'].sudo().search([('ten_loai', '=ilike', loai_name)], limit=1)
+            if not loai:
+                loai = self.env['loai_van_ban'].sudo().search([('ten_loai', 'ilike', loai_name)], limit=1)
+            if loai:
+                self.loai_van_ban_id = loai
+
+        # Related customer - chỉ gán vào field Char, không gán Many2one trong onchange
+        kh_name = (extracted.get('khach_hang') or '').strip() if extracted.get('khach_hang') else False
+        if kh_name:
+            if not self.khach_hang_trong_hop_dong:
+                self.khach_hang_trong_hop_dong = kh_name
+            # Không gán khach_hang_id trong onchange - tránh lỗi transaction
+
+        # Lưu ý: nguoi_ky đã được xử lý bởi _ai_apply_party_info() (rule-based)
+        # Không xử lý ở đây để tránh ghi đè
     
     # === COMPUTE METHODS ===
     
@@ -619,6 +1496,67 @@ class VanBan(models.Model):
                 'default_van_ban_id': self.id,
             }
         }
+    
+    def action_xac_thuc_chu_ky(self):
+        """
+        Xác thực chữ ký số bằng cách:
+        1. Lấy Public Key từ kho (Certificate)
+        2. Giải mã chữ ký số bằng Public Key
+        3. So sánh với file gốc
+        4. Kết luận: Hợp lệ hoặc Không hợp lệ
+        """
+        self.ensure_one()
+        
+        if not self.da_ky_noi_bo:
+            raise UserError('Văn bản chưa được ký điện tử!')
+        
+        # Tìm signature log mới nhất của văn bản (không chỉ giới hạn trạng thái 'signed')
+        # Trường hợp đã xác thực trước đó thì status sẽ là 'verified' và vẫn cần hiển thị được.
+        signature_log = self.env['van_ban.signature.log'].search([
+            ('van_ban_id', '=', self.id),
+            ('digital_signature', '!=', False),
+        ], order='signed_at desc', limit=1)
+
+        if not signature_log:
+            raise UserError(
+                'Không tìm thấy thông tin chữ ký số!\n\n'
+                'Vui lòng kiểm tra lại: văn bản đã được ký điện tử (PKI) và có log ký hợp lệ.'
+            )
+
+        if not signature_log.certificate_id:
+            raise UserError(
+                'Không tìm thấy chứng thư số (certificate) trong log ký!\n\n'
+                'Không thể xác thực chữ ký nếu thiếu certificate.'
+            )
+        
+        # Gọi method xác thực từ signature log
+        try:
+            # Nếu đã verify rồi thì chỉ hiển thị thông tin
+            if signature_log.verification_status != 'verified':
+                signature_log.action_verify_signature()
+            
+            signer_display = signature_log.signer_name or signature_log.signer_name_expected or 'N/A'
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('✅ Xác thực thành công'),
+                    'message': f'Chữ ký số hợp lệ!\n\n👤 Người ký: {signer_display}\n📅 Ngày ký: {signature_log.signed_at.strftime("%d/%m/%Y %H:%M")}\n🔐 Certificate: {signature_log.certificate_id.name if signature_log.certificate_id else "N/A"}\n✅ Xác thực lúc: {signature_log.verified_at.strftime("%d/%m/%Y %H:%M") if signature_log.verified_at else "N/A"}',
+                    'type': 'success',
+                    'sticky': True,
+                }
+            }
+        except Exception as e:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('❌ Xác thực thất bại'),
+                    'message': f'Chữ ký số không hợp lệ!\n\nLý do: {str(e)}',
+                    'type': 'danger',
+                    'sticky': True,
+                }
+            }
     
     def action_gui_van_ban(self):
         """Gửi văn bản - CHỈ được gửi SAU KHI đã ký điện tử"""

@@ -1,55 +1,131 @@
-# HƯỚNG DẪN KÝ ĐIỆN TỬ - VẼ CHỮ KÝ
+# QUY TRÌNH CHỮ KÝ SỐ PKI - CHUẨN QUỐC TẾ
 
-## 📅 Cập nhật: 2026-01-12
-
----
-
-## 🎨 TÍNH NĂNG MỚI: VẼ CHỮ KÝ ĐIỆN TỬ
-
-### ✨ Điểm mới:
-
-- ✅ **Vẽ chữ ký** trực tiếp trên màn hình (signature pad)
-- ✅ **Lưu hình ảnh** chữ ký vào database
-- ✅ **Hiển thị** chữ ký đã ký trong văn bản
-- ✅ **Xác thực** bằng OTP cho khách hàng
-- ✅ **Ghi log** đầy đủ (người ký, thời gian, IP)
+## 📅 Cập nhật: 2026-01-24
 
 ---
 
-## 🔄 QUY TRÌNH THỰC TẾ
+## 🎯 MỤC TIÊU CỦA CHỮ KÝ SỐ
 
-### 1️⃣ SOẠN VĂN BẢN (Word/PDF)
+Chữ ký số PKI (Public Key Infrastructure) được sử dụng nhằm đảm bảo:
+
+### 1. **Xác thực người ký** 🔐
+→ Xác định đúng danh tính chủ thể ký văn bản thông qua Certificate PKI
+
+### 2. **Toàn vẹn dữ liệu** ✅
+→ Nội dung văn bản không bị thay đổi sau khi ký (xác minh qua hash)
+
+### 3. **Không thể chối bỏ** 🔒
+→ Người ký không thể phủ nhận hành vi ký (private key chỉ người ký có)
+
+### 4. **Tính pháp lý** ⚖️
+→ Chữ ký số có giá trị pháp lý tương đương chữ ký tay
+
+---
+
+## 🏗️ THÀNH PHẦN HỆ THỐNG
+
+### 1. **Người ký (Signer)**
+- Có tài khoản trong hệ thống
+- Được cấp Certificate PKI (Private Key + Public Key)
+- Được phân quyền ký văn bản
+
+### 2. **Người nhận / Bên xác thực (Verifier)**
+- Có quyền truy cập văn bản đã ký
+- Sử dụng Public Key để xác thực chữ ký
+- Xác minh tính toàn vẹn của văn bản
+
+### 3. **Hệ thống ký số / Module Văn Bản**
+- Quản lý văn bản (tạo, duyệt, ký, gửi)
+- Tích hợp PKI Certificate Management
+- Quy trình workflow tự động
+
+### 4. **Hạ tầng khóa công khai (PKI)**
+- **Private Key**: Khóa riêng tư (bảo mật tuyệt đối) - dùng để KÝ
+- **Public Key**: Khóa công khai (có thể chia sẻ) - dùng để XÁC THỰC
+- **Certificate**: Chứng thư số X.509 xác thực danh tính
+
+### 5. **File văn bản (PDF)**
+- Văn bản cần ký ở định dạng PDF
+- Upload vào hệ thống
+- Được tạo hash trước khi ký
+
+### 6. **Cơ chế xác thực bổ sung**
+- **Xác thực 2 lớp (2FA)**: Password + OTP
+- **OTP qua Email**: Mã xác thực gửi email
+- **Xác minh họ tên**: Nhập đúng họ tên để xác nhận
+
+---
+
+## 🔄 QUY TRÌNH KÝ SỐ (SIGNING PROCESS)
+
+### **GIAI ĐOẠN I: CHUẨN BỊ**
+
+#### **Bước 0: Tạo Chứng thư số PKI** (Làm 1 lần duy nhất)
+
+```
+Người ký:
+1. Vào: Cấu hình → Chứng thư số PKI
+2. Click "Create"
+3. Nhập thông tin:
+   - Tên: "Certificate PKI - Giám đốc"
+   - Người dùng: [Chọn user]
+   - Common Name: Nguyễn Văn A
+   - Organization: Công ty TNHH ABC
+   - Email: director@company.com
+   - Key Size: 2048 bits (khuyến nghị)
+   - Hash Algorithm: SHA-256
+   - Password: ****** (bảo vệ Private Key)
+   - Thời hạn: 1 năm
+
+4. Click "🔐 Tạo Certificate"
+5. Hệ thống tự động:
+   ✅ Tạo Private Key (mã hóa bằng password)
+   ✅ Tạo Public Key
+   ✅ Tạo Certificate X.509
+   ✅ Lưu vào database
+   ✅ Trạng thái: Đang hoạt động
+
+→ Certificate này sẽ được dùng để ký TẤT CẢ văn bản
+```
+
+#### **Bước 1: Soạn thảo và chuẩn hóa văn bản**
 
 ```
 Nhân viên:
-- Soạn văn bản trên Word/Google Docs
-- Xuất ra PDF
-- Vào Odoo: Văn bản → Create
-- Upload file PDF
-- Điền thông tin: Tên, Loại, Khách hàng (nếu có)
-- Save
+1. Soạn văn bản trên Word/Google Docs
+2. Xuất ra PDF (định dạng chuẩn)
+3. Vào Odoo: Văn bản → Create
+4. Upload file PDF
+5. Điền thông tin:
+   - Tên văn bản: "Hợp đồng thuê nhà số 001/2026"
+   - Loại văn bản: Hợp đồng
+   - Khách hàng: (nếu có)
+   - Người ký: [Chọn Giám đốc]
+6. Save
+7. Trạng thái: Nháp
 ```
 
-### 2️⃣ GỬI DUYỆT
+#### **Bước 2: Gửi duyệt**
 
 ```
 Nhân viên:
-- Click nút "Gửi duyệt" (màu cam)
-- Trạng thái: Nháp → Chờ duyệt
-- Trưởng phòng nhận thông báo
+1. Click nút "Gửi duyệt" (màu cam)
+2. Trạng thái: Nháp → Chờ duyệt
+3. Trưởng phòng nhận thông báo email
 ```
 
-### 3️⃣ DUYỆT NỘI DUNG
+#### **Bước 3: Duyệt nội dung**
 
 ```
 Trưởng phòng:
-- Mở văn bản cần duyệt
-- Đọc kỹ nội dung
-- Kiểm tra file đính kèm
+1. Mở văn bản cần duyệt
+2. Đọc kỹ nội dung
+3. Kiểm tra file đính kèm
 
 ✅ Nếu OK:
    - Click "Duyệt"
    - Trạng thái: Chờ duyệt → Đã duyệt
+   - Giám đốc nhận thông báo cần ký
 
 ❌ Nếu cần sửa:
    - Click "Từ chối"
@@ -57,358 +133,376 @@ Trưởng phòng:
    - Trạng thái quay về: Nháp
 ```
 
-### 4️⃣ KÝ ĐIỆN TỬ - VẼ CHỮ KÝ ⭐ MỚI
+---
+
+### **GIAI ĐOẠN II: KÝ ĐIỆN TỬ PKI** ⭐
+
+#### **Bước 4: Mở wizard ký điện tử**
 
 ```
 Giám đốc (hoặc người có quyền ký):
+1. Mở văn bản đã duyệt
+2. Click nút "Ký điện tử" (màu xanh lá)
+3. Popup hiện ra với form ký điện tử
 
-Bước 1: Click nút "Ký điện tử" (màu xanh lá)
-
-Bước 2: Popup hiện ra với form:
-   ┌───────────────────────────────────┐
-   │  🖊️  KÝ ĐIỆN TỬ                   │
-   ├───────────────────────────────────┤
-   │  Văn bản: [Tên văn bản]          │
-   │  Người ký: [Họ tên - Chức vụ]    │
-   ├───────────────────────────────────┤
-   │  📝 VẼ CHỮ KÝ:                    │
-   │  ┌─────────────────────────────┐ │
-   │  │                             │ │
-   │  │  [Canvas - Vẽ ở đây]       │ │
-   │  │                             │ │
-   │  └─────────────────────────────┘ │
-   │  [Xóa và vẽ lại]                 │
-   ├───────────────────────────────────┤
-   │  ☑ Tôi xác nhận đã đọc và đồng   │
-   │    ý với nội dung văn bản này    │
-   ├───────────────────────────────────┤
-   │  [Hủy]       [✓ Xác nhận ký]     │
-   └───────────────────────────────────┘
-
-Bước 3: VẼ CHỮ KÝ
-   - Dùng chuột vẽ chữ ký trong canvas
-   - Hoặc dùng stylus nếu có màn hình cảm ứng
-   - Nếu vẽ sai → Click "Xóa" → Vẽ lại
-
-Bước 4: Xác nhận
-   - Đánh dấu vào ô "Tôi xác nhận..."
-   - Click "Xác nhận ký"
-
-Bước 5: Hoàn tất
-   ✓ Chữ ký được lưu vào hệ thống
-   ✓ Trạng thái: Đã duyệt → Đã ký
-   ✓ Văn bản CHƯA khóa (chờ gửi)
-   ✓ Hiển thị thông báo thành công
+→ Hệ thống tự động load Certificate PKI còn hiệu lực
 ```
 
-**Screenshot chữ ký sau khi ký:**
-```
-Trong form văn bản, xuất hiện:
-┌─────────────────────────────────┐
-│  CHỮ KÝ ĐIỆN TỬ               │
-├─────────────────────────────────┤
-│  Chữ ký nội bộ:                │
-│  [Hình ảnh chữ ký đã vẽ]       │
-│  👤 Nguyễn Văn A - Giám đốc    │
-│  🕐 12/01/2026 10:30:00        │
-└─────────────────────────────────┘
-```
-
-### 5️⃣ (NẾU CẦN) KHÁCH HÀNG KÝ
-
-```
-Trưởng phòng:
-- Click "Gửi yêu cầu ký cho KH"
-- Hệ thống gửi email cho khách
-
-Khách hàng:
-- Nhận email với link ký
-- Click link → Mở form ký
-
-Form ký khách hàng:
-   ┌───────────────────────────────────┐
-   │  🖊️  KÝ ĐIỆN TỬ VĂN BẢN          │
-   ├───────────────────────────────────┤
-   │  Văn bản: [Tên văn bản]          │
-   │  Khách hàng: [Tên công ty]       │
-   ├───────────────────────────────────┤
-   │  🔐 XÁC THỰC OTP                  │
-   │  Mã OTP: [______]  [Gửi lại]    │
-   ├───────────────────────────────────┤
-   │  📝 VẼ CHỮ KÝ:                    │
-   │  ┌─────────────────────────────┐ │
-   │  │  [Canvas - Vẽ chữ ký]      │ │
-   │  └─────────────────────────────┘ │
-   ├───────────────────────────────────┤
-   │  ☑ Tôi xác nhận đã đọc...        │
-   ├───────────────────────────────────┤
-   │  [Hủy]       [✓ Xác nhận ký]     │
-   └───────────────────────────────────┘
-
-Các bước:
-1. Kiểm tra email → Lấy mã OTP (6 số)
-2. Nhập OTP vào form
-3. Vẽ chữ ký
-4. Đánh dấu xác nhận
-5. Click "Xác nhận ký"
-
-Kết quả:
-✓ Chữ ký khách được lưu
-✓ Văn bản có đầy đủ 2 chữ ký
-✓ Sẵn sàng gửi đi
-```
-
-### 6️⃣ GỬI VĂN BẢN
-
-```
-Trưởng phòng:
-- Kiểm tra văn bản đã đủ chữ ký
-- Click "Gửi văn bản" (màu xanh dương)
-- Xác nhận popup
-
-Kết quả:
-✓ Trạng thái: Đã ký → Đã gửi
-✓ Văn bản TỰ ĐỘNG KHÓA 🔒
-✓ Email gửi cho khách hàng
-✓ HOÀN TẤT!
-```
-
----
-
-## 🎨 CHI TIẾT SIGNATURE PAD
-
-### Cách sử dụng:
-
-#### 🖱️ **Trên máy tính:**
-- Dùng chuột để vẽ
-- Click và giữ chuột trái
-- Di chuyển để vẽ chữ ký
-- Thả chuột để hoàn tất nét vẽ
-
-#### 📱 **Trên mobile/tablet:**
-- Dùng ngón tay hoặc stylus
-- Chạm và kéo để vẽ
-- Nhấc tay ra để hoàn tất nét vẽ
-
-#### ⚙️ **Các tính năng:**
-- **Xóa:** Click "Xóa và vẽ lại" để vẽ lại từ đầu
-- **Thu phóng:** Canvas tự động responsive
-- **Màu:** Mặc định màu đen (có thể tùy chỉnh)
-- **Độ dày:** Nét vẽ tự động theo tốc độ
-
-### Lưu ý khi vẽ:
-
-✅ **NÊN:**
-- Vẽ chữ ký tự nhiên như khi ký tay
-- Đảm bảo chữ ký rõ ràng, dễ nhận diện
-- Vẽ trong khung canvas
-- Kiểm tra lại trước khi xác nhận
-
-❌ **KHÔNG NÊN:**
-- Vẽ quá nhỏ (khó nhìn)
-- Vẽ ra ngoài khung
-- Vẽ lung tung, không giống chữ ký thật
-- Để trống (bắt buộc phải vẽ)
-
----
-
-## 🔒 BẢO MẬT
-
-### Chữ ký nội bộ:
-
-```
-Khi Giám đốc ký:
-✓ Lưu hình ảnh chữ ký (PNG base64)
-✓ Ghi nhận người ký
-✓ Ghi nhận thời gian chính xác
-✓ Ghi nhận IP address
-✓ Ghi vào Audit Trail (không xóa được)
-```
-
-### Chữ ký khách hàng:
-
-```
-Bảo mật 2 lớp:
-1. OTP qua email (timeout 5 phút)
-2. Link có token bảo mật
-
-Khi khách ký:
-✓ Xác thực OTP (max 5 lần thử)
-✓ Lưu chữ ký + IP address
-✓ Không thể ký lại sau khi đã ký
-✓ Ghi log đầy đủ
-```
-
----
-
-## 📊 HIỂN THỊ CHỮ KÝ
-
-### Trong form văn bản:
-
-Sau khi ký, xuất hiện section "Chữ ký điện tử":
+#### **Bước 5: Xác thực 2 lớp (2FA)** 🔐
 
 ```
 ┌─────────────────────────────────────────┐
-│  CHỮ KÝ ĐIỆN TỬ                        │
+│  🔒 XÁC THỰC 2 LỚP                      │
 ├─────────────────────────────────────────┤
-│  ┌─────────────────┬─────────────────┐ │
-│  │ CHỮ KÝ NỘI BỘ  │ CHỮ KÝ KHÁCH   │ │
-│  ├─────────────────┼─────────────────┤ │
-│  │ [Hình chữ ký]   │ [Hình chữ ký]   │ │
-│  │                 │                 │ │
-│  │ 👤 Nguyễn Văn A │ 👤 Công ty ABC  │ │
-│  │ 🕐 12/01 10:30  │ 🕐 12/01 14:20  │ │
-│  └─────────────────┴─────────────────┘ │
+│  ☑ Yêu cầu OTP (khuyến nghị)            │
+│                                         │
+│  [Gửi OTP qua Email]                    │
+│                                         │
+│  Nhập mã OTP: [______]                  │
+│                                         │
+│  [Xác thực OTP]                         │
 └─────────────────────────────────────────┘
+
+Quy trình:
+1. Click "Gửi OTP qua Email"
+2. Hệ thống gửi mã OTP 6 số đến email
+3. Nhập mã OTP vào ô input
+4. Click "Xác thực OTP"
+5. ✅ Xác thực thành công → Cho phép tiếp tục ký
 ```
 
-### Trong lịch sử:
+#### **Bước 6: Vẽ chữ ký tay**
 
 ```
-📜 Lịch sử thay đổi:
-12/01/2026 14:20 | Gửi văn bản        | Admin
-12/01/2026 14:20 | Khách hàng ký      | Công ty ABC (IP: 42.119.x.x)
-12/01/2026 10:30 | Ký điện tử văn bản | Nguyễn Văn A (IP: 192.168.1.5)
-12/01/2026 09:15 | Duyệt văn bản      | Nguyễn Văn B
-12/01/2026 08:00 | Tạo văn bản mới    | Nguyễn Văn C
+┌─────────────────────────────────────────┐
+│  🖊️  KÝ ĐIỆN TỬ PKI                     │
+├─────────────────────────────────────────┤
+│  Văn bản: Hợp đồng thuê nhà 001/2026    │
+│  Người ký: Nguyễn Văn A - Giám đốc      │
+│  Certificate: Certificate PKI - GĐ      │
+│  Hết hạn: 15/01/2027                    │
+├─────────────────────────────────────────┤
+│  📝 VẼ CHỮ KÝ TAY:                      │
+│  ┌─────────────────────────────────┐   │
+│  │                                 │   │
+│  │  [Canvas - Vẽ ở đây]           │   │
+│  │                                 │   │
+│  └─────────────────────────────────┘   │
+│  [Xóa và vẽ lại]                       │
+├─────────────────────────────────────────┤
+│  Xác minh họ tên: [Nguyễn Văn A]       │
+│                                         │
+│  ☑ Tôi xác nhận đã đọc và đồng ý       │
+│    với nội dung văn bản này            │
+├─────────────────────────────────────────┤
+│  [Hủy]       [✓ Xác nhận ký]           │
+└─────────────────────────────────────────┘
+
+Thao tác:
+1. Vẽ chữ ký tay trên canvas (chuột hoặc stylus)
+2. Nhập đúng họ tên để xác minh
+3. Đánh dấu vào ô "Tôi xác nhận..."
+4. Click "Xác nhận ký"
+```
+
+#### **Bước 7: Hệ thống thực hiện ký PKI** 🔐
+
+```
+Hệ thống tự động thực hiện (backend):
+
+1️⃣ TẠO HASH CỦA FILE PDF
+   - Đọc file PDF gốc
+   - Tạo SHA-256 hash: 
+     a7f8b2c3d4e5f6g7h8i9j0k1l2m3n4o5...
+   
+2️⃣ MÃ HÓA HASH BẰNG PRIVATE KEY
+   - Lấy Private Key từ Certificate
+   - Giải mã Private Key bằng password
+   - Mã hóa hash bằng Private Key
+   - Kết quả: CHỮ KÝ SỐ (Digital Signature)
+   
+3️⃣ GẮN CHỮ KÝ VÀO VĂN BẢN
+   - Lưu chữ ký số vào database
+   - Gắn kèm Public Key / Certificate
+   - Lưu File Hash (SHA-256)
+   - Lưu metadata: thời gian, IP, người ký
+   
+4️⃣ GHI LOG AUDIT TRAIL
+   - Lưu vào Lịch sử ký điện tử
+   - Certificate ID
+   - Digital Signature
+   - Hash Algorithm
+   - Verification Status: "signed"
+   
+5️⃣ LƯU LÊN BLOCKCHAIN (TÙY CHỌN)
+   - Tạo combined hash: file + signature
+   - Gửi transaction lên Ethereum
+   - Lưu Transaction Hash
+   
+✅ HOÀN TẤT
+   - Trạng thái: Đã duyệt → Đã ký
+   - File đã ký: SIGNED_HopDong001.pdf
+   - Thông báo: "✅ Ký thành công!"
 ```
 
 ---
 
-## 🛠️ KỸ THUẬT
+## ✅ GIAI ĐOẠN III: XÁC THỰC CHỮ KÝ (VERIFICATION)
 
-### Model: wizard.ky.dien.tu
+### **Bước 8: Người nhận xác thực văn bản**
 
-```python
-class WizardKyDienTu(models.TransientModel):
-    _name = 'wizard.ky.dien.tu'
-    
-    van_ban_id = fields.Many2one('van_ban')
-    chu_ky = fields.Binary('Chữ ký')  # Lưu PNG base64
-    nguoi_ky_id = fields.Many2one('nhan_vien')
-    xac_nhan = fields.Boolean()
-    
-    def action_ky(self):
-        # Lưu chữ ký vào văn bản
-        # Cập nhật trạng thái
-        # Ghi log
+```
+Người nhận / Kiểm toán viên:
+
+1. Vào: Văn bản → Mở văn bản đã ký
+2. Tab: Chữ ký điện tử → Xem log ký
+3. Click vào log cụ thể
+4. Click nút "🔍 Xác thực chữ ký số"
 ```
 
-### View: Signature widget
+### **Bước 9: Hệ thống xác thực (backend)**
 
-```xml
-<field name="chu_ky" 
-       widget="signature" 
-       options="{'size': [600, 200], 'editable': true, 'clear': true}"/>
+```
+Quy trình xác thực PKI:
+
+1️⃣ LẤY PUBLIC KEY TỪ CERTIFICATE
+   - Đọc Public Key từ database
+   - Load Certificate của người ký
+   
+2️⃣ LẤY DIGITAL SIGNATURE
+   - Đọc chữ ký số đã lưu
+   - Decode từ base64
+   
+3️⃣ TẠO LẠI HASH TỪ FILE HIỆN TẠI
+   - Đọc file PDF hiện tại
+   - Tạo SHA-256 hash mới
+   
+4️⃣ GIẢI MÃ CHỮ KÝ BẰNG PUBLIC KEY
+   - Sử dụng Public Key
+   - Giải mã Digital Signature
+   - Lấy được hash gốc
+   
+5️⃣ SO SÁNH HAI HASH
+   Hash gốc (từ chữ ký) == Hash mới (từ file)?
+   
+   ✅ TRÙNG NHAU:
+      → Chữ ký hợp lệ
+      → File không bị thay đổi
+      → Người ký xác thực đúng
+      → CÓ TÍNH PHÁP LÝ
+   
+   ❌ KHÁC NHAU:
+      → Chữ ký KHÔNG hợp lệ
+      → File đã bị thay đổi hoặc chữ ký giả mạo
+      → KHÔNG CÓ TÍNH PHÁP LÝ
 ```
 
-Widget `signature` của Odoo tự động:
-- Tạo canvas HTML5
-- Capture mouse/touch events
-- Convert sang image base64
-- Lưu vào Binary field
+### **Bước 10: Kết quả xác thực**
 
-### CSS: Styling
-
-```css
-.o_signature_canvas {
-    border: 2px solid #dee2e6;
-    background: #ffffff;
-    cursor: crosshair;
-    width: 100%;
-    height: 200px;
-}
 ```
+✅ KẾT QUẢ HỢP LỆ:
+
+┌─────────────────────────────────────────┐
+│  ✅ XÁC THỰC THÀNH CÔNG                 │
+├─────────────────────────────────────────┤
+│  1. Chữ ký số hợp lệ                    │
+│  2. File không bị thay đổi sau khi ký   │
+│  3. Người ký: Nguyễn Văn A              │
+│  4. Chứng thư số: Certificate PKI - GĐ  │
+│  5. Thời gian ký: 24/01/2026 10:30      │
+│  6. IP: 192.168.1.100                   │
+│                                         │
+│  → Văn bản này CÓ TÍNH PHÁP LÝ         │
+│    và không thể chối bỏ.               │
+└─────────────────────────────────────────┘
+
+Status: ✅ verified
+
+
+❌ KẾT QUẢ KHÔNG HỢP LỆ:
+
+┌─────────────────────────────────────────┐
+│  ❌ XÁC THỰC THẤT BẠI                   │
+├─────────────────────────────────────────┤
+│  Chữ ký số KHÔNG HỢP LỆ!               │
+│                                         │
+│  Nguyên nhân có thể:                    │
+│  1. File đã bị thay đổi sau khi ký     │
+│  2. Chữ ký bị giả mạo                  │
+│  3. Sử dụng sai certificate            │
+│                                         │
+│  → Văn bản này KHÔNG CÓ TÍNH PHÁP LÝ!  │
+└─────────────────────────────────────────┘
+
+Status: ❌ invalid
+```
+
+---
+
+## 📊 SƠ ĐỒ LUỒNG QUY TRÌNH
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  GIAI ĐOẠN I: CHUẨN BỊ                                     │
+└─────────────────────────────────────────────────────────────┘
+                           │
+     ┌─────────────────────┴─────────────────────┐
+     │                                           │
+[Tạo Certificate PKI]               [Soạn thảo văn bản]
+ (Làm 1 lần duy nhất)                  → PDF → Upload
+     │                                           │
+     │                                    [Gửi duyệt]
+     │                                           │
+     │                                    [Trưởng phòng duyệt]
+     │                                           │
+     └───────────────────┬───────────────────────┘
+                         │
+┌─────────────────────────────────────────────────────────────┐
+│  GIAI ĐOẠN II: KÝ ĐIỆN TỬ PKI                              │
+└─────────────────────────────────────────────────────────────┘
+                         │
+                  [Giám đốc mở wizard ký]
+                         │
+                  [Xác thực 2FA/OTP]
+                         │
+                  [Vẽ chữ ký + Xác minh]
+                         │
+              ┌──────────┴──────────┐
+              │  HỆ THỐNG XỬ LÝ    │
+              ├─────────────────────┤
+              │ 1. Tạo hash file    │
+              │ 2. Mã hóa bằng      │
+              │    Private Key      │
+              │ 3. Tạo chữ ký số    │
+              │ 4. Lưu + Public Key │
+              │ 5. Blockchain (opt) │
+              └──────────┬──────────┘
+                         │
+                  [✅ Đã ký thành công]
+                         │
+┌─────────────────────────────────────────────────────────────┐
+│  GIAI ĐOẠN III: XÁC THỰC                                   │
+└─────────────────────────────────────────────────────────────┘
+                         │
+              [Người nhận xem văn bản]
+                         │
+              [Click "Xác thực chữ ký"]
+                         │
+              ┌──────────┴──────────┐
+              │  HỆ THỐNG XÁC THỰC │
+              ├─────────────────────┤
+              │ 1. Lấy Public Key   │
+              │ 2. Giải mã chữ ký   │
+              │ 3. Tạo lại hash     │
+              │ 4. So sánh hash     │
+              └──────────┬──────────┘
+                         │
+                 ┌───────┴───────┐
+                 │               │
+          ✅ Hợp lệ      ❌ Không hợp lệ
+          (verified)        (invalid)
+```
+
+---
+
+## 🔒 BẢO MẬT & TUÂN THỦ
+
+### **1. Quản lý Private Key**
+- ✅ Mã hóa bằng password mạnh
+- ✅ Chỉ lưu ở database, không export
+- ✅ Chỉ admin & chủ sở hữu truy cập được
+- ⚠️ KHÔNG BAO GIỜ chia sẻ Private Key
+
+### **2. Quản lý Public Key**
+- ✅ Có thể chia sẻ công khai
+- ✅ Download để gửi cho đối tác xác thực
+- ✅ Đính kèm trong Certificate
+
+### **3. Certificate Lifecycle**
+- ✅ Có thời hạn (thường 1 năm)
+- ✅ Cảnh báo trước 30 ngày hết hạn
+- ✅ Tự động expire khi hết hạn
+- ✅ Có thể thu hồi (revoke) nếu cần
+
+### **4. Audit Trail**
+- ✅ Log đầy đủ mọi hành động ký
+- ✅ Lưu IP, timestamp, certificate
+- ✅ Không thể xóa log
+- ✅ Có thể xác thực lại bất cứ lúc nào
+
+### **5. Blockchain (Tùy chọn)**
+- ✅ Lưu hash lên Ethereum
+- ✅ Không thể thay đổi
+- ✅ Minh chứng timestamp
+- ✅ Tăng tính tin cậy
+
+---
+
+## 🎓 CHUẨN QUỐC TẾ & PHÁP LÝ
+
+### **Tuân thủ theo:**
+- ✅ **PKI (Public Key Infrastructure)**: Chuẩn quốc tế
+- ✅ **X.509 Certificate**: Định dạng certificate chuẩn
+- ✅ **RSA 2048-bit**: Thuật toán mã hóa khuyến nghị
+- ✅ **SHA-256**: Thuật toán hash an toàn
+- ✅ **PSS Padding**: Chuẩn padding cho RSA signature
+
+### **Tính pháp lý:**
+- ✅ Chữ ký số PKI có giá trị pháp lý
+- ✅ Đảm bảo: Xác thực, Toàn vẹn, Không chối bỏ
+- ✅ Audit trail đầy đủ
+- ✅ Có thể xác thực độc lập
+
+---
+
+## 🚀 HƯỚNG DẪN TRIỂN KHAI
+
+### **1. Cài đặt thư viện**
+```bash
+pip install cryptography
+```
+
+### **2. Tạo Certificate cho người ký**
+- Vào menu: Cấu hình → Chứng thư số PKI
+- Tạo certificate cho từng người có quyền ký
+- Lưu password Private Key cẩn thận
+
+### **3. Sử dụng**
+- Soạn văn bản → Duyệt → Ký PKI → Gửi
+- Người nhận có thể xác thực bất cứ lúc nào
+
+### **4. Bảo trì**
+- Gia hạn certificate trước khi hết hạn
+- Backup database định kỳ
+- Monitor log audit trail
 
 ---
 
 ## ❓ FAQ
 
-### ❓ Tôi vẽ xấu, có thể dùng ảnh chữ ký sẵn không?
+**Q: Private Key có bị lộ không?**
+A: Không. Private Key được mã hóa bằng password và chỉ lưu trong database. Không bao giờ export ra ngoài.
 
-Không được! Phải vẽ trực tiếp trên hệ thống. Điều này:
-- Đảm bảo tính xác thực
-- Ghi nhận thời gian thực tế
-- Có giá trị pháp lý
+**Q: Nếu quên password Private Key?**
+A: Phải tạo Certificate mới. Không thể khôi phục password.
 
-### ❓ Làm sao để vẽ đẹp hơn?
+**Q: Public Key có cần bảo mật không?**
+A: Không. Public Key được thiết kế để chia sẻ công khai.
 
-- Dùng màn hình lớn
-- Vẽ chậm rãi
-- Dùng stylus nếu có tablet
-- Luyện tập vài lần
+**Q: Certificate hết hạn thì sao?**
+A: Không thể ký văn bản mới. Nhưng văn bản đã ký trước đó vẫn hợp lệ.
 
-### ❓ Chữ ký có thể xóa/sửa sau khi đã ký không?
-
-Không! Sau khi click "Xác nhận ký", chữ ký được lưu vĩnh viễn.
-Chỉ Admin mới có thể mở khóa văn bản để ký lại.
-
-### ❓ Khách hàng không nhận được OTP?
-
-Kiểm tra:
-- Email có đúng không?
-- Thư rác (Spam folder)
-- SMTP server có hoạt động không?
-- Click "Gửi lại OTP" trong form
-
-### ❓ Văn bản đã ký có thể in ra được không?
-
-Có! Chữ ký sẽ hiển thị khi in hoặc xuất PDF.
+**Q: Có thể xác thực văn bản đã ký từ nhiều năm trước?**
+A: Có. Miễn là còn lưu Public Key/Certificate và file gốc.
 
 ---
 
-## ✅ CHECKLIST KÝ ĐIỆN TỬ
+## 📞 HỖ TRỢ
 
-### Trước khi ký (Nội bộ):
-
-```
-☐ Văn bản đã được duyệt?
-☐ File đã upload đầy đủ?
-☐ Nội dung đã kiểm tra kỹ?
-☐ Thông tin chính xác?
-→ OK → Click "Ký điện tử"
-```
-
-### Khi vẽ chữ ký:
-
-```
-☐ Chữ ký rõ ràng, dễ nhận diện?
-☐ Vẽ trong khung canvas?
-☐ Giống chữ ký thật của bạn?
-☐ Đã đánh dấu xác nhận?
-→ OK → Click "Xác nhận ký"
-```
-
-### Trước khi gửi văn bản:
-
-```
-☐ Đã ký nội bộ?
-☐ Nếu có khách → Khách đã ký?
-☐ Đã kiểm tra lần cuối?
-☐ Sẵn sàng KHÓA văn bản?
-→ OK → Click "Gửi văn bản"
-```
+Liên hệ: [Admin] hoặc [IT Support]
+Email: support@company.com
+Phone: 0123.456.789
 
 ---
 
-## 🎓 KẾT LUẬN
-
-### Ưu điểm của VẼ CHỮ KÝ:
-
-✅ **Trực quan:** Giống ký tay thật
-✅ **Dễ dùng:** Không cần USB token, thiết bị đặc biệt
-✅ **Nhanh:** Ký trong vài giây
-✅ **Bảo mật:** Có OTP, ghi log đầy đủ
-✅ **Pháp lý:** Có giá trị như chữ ký tay
-
-### Lưu ý:
-
-⚠️ Đây là chữ ký điện tử đơn giản, KHÔNG phải chữ ký số theo chuẩn PKI
-⚠️ Phù hợp cho văn bản nội bộ, hợp đồng doanh nghiệp
-⚠️ Nếu cần chữ ký số chuẩn → Tích hợp với nhà cung cấp chứng thư số
-
----
-
-**Phiên bản:** 2.0.0 (Signature Pad)  
-**Tác giả:** FIT-DNU  
-**Cập nhật:** 2026-01-12
+**© 2026 - Module Văn Bản PKI v2.0**

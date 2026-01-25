@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI Assistant Wizard Form View -->
+    <record id="view_ai_assistant_wizard_form" model="ir.ui.view">
+        <field name="name">ai.assistant.wizard.form</field>
+        <field name="model">ai.assistant.wizard</field>
+        <field name="arch" type="xml">
+            <form string="AI Assistant">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <i class="fa fa-robot text-primary"/> Trợ lý AI
+                        </h1>
+                    </div>
+                    
+                    <!-- Context info -->
+                    <group attrs="{'invisible': [('record_name', '=', False)]}">
+                        <field name="record_name" readonly="1"/>
+                        <field name="model_name" invisible="1"/>
+                        <field name="record_id" invisible="1"/>
+                    </group>
+                    
+                    <!-- Input section -->
+                    <group string="Nhập yêu cầu">
+                        <field name="action_type" widget="radio" options="{'horizontal': true}"/>
+                        <field name="include_record_context" 
+                               attrs="{'invisible': [('record_name', '=', False)]}"/>
+                    </group>
+                    
+                    <group>
+                        <field name="user_prompt" placeholder="Nhập câu hỏi hoặc yêu cầu của bạn..." 
+                               widget="text" nolabel="1"/>
+                    </group>
+                    
+                    <!-- Advanced options -->
+                    <group>
+                        <field name="show_advanced" widget="boolean_toggle"/>
+                    </group>
+                    <group attrs="{'invisible': [('show_advanced', '=', False)]}">
+                        <group>
+                            <field name="temperature"/>
+                        </group>
+                        <group>
+                            <field name="max_tokens"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Response section -->
+                    <group string="Phản hồi từ AI" attrs="{'invisible': [('response_ready', '=', False)]}">
+                        <field name="ai_response" readonly="1" nolabel="1" widget="text"/>
+                    </group>
+                    
+                    <field name="response_ready" invisible="1"/>
+                </sheet>
+                <footer>
+                    <button name="action_send" type="object" string="Gửi" 
+                            class="btn-primary" icon="fa-paper-plane"
+                            attrs="{'invisible': [('response_ready', '=', True)]}"/>
+                    <button name="action_new_chat" type="object" string="Chat mới" 
+                            class="btn-primary" icon="fa-refresh"
+                            attrs="{'invisible': [('response_ready', '=', False)]}"/>
+                    <button string="Đóng" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <!-- AI Assistant Action (for menu) -->
+    <record id="action_ai_assistant" model="ir.actions.act_window">
+        <field name="name">AI Assistant</field>
+        <field name="res_model">ai.assistant.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

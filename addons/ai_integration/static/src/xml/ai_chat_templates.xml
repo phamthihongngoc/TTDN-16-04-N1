@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <!-- Systray Chat Button -->
+    <t t-name="ai_integration.ChatSystray">
+        <div class="o_systray_item o_ai_chat_systray">
+            <a class="ai-systray-icon o_nav_link" href="#" title="AI Assistant">
+                <i class="fa fa-comments"></i>
+                <span class="ai-systray-label">AI</span>
+            </a>
+            
+            <!-- Chat Dropdown Panel -->
+            <div class="ai-chat-dropdown">
+                <!-- Header -->
+                <div class="ai-chat-header">
+                    <h5>
+                        <i class="fa fa-robot mr-2"></i>
+                        AI Assistant
+                    </h5>
+                    <div class="ai-chat-actions">
+                        <button class="ai-clear-chat" title="Xóa lịch sử">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                        <button class="ai-chat-close" title="Đóng">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="ai-quick-actions">
+                    <!-- Populated dynamically -->
+                </div>
+                
+                <!-- Messages -->
+                <div class="ai-chat-messages">
+                    <div class="ai-message ai-msg-assistant">
+                        <div class="ai-msg-content">
+                            👋 Xin chào! Tôi là AI Assistant. Bạn cần hỗ trợ gì?
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Loading -->
+                <div class="ai-chat-loading d-none">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="sr-only">Đang xử lý...</span>
+                    </div>
+                    <small class="text-muted ml-2">Đang suy nghĩ...</small>
+                </div>
+                
+                <!-- Input -->
+                <div class="ai-chat-input-area">
+                    <div class="ai-chat-input-wrapper">
+                        <textarea 
+                            class="ai-chat-input" 
+                            placeholder="Nhập tin nhắn..." 
+                            rows="1"></textarea>
+                        <button class="ai-chat-send" title="Gửi">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+    
+    <!-- Chat Panel Template (for Form Views) -->
+    <t t-name="ai_integration.ChatPanel">
+        <div class="ai-chat-panel-container">
+            <!-- Toggle Button -->
+            <button class="ai-chat-toggle-btn ai-chat-toggle" title="AI Assistant">
+                <i class="fa fa-robot"></i>
+            </button>
+            
+            <!-- Panel -->
+            <div class="ai-chat-panel">
+                <!-- Header -->
+                <div class="ai-chat-header">
+                    <h5>
+                        <i class="fa fa-robot mr-2"></i>
+                        AI Assistant
+                    </h5>
+                    <div class="ai-chat-actions">
+                        <button class="ai-new-session" title="Phiên mới">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                        <button class="ai-clear-chat" title="Xóa lịch sử">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                        <button class="ai-chat-close" title="Đóng">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Context Info -->
+                <div class="ai-context-info p-2 bg-light border-bottom small" t-if="widget.activeModel">
+                    <i class="fa fa-info-circle text-muted"></i>
+                    <span class="text-muted">Đang xem: </span>
+                    <span t-esc="widget.activeModel"/>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="ai-quick-actions">
+                    <!-- Populated dynamically -->
+                </div>
+                
+                <!-- Messages -->
+                <div class="ai-chat-messages">
+                    <div class="ai-message ai-msg-assistant">
+                        <div class="ai-msg-avatar">
+                            <i class="fa fa-robot"></i>
+                        </div>
+                        <div class="ai-msg-content">
+                            👋 Xin chào! Tôi có thể giúp gì cho bạn với bản ghi này?
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Loading -->
+                <div class="ai-chat-loading d-none">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="sr-only">Đang xử lý...</span>
+                    </div>
+                    <small class="text-muted ml-2">Đang phân tích...</small>
+                </div>
+                
+                <!-- Input -->
+                <div class="ai-chat-input-area">
+                    <div class="ai-chat-input-wrapper">
+                        <textarea 
+                            class="ai-chat-input" 
+                            placeholder="Hỏi AI về bản ghi này..." 
+                            rows="1"></textarea>
+                        <button class="ai-chat-send" title="Gửi">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+    
+    <!-- Message Template -->
+    <t t-name="ai_integration.ChatMessage">
+        <div t-attf-class="ai-message ai-msg-#{message.role}">
+            <div class="ai-msg-avatar">
+                <i t-attf-class="fa #{message.role === 'user' ? 'fa-user' : 'fa-robot'}"></i>
+            </div>
+            <div class="ai-msg-content">
+                <t t-if="message.content_html">
+                    <t t-raw="message.content_html"/>
+                </t>
+                <t t-else="">
+                    <t t-esc="message.content"/>
+                </t>
+                
+                <!-- Confirmation buttons -->
+                <t t-if="message.requires_confirmation and not message.action_confirmed">
+                    <div class="ai-msg-actions mt-2">
+                        <button class="btn btn-sm btn-success ai-confirm-btn" 
+                                t-att-data-message-id="message.id">
+                            <i class="fa fa-check"></i> Xác nhận
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger ai-reject-btn ml-2"
+                                t-att-data-message-id="message.id">
+                            <i class="fa fa-times"></i> Từ chối
+                        </button>
+                    </div>
+                </t>
+            </div>
+            <div class="ai-msg-time" t-if="message.created_at">
+                <t t-esc="message.created_at"/>
+            </div>
+        </div>
+    </t>
+    
+    <!-- Quick Action Button Template -->
+    <t t-name="ai_integration.QuickAction">
+        <button class="btn btn-sm btn-outline-primary ai-quick-action m-1"
+                t-att-data-prompt="action.prompt">
+            <i t-attf-class="fa #{action.icon or 'fa-bolt'}"></i>
+            <t t-esc="action.label"/>
+        </button>
+    </t>
+
+    <!-- Full Page AI Chat Widget (for Client Action) -->
+    <t t-name="ai_integration.ChatWidgetPage">
+        <div class="ai-chat-widget-page o_action">
+            <div class="ai-chat-main-container">
+                <!-- Header -->
+                <div class="ai-chat-page-header">
+                    <div class="ai-chat-title">
+                        <i class="fa fa-robot fa-lg text-primary mr-2"></i>
+                        <h3>AI Assistant</h3>
+                    </div>
+                    <div class="ai-chat-header-actions">
+                        <button class="btn btn-outline-secondary ai-new-session" title="Phiên mới">
+                            <i class="fa fa-plus"></i> Phiên mới
+                        </button>
+                        <button class="btn btn-outline-danger ai-clear-chat" title="Xóa lịch sử">
+                            <i class="fa fa-trash"></i> Xóa lịch sử
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Chat Container -->
+                <div class="ai-chat-body">
+                    <!-- Messages Area -->
+                    <div class="ai-chat-messages">
+                        <div class="ai-message ai-msg-assistant">
+                            <div class="ai-msg-avatar">
+                                <i class="fa fa-robot"></i>
+                            </div>
+                            <div class="ai-msg-content">
+                                👋 Xin chào! Tôi là AI Assistant. Tôi có thể giúp bạn tra cứu thông tin, phân tích dữ liệu và trả lời các câu hỏi về hệ thống.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Loading Indicator -->
+                    <div class="ai-chat-loading" style="display: none;">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        <span class="ml-2">Đang xử lý...</span>
+                    </div>
+                </div>
+                
+                <!-- Input Area -->
+                <div class="ai-chat-footer">
+                    <div class="ai-chat-input-container">
+                        <textarea class="ai-chat-input form-control" 
+                                  placeholder="Nhập câu hỏi của bạn..." 
+                                  rows="2"></textarea>
+                        <button class="btn btn-primary ai-chat-send">
+                            <i class="fa fa-paper-plane"></i> Gửi
+                        </button>
+                    </div>
+                    <div class="ai-chat-tips text-muted small mt-2">
+                        <i class="fa fa-lightbulb-o"></i> Gợi ý: Bạn có thể hỏi về nhân viên, phòng ban, khách hàng, văn bản...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Full Page Chat Widget for Client Action -->
+    <t t-name="ai_integration.ChatFullPage">
+        <div class="ai-chat-fullpage">
+            <div class="ai-chat-header">
+                <div class="ai-chat-header-info">
+                    <h3><i class="fa fa-robot"/> AI Assistant</h3>
+                    <span class="ai-chat-subtitle">Trợ lý thông minh của bạn</span>
+                </div>
+                <div class="ai-chat-actions">
+                    <button class="btn btn-sm btn-light ai-new-session" title="Phiên chat mới">
+                        <i class="fa fa-plus"/> Mới
+                    </button>
+                    <button class="btn btn-sm btn-light ai-clear-chat" title="Xóa lịch sử">
+                        <i class="fa fa-trash"/> Xóa
+                    </button>
+                </div>
+            </div>
+            
+            <div class="ai-chat-body">
+                <div class="ai-chat-messages-wrapper">
+                    <div class="ai-chat-messages">
+                        <!-- Messages will be rendered here by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="ai-chat-loading" style="display: none;">
+                    <div class="ai-typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span class="ai-typing-text">AI đang suy nghĩ...</span>
+                </div>
+            </div>
+            
+            <div class="ai-chat-footer">
+                <div class="ai-chat-input-container">
+                    <textarea class="ai-chat-input form-control" 
+                              placeholder="Nhập câu hỏi của bạn..." 
+                              rows="2"/>
+                    <button class="btn btn-primary ai-chat-send">
+                        <i class="fa fa-paper-plane"/>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

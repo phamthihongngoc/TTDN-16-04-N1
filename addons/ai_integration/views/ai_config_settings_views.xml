@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Simplified AI Settings View -->
+    <record id="view_ai_integration_settings_form" model="ir.ui.view">
+        <field name="name">ai.integration.settings.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="arch" type="xml">
+            <form string="AI Integration Settings" class="oe_form_configuration">
+                <header>
+                    <button string="Lưu" type="object" name="execute" class="oe_highlight"/>
+                    <button string="Hủy" type="object" name="cancel" class="btn-secondary"/>
+                    <button name="action_test_connection" type="object" 
+                            string="Test Connection" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="app_settings_block">
+                        <h2>🤖 AI Integration Settings</h2>
+                        
+                        <group string="OpenAI Configuration">
+                            <group>
+                                <field name="ai_openai_api_key" password="True"/>
+                                <field name="ai_openai_model"/>
+                            </group>
+                            <group>
+                                <field name="ai_max_tokens"/>
+                                <field name="ai_temperature"/>
+                            </group>
+                        </group>
+                        
+                        <group string="Cache &amp; Performance">
+                            <group>
+                                <field name="ai_cache_enabled"/>
+                                <field name="ai_cache_ttl" attrs="{'invisible': [('ai_cache_enabled', '=', False)]}"/>
+                            </group>
+                            <group>
+                                <field name="ai_log_retention_days"/>
+                                <field name="ai_mask_pii"/>
+                            </group>
+                        </group>
+                        
+                        <group string="Statistics (30 days)">
+                            <field name="ai_total_requests" readonly="1"/>
+                            <field name="ai_success_rate" readonly="1" widget="percentage"/>
+                            <field name="ai_total_cost" readonly="1" widget="monetary"/>
+                        </group>
+                        
+                        <group>
+                            <button name="action_view_logs" type="object" 
+                                    string="View Logs" class="btn-secondary"/>
+                            <button name="action_view_jobs" type="object" 
+                                    string="View Jobs" class="btn-secondary"/>
+                        </group>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Menu action -->
+    <record id="action_ai_integration_settings" model="ir.actions.act_window">
+        <field name="name">AI Integration Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="view_id" ref="view_ai_integration_settings_form"/>
+    </record>
+</odoo>

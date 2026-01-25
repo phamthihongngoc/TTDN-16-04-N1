@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- AI Chat Session Tree View -->
+    <record id="view_ai_chat_session_tree" model="ir.ui.view">
+        <field name="name">ai.chat.session.tree</field>
+        <field name="model">ai.chat.session</field>
+        <field name="arch" type="xml">
+            <tree string="Phiên Chat AI">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="active_model"/>
+                <field name="active_record_name"/>
+                <field name="message_count"/>
+                <field name="total_tokens"/>
+                <field name="total_cost" widget="monetary"/>
+                <field name="last_activity"/>
+                <field name="state" widget="badge" decoration-success="state == 'active'" decoration-muted="state == 'archived'"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- AI Chat Session Form View -->
+    <record id="view_ai_chat_session_form" model="ir.ui.view">
+        <field name="name">ai.chat.session.form</field>
+        <field name="model">ai.chat.session</field>
+        <field name="arch" type="xml">
+            <form string="Phiên Chat AI">
+                <header>
+                    <button name="action_archive" string="Lưu trữ" type="object" 
+                            attrs="{'invisible': [('state', '=', 'archived')]}"/>
+                    <button name="action_activate" string="Kích hoạt" type="object"
+                            attrs="{'invisible': [('state', '=', 'active')]}"/>
+                    <button name="action_clear_messages" string="Xóa tin nhắn" type="object" 
+                            confirm="Bạn có chắc muốn xóa tất cả tin nhắn?"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="active_model"/>
+                            <field name="active_res_id"/>
+                            <field name="active_record_name"/>
+                        </group>
+                        <group>
+                            <field name="message_count"/>
+                            <field name="total_tokens"/>
+                            <field name="total_cost"/>
+                            <field name="last_activity"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Tin nhắn" name="messages">
+                            <field name="message_ids" readonly="1">
+                                <tree string="Tin nhắn" create="false" delete="false">
+                                    <field name="create_date"/>
+                                    <field name="role" widget="badge"/>
+                                    <field name="content" widget="text"/>
+                                    <field name="tool_name"/>
+                                    <field name="tokens_used"/>
+                                    <field name="requires_confirmation" widget="boolean"/>
+                                    <field name="action_confirmed" widget="boolean"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- AI Chat Session Search View -->
+    <record id="view_ai_chat_session_search" model="ir.ui.view">
+        <field name="name">ai.chat.session.search</field>
+        <field name="model">ai.chat.session</field>
+        <field name="arch" type="xml">
+            <search string="Tìm phiên chat">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="active_model"/>
+                <filter name="filter_active" string="Đang hoạt động" domain="[('state', '=', 'active')]"/>
+                <filter name="filter_archived" string="Đã lưu trữ" domain="[('state', '=', 'archived')]"/>
+                <filter name="filter_my_sessions" string="Của tôi" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter name="filter_khach_hang" string="Khách hàng" domain="[('active_model', 'ilike', 'khach_hang')]"/>
+                <filter name="filter_van_ban" string="Văn bản" domain="[('active_model', 'ilike', 'van_ban')]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter name="group_user" string="Người dùng" context="{'group_by': 'user_id'}"/>
+                    <filter name="group_model" string="Model" context="{'group_by': 'active_model'}"/>
+                    <filter name="group_state" string="Trạng thái" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- AI Chat Session Action -->
+    <record id="action_ai_chat_session" model="ir.actions.act_window">
+        <field name="name">Phiên Chat AI</field>
+        <field name="res_model">ai.chat.session</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Chưa có phiên chat nào
+            </p>
+            <p>
+                Phiên chat sẽ được tạo tự động khi bạn sử dụng AI Assistant.
+            </p>
+        </field>
+    </record>
+    
+    <!-- AI Chat Message Tree View -->
+    <record id="view_ai_chat_message_tree" model="ir.ui.view">
+        <field name="name">ai.chat.message.tree</field>
+        <field name="model">ai.chat.message</field>
+        <field name="arch" type="xml">
+            <tree string="Tin nhắn Chat">
+                <field name="create_date"/>
+                <field name="session_id"/>
+                <field name="role" widget="badge" 
+                       decoration-info="role == 'user'"
+                       decoration-success="role == 'assistant'"
+                       decoration-warning="role == 'tool'"/>
+                <field name="content" widget="text"/>
+                <field name="tool_name"/>
+                <field name="tokens_used"/>
+                <field name="cost"/>
+                <field name="model_used"/>
+                <field name="requires_confirmation" widget="boolean"/>
+                <field name="action_confirmed" widget="boolean"/>
+                <field name="is_error" widget="boolean"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- AI Chat Message Form View -->
+    <record id="view_ai_chat_message_form" model="ir.ui.view">
+        <field name="name">ai.chat.message.form</field>
+        <field name="model">ai.chat.message</field>
+        <field name="arch" type="xml">
+            <form string="Tin nhắn Chat">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="session_id"/>
+                            <field name="role"/>
+                            <field name="create_date"/>
+                        </group>
+                        <group>
+                            <field name="model_used"/>
+                            <field name="tokens_used"/>
+                            <field name="cost"/>
+                            <field name="latency"/>
+                        </group>
+                    </group>
+                    <group string="Nội dung">
+                        <field name="content" nolabel="1"/>
+                    </group>
+                    <group string="Tool Call" attrs="{'invisible': [('tool_name', '=', False)]}">
+                        <field name="tool_name"/>
+                        <field name="tool_call_id"/>
+                        <field name="tool_arguments"/>
+                        <field name="tool_result"/>
+                    </group>
+                    <group string="Action" attrs="{'invisible': [('requires_confirmation', '=', False)]}">
+                        <field name="requires_confirmation"/>
+                        <field name="action_type"/>
+                        <field name="action_payload"/>
+                        <field name="action_confirmed"/>
+                        <field name="action_result"/>
+                    </group>
+                    <group string="Error" attrs="{'invisible': [('is_error', '=', False)]}">
+                        <field name="is_error"/>
+                        <field name="error_message"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- AI Chat Message Action -->
+    <record id="action_ai_chat_message" model="ir.actions.act_window">
+        <field name="name">Tin nhắn Chat</field>
+        <field name="res_model">ai.chat.message</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    <!-- AI Chat Tool Tree View -->
+    <record id="view_ai_chat_tool_tree" model="ir.ui.view">
+        <field name="name">ai.chat.tool.tree</field>
+        <field name="model">ai.chat.tool</field>
+        <field name="arch" type="xml">
+            <tree string="AI Chat Tools">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="display_name"/>
+                <field name="module" widget="badge"/>
+                <field name="is_read_only" widget="boolean"/>
+                <field name="requires_confirmation" widget="boolean"/>
+                <field name="is_quick_action" widget="boolean"/>
+                <field name="active" widget="boolean"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- AI Chat Tool Form View -->
+    <record id="view_ai_chat_tool_form" model="ir.ui.view">
+        <field name="name">ai.chat.tool.form</field>
+        <field name="model">ai.chat.tool</field>
+        <field name="arch" type="xml">
+            <form string="AI Chat Tool">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "active"}'/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="display_name"/>
+                            <field name="module"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="model_name"/>
+                            <field name="method_name"/>
+                            <field name="required_group_id"/>
+                            <field name="applicable_models"/>
+                        </group>
+                    </group>
+                    <group string="Mô tả">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                    <group string="Parameters Schema (JSON)">
+                        <field name="parameters_schema" nolabel="1" widget="ace" options="{'mode': 'json'}"/>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="is_read_only"/>
+                            <field name="requires_confirmation"/>
+                        </group>
+                        <group>
+                            <field name="icon"/>
+                            <field name="color"/>
+                        </group>
+                    </group>
+                    <group string="Quick Action" attrs="{'invisible': [('is_quick_action', '=', False)]}">
+                        <field name="is_quick_action"/>
+                        <field name="quick_action_label"/>
+                        <field name="quick_action_prompt"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- AI Chat Tool Action -->
+    <record id="action_ai_chat_tool" model="ir.actions.act_window">
+        <field name="name">Chat Tools</field>
+        <field name="res_model">ai.chat.tool</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

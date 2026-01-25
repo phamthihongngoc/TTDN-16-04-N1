@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- AI Integration Category -->
+        <record id="module_category_ai_integration" model="ir.module.category">
+            <field name="name">AI Integration</field>
+            <field name="description">AI/ML Features using OpenAI</field>
+            <field name="sequence">100</field>
+        </record>
+        
+        <!-- AI User Group -->
+        <record id="group_ai_user" model="res.groups">
+            <field name="name">AI User</field>
+            <field name="category_id" ref="module_category_ai_integration"/>
+            <field name="comment">Có thể sử dụng các tính năng AI</field>
+        </record>
+        
+        <!-- AI Manager Group -->
+        <record id="group_ai_manager" model="res.groups">
+            <field name="name">AI Manager</field>
+            <field name="category_id" ref="module_category_ai_integration"/>
+            <field name="implied_ids" eval="[(4, ref('group_ai_user'))]"/>
+            <field name="comment">Có thể cấu hình AI và xem logs</field>
+        </record>
+        
+        <!-- Record Rules -->
+        <record id="ai_log_rule_all" model="ir.rule">
+            <field name="name">AI Log: User sees own logs</field>
+            <field name="model_id" ref="model_ai_log"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+        
+        <record id="ai_log_rule_manager" model="ir.rule">
+            <field name="name">AI Log: Manager sees all logs</field>
+            <field name="model_id" ref="model_ai_log"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_ai_manager'))]"/>
+        </record>
+        
+        <record id="ai_job_rule_all" model="ir.rule">
+            <field name="name">AI Job: User sees own jobs</field>
+            <field name="model_id" ref="model_ai_job"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="ai_job_rule_manager" model="ir.rule">
+            <field name="name">AI Job: Manager sees all jobs</field>
+            <field name="model_id" ref="model_ai_job"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_ai_manager'))]"/>
+        </record>
+        
+        <!-- Auto-assign admin user to AI Manager group -->
+        <record id="base.user_admin" model="res.users">
+            <field name="groups_id" eval="[(4, ref('group_ai_manager'))]"/>
+        </record>
+    </data>
+</odoo>

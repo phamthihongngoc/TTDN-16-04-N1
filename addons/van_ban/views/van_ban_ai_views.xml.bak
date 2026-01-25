@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI buttons for van.ban form -->
+    <record id="view_van_ban_form_ai_inherit" model="ir.ui.view">
+        <field name="name">van.ban.form.ai.inherit</field>
+        <field name="model">van_ban</field>
+        <field name="inherit_id" ref="van_ban.view_van_ban_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_summarize" type="object" 
+                        string="🤖 Tóm tắt AI" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_extract_metadata" type="object" 
+                        string="📋 Trích xuất AI" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_analyze_risk" type="object" 
+                        string="⚠️ Phân tích rủi ro" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_assistant" type="object" 
+                        string="💬 Hỏi AI" class="btn-info"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <notebook position="inside">
+                    <page string="🤖 Phân tích AI" name="ai_analysis" groups="ai_integration.group_ai_user">
+                        <group>
+                            <group>
+                                <field name="ai_risk_level" readonly="1"/>
+                                <field name="ai_risk_score" readonly="1"/>
+                                <field name="ai_last_analyzed" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="ai_suggested_workflow" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Tóm tắt AI">
+                            <field name="ai_summary" nolabel="1" readonly="1"/>
+                        </group>
+                        <group string="Chi tiết rủi ro">
+                            <field name="ai_risk_details" nolabel="1" readonly="1"/>
+                        </group>
+                        <group string="Dữ liệu trích xuất">
+                            <field name="ai_extracted_data" nolabel="1" readonly="1"/>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- AI buttons for van.ban.di form -->
+    <record id="view_van_ban_di_form_ai_inherit" model="ir.ui.view">
+        <field name="name">van.ban.di.form.ai.inherit</field>
+        <field name="model">van_ban_di</field>
+        <field name="inherit_id" ref="van_ban.view_van_ban_di_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_summarize" type="object" 
+                        string="🤖 Tóm tắt AI" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_suggest_workflow" type="object" 
+                        string="📝 Đề xuất quy trình" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_generate_email" type="object" 
+                        string="✉️ Soạn email" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_assistant" type="object" 
+                        string="💬 Hỏi AI" class="btn-info"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <notebook position="inside">
+                    <page string="🤖 Phân tích AI" name="ai_analysis" groups="ai_integration.group_ai_user">
+                        <group>
+                            <group>
+                                <field name="ai_risk_level" readonly="1"/>
+                                <field name="ai_risk_score" readonly="1"/>
+                                <field name="ai_last_analyzed" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="ai_suggested_workflow" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Tóm tắt AI">
+                            <field name="ai_summary" nolabel="1" readonly="1"/>
+                        </group>
+                        <group string="Email được tạo bởi AI">
+                            <field name="ai_generated_email" nolabel="1" readonly="1"/>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- AI buttons for van.ban.den form -->
+    <record id="view_van_ban_den_form_ai_inherit" model="ir.ui.view">
+        <field name="name">van.ban.den.form.ai.inherit</field>
+        <field name="model">van_ban_den</field>
+        <field name="inherit_id" ref="van_ban.view_van_ban_den_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_summarize" type="object" 
+                        string="🤖 Tóm tắt AI" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_classify_and_route" type="object" 
+                        string="📂 Phân loại &amp; Chuyển" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_assistant" type="object" 
+                        string="💬 Hỏi AI" class="btn-info"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <notebook position="inside">
+                    <page string="🤖 Phân tích AI" name="ai_analysis" groups="ai_integration.group_ai_user">
+                        <group>
+                            <group>
+                                <field name="ai_risk_level" readonly="1"/>
+                                <field name="ai_risk_score" readonly="1"/>
+                                <field name="ai_last_analyzed" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="ai_suggested_workflow" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Tóm tắt AI">
+                            <field name="ai_summary" nolabel="1" readonly="1"/>
+                        </group>
+                        <group string="Dữ liệu trích xuất">
+                            <field name="ai_extracted_data" nolabel="1" readonly="1"/>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+</odoo>

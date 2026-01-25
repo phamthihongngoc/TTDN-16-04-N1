@@ -36,7 +36,7 @@
     <menuitem id="menu_van_ban_den_main"
               name="Văn bản đến"
               parent="menu_van_ban_root"
-              sequence="15"/>
+              sequence="20"/>
 
     <menuitem id="menu_van_ban_den"
               name="Tất cả văn bản đến"
@@ -54,7 +54,7 @@
     <menuitem id="menu_van_ban_di_main"
               name="Văn bản đi"
               parent="menu_van_ban_root"
-              sequence="20"/>
+              sequence="30"/>
 
     <menuitem id="menu_van_ban_di"
               name="Tất cả văn bản đi"
@@ -81,13 +81,19 @@
               name="Yêu cầu ký"
               action="action_yeu_cau_ky"
               parent="menu_van_ban_root"
-              sequence="20"/>
+              sequence="40"/>
+
+    <!-- Menu: Công cụ (AI + OCR) -->
+    <menuitem id="menu_van_ban_tools"
+              name="Công cụ"
+              parent="menu_van_ban_root"
+              sequence="50"/>
 
     <!-- Menu: OCR -->
     <menuitem id="menu_van_ban_ocr"
               name="OCR"
-              parent="menu_van_ban_root"
-              sequence="25"/>
+              parent="menu_van_ban_tools"
+              sequence="20"/>
 
     <menuitem id="menu_van_ban_ocr_main"
               name="Bóc tách OCR"
@@ -105,7 +111,7 @@
     <menuitem id="menu_van_ban_bao_cao"
               name="Báo cáo"
               parent="menu_van_ban_root"
-              sequence="30"/>
+              sequence="60"/>
 
     <menuitem id="menu_van_ban_dashboard"
               name="Dashboard"
@@ -136,7 +142,7 @@
     <menuitem id="menu_van_ban_cau_hinh"
               name="Cấu hình"
               parent="menu_van_ban_root"
-              sequence="40"
+              sequence="90"
               groups="van_ban.group_quan_tri_van_ban"/>
 
     <menuitem id="menu_loai_van_ban"
@@ -144,5 +150,18 @@
               action="action_loai_van_ban"
               parent="menu_van_ban_cau_hinh"
               sequence="1"/>
+
+    <!-- AI Chat -->
+    <record id="action_ai_chat_van_ban" model="ir.actions.client">
+        <field name="name">AI Assistant - Văn bản</field>
+        <field name="tag">ai_chat_widget</field>
+        <field name="context">{'default_module': 'van_ban'}</field>
+    </record>
+
+    <menuitem id="menu_ai_chat_van_ban"
+              name="🤖 AI Assistant"
+              parent="menu_van_ban_tools"
+              action="action_ai_chat_van_ban"
+              sequence="10"/>
 
 </odoo>

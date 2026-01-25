@@ -32,6 +32,11 @@
                             attrs="{'invisible': [('trang_thai', 'not in', ['da_duyet', 'cho_ky'])]}"
                             groups="van_ban.group_giam_doc_ky"/>
                     
+                    <button name="action_xac_thuc_chu_ky" string="🔍 Xác thực chữ ký" type="object" 
+                            class="btn-info"
+                            attrs="{'invisible': [('da_ky_noi_bo', '=', False)]}"
+                            help="Xác thực chữ ký số bằng Public Key từ kho"/>
+                    
                     <button name="action_gui_yeu_cau_ky_khach" string="Gửi yêu cầu ký cho KH" 
                             type="object" class="btn-primary"
                             attrs="{'invisible': ['|', ('trang_thai', '!=', 'da_ky'), ('khach_hang_id', '=', False)]}"
@@ -125,7 +130,9 @@
                         <group string="Thông tin văn bản">
                             <field name="loai_van_ban_id" placeholder="Chọn loại văn bản (Hợp đồng, Báo giá, Phụ lục...)"/>
                             <field name="workflow_template_id" placeholder="Chọn workflow template (tùy chọn)"/>
-                            <field name="khach_hang_id"/>
+                            <field name="khach_hang_trong_hop_dong" string="Khách hàng (trong hợp đồng)"
+                                placeholder="Tên khách hàng/bên trong hợp đồng"/>
+                            <field name="khach_hang_id" invisible="1"/>
                             <field name="don_hang_id" attrs="{'invisible': [('khach_hang_id', '=', False)]}"/>
                             <field name="gia_tri_hop_dong" widget="monetary"/>
                             <field name="currency_id" invisible="1"/>
@@ -182,12 +189,28 @@
                                 <group string="File gốc">
                                     <field name="file_dinh_kem" filename="ten_file" 
                                            attrs="{'readonly': [('bi_khoa', '=', True)]}"/>
-                                    <field name="ten_file"/>
+                                    <field name="ten_file" readonly="1"/>
                                     <field name="hash_file" readonly="1"/>
+
+                                    <div class="text-muted" attrs="{'invisible': [('file_dinh_kem', '=', False)]}">
+                                        <i class="fa fa-info-circle"/> Upload PDF để hệ thống tự đọc nội dung và tự điền các trường (chỉ điền khi đang trống).
+                                    </div>
+
+                                    <group string="AI trích xuất từ PDF" col="2" attrs="{'invisible': [('file_dinh_kem', '=', False)]}">
+                                        <button name="action_ai_autofill_from_pdf" string="Tự điền lại từ PDF" type="object"
+                                                class="btn-primary" icon="fa-magic"
+                                                attrs="{'invisible': [('bi_khoa', '=', True)]}"/>
+                                        <field name="ai_pdf_extract_state" readonly="1"/>
+                                        <field name="ai_pdf_extracted_at" readonly="1"/>
+                                        <field name="ai_pdf_extract_error" readonly="1"
+                                               attrs="{'invisible': [('ai_pdf_extract_state', '!=', 'error')]}"/>
+                                        <field name="ai_pdf_text" readonly="1" nolabel="1"
+                                               attrs="{'invisible': [('ai_pdf_extract_state', '!=', 'done')]}"/>
+                                    </group>
                                 </group>
                                 <group string="File đã ký" attrs="{'invisible': [('file_da_ky', '=', False)]}">
                                     <field name="file_da_ky" filename="ten_file_da_ky" readonly="1"/>
-                                    <field name="ten_file_da_ky"/>
+                                    <field name="ten_file_da_ky" readonly="1"/>
                                 </group>
                             </group>
                         </page>

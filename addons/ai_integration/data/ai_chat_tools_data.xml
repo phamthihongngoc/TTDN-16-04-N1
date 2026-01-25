@@ -1,0 +1,737 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- ==================== KHÁCH HÀNG TOOLS ==================== -->
+        
+        <record id="tool_search_customer" model="ai.chat.tool">
+            <field name="name">search_customer</field>
+            <field name="display_name">Tìm kiếm khách hàng</field>
+            <field name="description">Tìm kiếm khách hàng theo tên, mã, email hoặc số điện thoại. Sử dụng khi user hỏi về một khách hàng cụ thể hoặc muốn tìm danh sách khách hàng.</field>
+            <field name="module">khach_hang</field>
+            <field name="model_name">ai.chat.tool.khach_hang</field>
+            <field name="method_name">tool_search_customer</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "query": {
+            "type": "string",
+            "description": "Từ khóa tìm kiếm (tên, mã, email, SĐT)"
+        },
+        "filters": {
+            "type": "object",
+            "description": "Bộ lọc bổ sung",
+            "properties": {
+                "loai_khach_hang": {"type": "string"},
+                "trang_thai": {"type": "string"}
+            }
+        },
+        "limit": {
+            "type": "integer",
+            "description": "Số lượng kết quả tối đa",
+            "default": 10
+        }
+    },
+    "required": ["query"]
+}</field>
+            <field name="sequence">10</field>
+            <field name="icon">fa-search</field>
+            <field name="applicable_models">khach_hang,don_hang,ho_tro_khach_hang</field>
+        </record>
+        
+        <record id="tool_get_customer_brief" model="ai.chat.tool">
+            <field name="name">get_customer_brief</field>
+            <field name="display_name">Tóm tắt khách hàng</field>
+            <field name="description">Lấy thông tin tóm tắt 360° về khách hàng bao gồm: thông tin cơ bản, lịch sử đơn hàng, phiếu hỗ trợ, phân loại RFM. Dùng khi user hỏi về thông tin tổng quan của một khách hàng.</field>
+            <field name="module">khach_hang</field>
+            <field name="model_name">ai.chat.tool.khach_hang</field>
+            <field name="method_name">tool_get_customer_brief</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "customer_id": {
+            "type": "integer",
+            "description": "ID khách hàng (lấy từ context nếu không có)"
+        }
+    }
+}</field>
+            <field name="sequence">20</field>
+            <field name="icon">fa-user-circle</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Tóm tắt KH</field>
+            <field name="quick_action_prompt">Tóm tắt thông tin khách hàng này</field>
+            <field name="applicable_models">khach_hang</field>
+        </record>
+        
+        <record id="tool_summarize_interactions" model="ai.chat.tool">
+            <field name="name">summarize_interactions</field>
+            <field name="display_name">Tổng hợp tương tác</field>
+            <field name="description">Tổng hợp lịch sử tương tác với khách hàng trong một khoảng thời gian: đơn hàng, phiếu hỗ trợ, liên hệ.</field>
+            <field name="module">khach_hang</field>
+            <field name="model_name">ai.chat.tool.khach_hang</field>
+            <field name="method_name">tool_summarize_interactions</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "customer_id": {
+            "type": "integer",
+            "description": "ID khách hàng"
+        },
+        "days": {
+            "type": "integer",
+            "description": "Số ngày lịch sử cần lấy",
+            "default": 30
+        }
+    }
+}</field>
+            <field name="sequence">30</field>
+            <field name="icon">fa-history</field>
+            <field name="applicable_models">khach_hang</field>
+        </record>
+        
+        <record id="tool_analyze_customer_risk" model="ai.chat.tool">
+            <field name="name">analyze_customer_risk</field>
+            <field name="display_name">Phân tích rủi ro</field>
+            <field name="description">Phân tích các yếu tố rủi ro của khách hàng: vấn đề tồn đọng, xu hướng giảm, nguy cơ rời bỏ.</field>
+            <field name="module">khach_hang</field>
+            <field name="model_name">ai.chat.tool.khach_hang</field>
+            <field name="method_name">tool_analyze_customer_risk</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "customer_id": {
+            "type": "integer",
+            "description": "ID khách hàng"
+        }
+    }
+}</field>
+            <field name="sequence">40</field>
+            <field name="icon">fa-exclamation-triangle</field>
+            <field name="applicable_models">khach_hang</field>
+        </record>
+        
+        <record id="tool_get_customer_orders" model="ai.chat.tool">
+            <field name="name">get_customer_orders</field>
+            <field name="display_name">Xem đơn hàng</field>
+            <field name="description">Lấy danh sách đơn hàng của khách hàng, có thể lọc theo trạng thái.</field>
+            <field name="module">khach_hang</field>
+            <field name="model_name">ai.chat.tool.khach_hang</field>
+            <field name="method_name">tool_get_customer_orders</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "customer_id": {
+            "type": "integer",
+            "description": "ID khách hàng"
+        },
+        "status": {
+            "type": "string",
+            "description": "Lọc theo trạng thái đơn hàng"
+        },
+        "limit": {
+            "type": "integer",
+            "description": "Số lượng tối đa",
+            "default": 10
+        }
+    }
+}</field>
+            <field name="sequence">50</field>
+            <field name="icon">fa-shopping-cart</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Xem đơn hàng</field>
+            <field name="quick_action_prompt">Cho tôi xem các đơn hàng của khách hàng này</field>
+            <field name="applicable_models">khach_hang,don_hang</field>
+        </record>
+        
+        <record id="tool_draft_customer_email" model="ai.chat.tool">
+            <field name="name">draft_customer_email</field>
+            <field name="display_name">Soạn email</field>
+            <field name="description">Soạn email cho khách hàng với các mục đích: chăm sóc, nhắc nhở, khảo sát, khuyến mãi. Email được soạn tự động dựa trên thông tin khách hàng.</field>
+            <field name="module">khach_hang</field>
+            <field name="model_name">ai.chat.tool.khach_hang</field>
+            <field name="method_name">tool_draft_customer_email</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "customer_id": {
+            "type": "integer",
+            "description": "ID khách hàng"
+        },
+        "intent": {
+            "type": "string",
+            "enum": ["care", "reminder", "survey", "promotion"],
+            "description": "Mục đích email: care=chăm sóc, reminder=nhắc nhở, survey=khảo sát, promotion=khuyến mãi"
+        },
+        "tone": {
+            "type": "string",
+            "enum": ["formal", "friendly", "urgent"],
+            "description": "Giọng văn: formal=trang trọng, friendly=thân thiện, urgent=khẩn cấp",
+            "default": "friendly"
+        },
+        "additional_info": {
+            "type": "string",
+            "description": "Thông tin bổ sung cho email"
+        }
+    },
+    "required": ["intent"]
+}</field>
+            <field name="sequence">60</field>
+            <field name="icon">fa-envelope</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Soạn email</field>
+            <field name="quick_action_prompt">Soạn email chăm sóc cho khách hàng này</field>
+            <field name="applicable_models">khach_hang</field>
+        </record>
+        
+        <record id="tool_create_support_ticket" model="ai.chat.tool">
+            <field name="name">create_support_ticket</field>
+            <field name="display_name">Tạo phiếu hỗ trợ</field>
+            <field name="description">Tạo phiếu hỗ trợ mới cho khách hàng. Cần xác nhận trước khi thực hiện.</field>
+            <field name="module">khach_hang</field>
+            <field name="model_name">ai.chat.tool.khach_hang</field>
+            <field name="method_name">tool_create_support_ticket</field>
+            <field name="is_read_only">False</field>
+            <field name="requires_confirmation">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "customer_id": {
+            "type": "integer",
+            "description": "ID khách hàng"
+        },
+        "subject": {
+            "type": "string",
+            "description": "Tiêu đề phiếu hỗ trợ"
+        },
+        "description": {
+            "type": "string",
+            "description": "Mô tả chi tiết vấn đề"
+        },
+        "priority": {
+            "type": "string",
+            "enum": ["low", "normal", "high", "urgent"],
+            "description": "Mức độ ưu tiên",
+            "default": "normal"
+        }
+    },
+    "required": ["subject", "description"]
+}</field>
+            <field name="sequence">70</field>
+            <field name="icon">fa-ticket</field>
+            <field name="applicable_models">khach_hang,ho_tro_khach_hang</field>
+        </record>
+        
+        <record id="tool_next_best_action" model="ai.chat.tool">
+            <field name="name">next_best_action</field>
+            <field name="display_name">Đề xuất hành động</field>
+            <field name="description">Phân tích và đề xuất bước tiếp theo nên làm với khách hàng dựa trên dữ liệu: lịch sử mua hàng, phiếu hỗ trợ, phân loại RFM.</field>
+            <field name="module">khach_hang</field>
+            <field name="model_name">ai.chat.tool.khach_hang</field>
+            <field name="method_name">tool_next_best_action</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "customer_id": {
+            "type": "integer",
+            "description": "ID khách hàng"
+        }
+    }
+}</field>
+            <field name="sequence">80</field>
+            <field name="icon">fa-lightbulb-o</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Đề xuất</field>
+            <field name="quick_action_prompt">Tôi nên làm gì tiếp với khách hàng này?</field>
+            <field name="applicable_models">khach_hang</field>
+        </record>
+        
+        <!-- ==================== VĂN BẢN TOOLS ==================== -->
+        
+        <record id="tool_search_document" model="ai.chat.tool">
+            <field name="name">search_document</field>
+            <field name="display_name">Tìm văn bản</field>
+            <field name="description">Tìm kiếm văn bản theo trích yếu, số ký hiệu, nơi gửi/nhận. Có thể lọc theo loại (đến/đi) và trạng thái.</field>
+            <field name="module">van_ban</field>
+            <field name="model_name">ai.chat.tool.van_ban</field>
+            <field name="method_name">tool_search_document</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "query": {
+            "type": "string",
+            "description": "Từ khóa tìm kiếm"
+        },
+        "doc_type": {
+            "type": "string",
+            "enum": ["incoming", "outgoing", "all"],
+            "description": "Loại văn bản: incoming=đến, outgoing=đi"
+        },
+        "filters": {
+            "type": "object",
+            "properties": {
+                "trang_thai": {"type": "string"}
+            }
+        },
+        "limit": {
+            "type": "integer",
+            "default": 10
+        }
+    },
+    "required": ["query"]
+}</field>
+            <field name="sequence">100</field>
+            <field name="icon">fa-search</field>
+            <field name="applicable_models">van_ban,van_ban_den,van_ban_di</field>
+        </record>
+        
+        <record id="tool_summarize_document" model="ai.chat.tool">
+            <field name="name">summarize_document</field>
+            <field name="display_name">Tóm tắt văn bản</field>
+            <field name="description">Tóm tắt nội dung văn bản: ý chính, các điểm quan trọng, deadline, yêu cầu hành động.</field>
+            <field name="module">van_ban</field>
+            <field name="model_name">ai.chat.tool.van_ban</field>
+            <field name="method_name">tool_summarize_document</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "model": {
+            "type": "string",
+            "description": "Model văn bản (van_ban_den, van_ban_di)"
+        },
+        "res_id": {
+            "type": "integer",
+            "description": "ID văn bản"
+        }
+    }
+}</field>
+            <field name="sequence">110</field>
+            <field name="icon">fa-file-text-o</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Tóm tắt VB</field>
+            <field name="quick_action_prompt">Tóm tắt nội dung văn bản này</field>
+            <field name="applicable_models">van_ban_den,van_ban_di,van_ban</field>
+        </record>
+        
+        <record id="tool_extract_entities" model="ai.chat.tool">
+            <field name="name">extract_entities</field>
+            <field name="display_name">Trích xuất thực thể</field>
+            <field name="description">Trích xuất các thực thể từ văn bản: người, cơ quan, ngày tháng, số văn bản, thời hạn, số tiền, địa điểm, yêu cầu hành động.</field>
+            <field name="module">van_ban</field>
+            <field name="model_name">ai.chat.tool.van_ban</field>
+            <field name="method_name">tool_extract_entities</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "model": {
+            "type": "string",
+            "description": "Model văn bản"
+        },
+        "res_id": {
+            "type": "integer",
+            "description": "ID văn bản"
+        }
+    }
+}</field>
+            <field name="sequence">120</field>
+            <field name="icon">fa-tags</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Trích xuất</field>
+            <field name="quick_action_prompt">Trích xuất các thông tin quan trọng từ văn bản này</field>
+            <field name="applicable_models">van_ban_den,van_ban_di,van_ban</field>
+        </record>
+        
+        <record id="tool_classify_document" model="ai.chat.tool">
+            <field name="name">classify_document</field>
+            <field name="display_name">Phân loại văn bản</field>
+            <field name="description">Phân loại văn bản theo loại, độ khẩn, độ mật, chủ đề, phòng ban liên quan.</field>
+            <field name="module">van_ban</field>
+            <field name="model_name">ai.chat.tool.van_ban</field>
+            <field name="method_name">tool_classify_document</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "model": {
+            "type": "string",
+            "description": "Model văn bản"
+        },
+        "res_id": {
+            "type": "integer",
+            "description": "ID văn bản"
+        }
+    }
+}</field>
+            <field name="sequence">130</field>
+            <field name="icon">fa-folder-open</field>
+            <field name="applicable_models">van_ban_den,van_ban_di,van_ban</field>
+        </record>
+        
+        <record id="tool_get_pending_documents" model="ai.chat.tool">
+            <field name="name">get_pending_documents</field>
+            <field name="display_name">Văn bản chờ xử lý</field>
+            <field name="description">Lấy danh sách văn bản đang chờ xử lý của user hiện tại: văn bản đến cần xử lý, văn bản đi cần ký.</field>
+            <field name="module">van_ban</field>
+            <field name="model_name">ai.chat.tool.van_ban</field>
+            <field name="method_name">tool_get_pending_documents</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "days": {
+            "type": "integer",
+            "description": "Số ngày gần đây",
+            "default": 7
+        }
+    }
+}</field>
+            <field name="sequence">140</field>
+            <field name="icon">fa-clock-o</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">VB chờ xử lý</field>
+            <field name="quick_action_prompt">Tôi có văn bản nào cần xử lý?</field>
+            <field name="applicable_models">van_ban_den,van_ban_di,van_ban</field>
+        </record>
+        
+        <record id="tool_suggest_workflow" model="ai.chat.tool">
+            <field name="name">suggest_workflow</field>
+            <field name="display_name">Đề xuất xử lý</field>
+            <field name="description">Phân tích trạng thái văn bản và đề xuất các bước xử lý tiếp theo, người thực hiện, thời hạn.</field>
+            <field name="module">van_ban</field>
+            <field name="model_name">ai.chat.tool.van_ban</field>
+            <field name="method_name">tool_suggest_workflow</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "model": {
+            "type": "string",
+            "description": "Model văn bản"
+        },
+        "res_id": {
+            "type": "integer",
+            "description": "ID văn bản"
+        }
+    }
+}</field>
+            <field name="sequence">150</field>
+            <field name="icon">fa-sitemap</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Đề xuất xử lý</field>
+            <field name="quick_action_prompt">Văn bản này nên xử lý như thế nào?</field>
+            <field name="applicable_models">van_ban_den,van_ban_di</field>
+        </record>
+        
+        <record id="tool_generate_action_items" model="ai.chat.tool">
+            <field name="name">generate_action_items</field>
+            <field name="display_name">Tạo checklist</field>
+            <field name="description">Phân tích văn bản và tạo danh sách các việc cần làm (action items) với deadline và mức độ ưu tiên.</field>
+            <field name="module">van_ban</field>
+            <field name="model_name">ai.chat.tool.van_ban</field>
+            <field name="method_name">tool_generate_action_items</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "model": {
+            "type": "string",
+            "description": "Model văn bản"
+        },
+        "res_id": {
+            "type": "integer",
+            "description": "ID văn bản"
+        }
+    }
+}</field>
+            <field name="sequence">160</field>
+            <field name="icon">fa-check-square-o</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Tạo checklist</field>
+            <field name="quick_action_prompt">Tạo danh sách việc cần làm từ văn bản này</field>
+            <field name="applicable_models">van_ban_den,van_ban_di,van_ban</field>
+        </record>
+        
+        <record id="tool_draft_outgoing_from_incoming" model="ai.chat.tool">
+            <field name="name">draft_outgoing_from_incoming</field>
+            <field name="display_name">Soạn văn bản đi</field>
+            <field name="description">Soạn văn bản đi (phúc đáp, chuyển tiếp, báo cáo) dựa trên văn bản đến. Cần xác nhận trước khi tạo.</field>
+            <field name="module">van_ban</field>
+            <field name="model_name">ai.chat.tool.van_ban</field>
+            <field name="method_name">tool_draft_outgoing_from_incoming</field>
+            <field name="is_read_only">False</field>
+            <field name="requires_confirmation">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "incoming_id": {
+            "type": "integer",
+            "description": "ID văn bản đến"
+        },
+        "template": {
+            "type": "string",
+            "enum": ["reply", "forward", "report"],
+            "description": "Loại văn bản đi: reply=phúc đáp, forward=chuyển tiếp, report=báo cáo",
+            "default": "reply"
+        },
+        "recipients": {
+            "type": "string",
+            "description": "Danh sách người/đơn vị nhận"
+        }
+    }
+}</field>
+            <field name="sequence">170</field>
+            <field name="icon">fa-reply</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Soạn phúc đáp</field>
+            <field name="quick_action_prompt">Soạn văn bản phúc đáp cho văn bản này</field>
+            <field name="applicable_models">van_ban_den</field>
+        </record>
+        
+        <!-- ==================== NHÂN SỰ TOOLS ==================== -->
+        
+        <record id="tool_search_employee" model="ai.chat.tool">
+            <field name="name">search_employee</field>
+            <field name="display_name">Tìm kiếm nhân viên</field>
+            <field name="description">Tìm kiếm nhân viên theo tên, mã nhân viên, email hoặc số điện thoại. Sử dụng khi user hỏi về một nhân viên cụ thể hoặc muốn tìm danh sách nhân viên.</field>
+            <field name="module">nhan_su</field>
+            <field name="model_name">ai.chat.tool.nhan_su</field>
+            <field name="method_name">tool_search_employee</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "query": {
+            "type": "string",
+            "description": "Từ khóa tìm kiếm (tên, mã NV, email, SĐT)"
+        },
+        "limit": {
+            "type": "integer",
+            "description": "Số lượng kết quả tối đa",
+            "default": 20
+        }
+    },
+    "required": ["query"]
+}</field>
+            <field name="sequence">200</field>
+            <field name="icon">fa-search</field>
+            <field name="applicable_models">nhan_vien,phong_ban,cham_cong,bang_luong</field>
+        </record>
+        
+        <record id="tool_get_employee_info" model="ai.chat.tool">
+            <field name="name">get_employee_info</field>
+            <field name="display_name">Thông tin nhân viên</field>
+            <field name="description">Lấy thông tin chi tiết của một nhân viên bao gồm: thông tin cá nhân, phòng ban, chức vụ, hợp đồng, chấm công. Dùng khi user hỏi về thông tin cụ thể của một nhân viên.</field>
+            <field name="module">nhan_su</field>
+            <field name="model_name">ai.chat.tool.nhan_su</field>
+            <field name="method_name">tool_get_employee_info</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "employee_id": {
+            "type": "integer",
+            "description": "ID nhân viên"
+        },
+        "ma_nhan_vien": {
+            "type": "string",
+            "description": "Mã nhân viên (nếu không có ID)"
+        }
+    }
+}</field>
+            <field name="sequence">210</field>
+            <field name="icon">fa-user</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Thông tin NV</field>
+            <field name="quick_action_prompt">Cho tôi xem thông tin chi tiết nhân viên này</field>
+            <field name="applicable_models">nhan_vien</field>
+        </record>
+        
+        <record id="tool_get_all_employees" model="ai.chat.tool">
+            <field name="name">get_all_employees</field>
+            <field name="display_name">Danh sách nhân viên</field>
+            <field name="description">Lấy danh sách tất cả nhân viên trong hệ thống với thông tin tổng quan. Dùng khi user muốn xem tổng quan về nhân sự.</field>
+            <field name="module">nhan_su</field>
+            <field name="model_name">ai.chat.tool.nhan_su</field>
+            <field name="method_name">tool_get_all_employees</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "department": {
+            "type": "string",
+            "description": "Lọc theo tên phòng ban (tùy chọn)"
+        },
+        "status": {
+            "type": "string",
+            "enum": ["dang_lam", "nghi_viec", "tam_nghi"],
+            "description": "Lọc theo trạng thái (tùy chọn)"
+        },
+        "limit": {
+            "type": "integer",
+            "description": "Số lượng tối đa",
+            "default": 50
+        }
+    }
+}</field>
+            <field name="sequence">220</field>
+            <field name="icon">fa-users</field>
+            <field name="applicable_models">nhan_vien,phong_ban</field>
+        </record>
+        
+        <record id="tool_get_departments_summary" model="ai.chat.tool">
+            <field name="name">get_departments_summary</field>
+            <field name="display_name">Tổng quan phòng ban</field>
+            <field name="description">Lấy thông tin tổng quan về tất cả phòng ban: tên, số nhân viên, trưởng phòng. Dùng khi user hỏi về cơ cấu tổ chức.</field>
+            <field name="module">nhan_su</field>
+            <field name="model_name">ai.chat.tool.nhan_su</field>
+            <field name="method_name">tool_get_departments_summary</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {}
+}</field>
+            <field name="sequence">230</field>
+            <field name="icon">fa-sitemap</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Danh sách phòng ban</field>
+            <field name="quick_action_prompt">Liệt kê tất cả phòng ban và số nhân viên</field>
+            <field name="applicable_models">phong_ban,nhan_vien</field>
+        </record>
+        
+        <record id="tool_get_department_info" model="ai.chat.tool">
+            <field name="name">get_department_info</field>
+            <field name="display_name">Chi tiết phòng ban</field>
+            <field name="description">Lấy thông tin chi tiết của một phòng ban: danh sách nhân viên, trưởng phòng, chức năng.</field>
+            <field name="module">nhan_su</field>
+            <field name="model_name">ai.chat.tool.nhan_su</field>
+            <field name="method_name">tool_get_department_info</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "department_id": {
+            "type": "integer",
+            "description": "ID phòng ban"
+        },
+        "department_name": {
+            "type": "string",
+            "description": "Tên phòng ban (nếu không có ID)"
+        }
+    }
+}</field>
+            <field name="sequence">240</field>
+            <field name="icon">fa-building</field>
+            <field name="applicable_models">phong_ban</field>
+        </record>
+        
+        <record id="tool_get_attendance_report" model="ai.chat.tool">
+            <field name="name">get_attendance_report</field>
+            <field name="display_name">Báo cáo chấm công</field>
+            <field name="description">Lấy báo cáo chấm công theo tháng: số ngày công, giờ làm, đi muộn/về sớm. Dùng khi user hỏi về tình hình chấm công.</field>
+            <field name="module">nhan_su</field>
+            <field name="model_name">ai.chat.tool.nhan_su</field>
+            <field name="method_name">tool_get_attendance_report</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "month": {
+            "type": "integer",
+            "description": "Tháng (1-12), mặc định tháng hiện tại"
+        },
+        "year": {
+            "type": "integer",
+            "description": "Năm, mặc định năm hiện tại"
+        },
+        "employee_id": {
+            "type": "integer",
+            "description": "ID nhân viên cụ thể (tùy chọn)"
+        }
+    }
+}</field>
+            <field name="sequence">250</field>
+            <field name="icon">fa-calendar-check-o</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Báo cáo chấm công</field>
+            <field name="quick_action_prompt">Báo cáo chấm công tháng này</field>
+            <field name="applicable_models">cham_cong,nhan_vien</field>
+        </record>
+        
+        <record id="tool_get_hr_statistics" model="ai.chat.tool">
+            <field name="name">get_hr_statistics</field>
+            <field name="display_name">Thống kê nhân sự</field>
+            <field name="description">Lấy thống kê tổng quan về nhân sự: tổng số nhân viên, phân bổ theo phòng ban, loại hợp đồng, trạng thái làm việc.</field>
+            <field name="module">nhan_su</field>
+            <field name="model_name">ai.chat.tool.nhan_su</field>
+            <field name="method_name">tool_get_hr_statistics</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {}
+}</field>
+            <field name="sequence">260</field>
+            <field name="icon">fa-pie-chart</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Thống kê nhân sự</field>
+            <field name="quick_action_prompt">Thống kê tổng quan về nhân sự công ty</field>
+            <field name="applicable_models">nhan_vien,phong_ban</field>
+        </record>
+        
+        <record id="tool_get_payroll_info" model="ai.chat.tool">
+            <field name="name">get_payroll_info</field>
+            <field name="display_name">Thông tin bảng lương</field>
+            <field name="description">Lấy thông tin bảng lương của nhân viên theo tháng. Bao gồm lương cơ bản, phụ cấp, khấu trừ, thực lĩnh.</field>
+            <field name="module">nhan_su</field>
+            <field name="model_name">ai.chat.tool.nhan_su</field>
+            <field name="method_name">tool_get_payroll_info</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "employee_id": {
+            "type": "integer",
+            "description": "ID nhân viên (tùy chọn)"
+        },
+        "month": {
+            "type": "integer",
+            "description": "Tháng"
+        },
+        "year": {
+            "type": "integer",
+            "description": "Năm"
+        }
+    }
+}</field>
+            <field name="sequence">270</field>
+            <field name="icon">fa-money</field>
+            <field name="applicable_models">bang_luong,nhan_vien</field>
+        </record>
+        
+        <record id="tool_employee_count_by_department" model="ai.chat.tool">
+            <field name="name">employee_count_by_department</field>
+            <field name="display_name">Số nhân viên theo phòng</field>
+            <field name="description">Đếm số lượng nhân viên đang làm việc theo từng phòng ban. Dùng để so sánh quy mô các phòng ban.</field>
+            <field name="module">nhan_su</field>
+            <field name="model_name">ai.chat.tool.nhan_su</field>
+            <field name="method_name">tool_employee_count_by_department</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {}
+}</field>
+            <field name="sequence">280</field>
+            <field name="icon">fa-bar-chart</field>
+            <field name="applicable_models">phong_ban,nhan_vien</field>
+        </record>
+        
+    </data>
+</odoo>

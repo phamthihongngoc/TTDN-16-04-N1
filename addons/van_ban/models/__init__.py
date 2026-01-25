@@ -10,3 +10,10 @@ from . import van_ban_ocr
 from . import van_ban_ocr_history
 from . import workflow_template
 from . import van_ban_signature_log
+from . import pki_certificate
+from . import pki_certificate_revocation
+from . import pki_certificate_rotation
+from . import res_config_settings
+from . import van_ban_ai
+from . import performance_optimization
+from . import external_storage

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wizard_tu_choi_ho_so_form" model="ir.ui.view">
+        <field name="name">wizard.tu.choi.ho.so.form</field>
+        <field name="model">wizard.tu_choi_ho_so</field>
+        <field name="arch" type="xml">
+            <form string="Từ Chối Hồ Sơ">
+                <group>
+                    <field name="ho_so_id" invisible="1"/>
+                    <field name="ly_do_tu_choi" placeholder="Nhập lý do từ chối hồ sơ này..." nolabel="1"/>
+                </group>
+                <footer>
+                    <button string="Xác Nhận" type="object" name="action_confirm" class="btn-primary"/>
+                    <button string="Hủy" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

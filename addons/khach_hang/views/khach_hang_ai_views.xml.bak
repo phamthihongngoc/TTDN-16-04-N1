@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI buttons for khach.hang form -->
+    <record id="view_khach_hang_form_ai_inherit" model="ir.ui.view">
+        <field name="name">khach.hang.form.ai.inherit</field>
+        <field name="model">khach_hang</field>
+        <field name="inherit_id" ref="khach_hang.view_khach_hang_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_customer_360" type="object" 
+                        string="🤖 Customer 360°" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_next_best_action" type="object" 
+                        string="🎯 Hành động tiếp theo" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_analyze_churn" type="object" 
+                        string="⚠️ Rủi ro rời bỏ" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_classify_persona" type="object" 
+                        string="👤 Phân loại Persona" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_draft_email" type="object" 
+                        string="✉️ Soạn email" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_assistant" type="object" 
+                        string="💬 Hỏi AI" class="btn-info"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <notebook position="inside">
+                    <page string="🤖 Phân tích AI" name="ai_analysis" groups="ai_integration.group_ai_user">
+                        <group>
+                            <group>
+                                <field name="ai_persona" readonly="1"/>
+                                <field name="ai_last_analyzed" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Customer 360° - Tổng quan khách hàng">
+                            <field name="ai_customer_summary" nolabel="1" readonly="1"/>
+                        </group>
+                        <group string="Hành động tiếp theo được đề xuất">
+                            <field name="ai_next_best_action" nolabel="1" readonly="1"/>
+                        </group>
+                        <group string="Phân tích rủi ro rời bỏ">
+                            <field name="ai_churn_analysis" nolabel="1" readonly="1"/>
+                        </group>
+                        <group string="Email được AI soạn thảo">
+                            <field name="ai_email_draft" nolabel="1" readonly="1"/>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- AI batch analyze action for tree view -->
+
+    <!-- AI buttons for ho.tro.khach.hang form -->
+    <record id="view_ho_tro_khach_hang_form_ai_inherit" model="ir.ui.view">
+        <field name="name">ho.tro.khach.hang.form.ai.inherit</field>
+        <field name="model">ho_tro_khach_hang</field>
+        <field name="inherit_id" ref="khach_hang.view_ho_tro_khach_hang_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_suggest_response" type="object" 
+                        string="🤖 Gợi ý phản hồi" class="btn-primary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_summarize_ticket" type="object" 
+                        string="📋 Tóm tắt ticket" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <notebook position="inside">
+                    <page string="🤖 Hỗ trợ AI" name="ai_support" groups="ai_integration.group_ai_user">
+                        <group>
+                            <field name="ai_priority_suggestion" readonly="1"/>
+                        </group>
+                        <group string="Tóm tắt ticket">
+                            <field name="ai_ticket_summary" nolabel="1" readonly="1"/>
+                        </group>
+                        <group string="Gợi ý phản hồi từ AI">
+                            <field name="ai_suggested_response" nolabel="1" readonly="1"/>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+</odoo>

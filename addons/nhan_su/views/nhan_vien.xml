@@ -35,6 +35,18 @@
                             <button type="object" name="action_view_van_ban" class="oe_stat_button" icon="fa-file-text-o">
                                 <field name="so_van_ban_tao" widget="statinfo" string="Văn bản"/>
                             </button>
+                            <button type="object" name="action_view_ho_so" class="oe_stat_button" icon="fa-folder-open">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="ho_so_count"/>
+                                    </span>
+                                    <span class="o_stat_text">Hồ Sơ</span>
+                                </div>
+                                <field name="trang_thai_ho_so" widget="badge" 
+                                       decoration-success="trang_thai_ho_so == 'day_du'"
+                                       decoration-warning="trang_thai_ho_so == 'sap_het_han'"
+                                       decoration-danger="trang_thai_ho_so in ['thieu', 'het_han']"/>
+                            </button>
                         </div>
                         <!-- Header với tiêu đề đẹp -->
                         <div class="oe_title">
@@ -138,6 +150,25 @@
                                     <i class="fa fa-info-circle"></i> 
                                     Thống kê chỉ tính cho nhân viên đang làm việc. Dữ liệu được đồng bộ tự động từ các module khác.
                                 </p>
+                            </page>
+                            
+                            <page string="Hồ Sơ" name="ho_so">
+                                <field name="ho_so_ids" context="{'default_nhan_vien_id': active_id}">
+                                    <tree decoration-success="trang_thai == 'da_duyet'"
+                                          decoration-info="trang_thai == 'cho_duyet'"
+                                          decoration-muted="trang_thai == 'nhap'"
+                                          decoration-danger="trang_thai in ['tu_choi', 'het_han']"
+                                          decoration-warning="so_ngay_con_lai &lt;= 30 and so_ngay_con_lai &gt; 0">
+                                        <field name="name"/>
+                                        <field name="loai_ho_so"/>
+                                        <field name="bat_buoc" widget="boolean_toggle"/>
+                                        <field name="ngay_cap"/>
+                                        <field name="ngay_het_han"/>
+                                        <field name="so_ngay_con_lai" optional="hide"/>
+                                        <field name="trang_thai" widget="badge"/>
+                                        <field name="phien_ban"/>
+                                    </tree>
+                                </field>
                             </page>
                         </notebook>
                     </sheet>

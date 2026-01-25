@@ -41,6 +41,21 @@ class DonHang(models.Model):
         ('huy', 'Hủy')
     ], string='Trạng thái', default='moi', required=True, tracking=True)
     
+    # Priority và color cho Kanban
+    priority = fields.Selection([
+        ('0', 'Thấp'),
+        ('1', 'Trung bình'),
+        ('2', 'Cao'),
+        ('3', 'Khẩn cấp')
+    ], string='Độ ưu tiên', default='1')
+    
+    color = fields.Integer('Color Index', compute='_compute_color')
+    kanban_state = fields.Selection([
+        ('normal', 'In Progress'),
+        ('done', 'Ready'),
+        ('blocked', 'Blocked')
+    ], string='Kanban State', default='normal')
+    
     # Chi tiết đơn hàng
     line_ids = fields.One2many('don_hang.line', 'don_hang_id', string='Chi tiết đơn hàng',
                                  copy=True)
@@ -81,6 +96,19 @@ class DonHang(models.Model):
     _sql_constraints = [
         ('ma_don_hang_unique', 'unique(ma_don_hang)', 'Mã đơn hàng đã tồn tại!')
     ]
+    
+    @api.depends('priority', 'tong_tien')
+    def _compute_color(self):
+        """Tính màu cho Kanban based on priority và value"""
+        for record in self:
+            if record.priority == '3':  # Khẩn cấp
+                record.color = 1  # Red
+            elif record.priority == '2':  # Cao
+                record.color = 3  # Yellow
+            elif record.tong_tien > 50000000:  # High value
+                record.color = 4  # Blue
+            else:
+                record.color = 0  # Default
 
     def _is_placeholder_ma_don_hang(self, value):
         return not value or value in {'New', 'Mới', _('New')}

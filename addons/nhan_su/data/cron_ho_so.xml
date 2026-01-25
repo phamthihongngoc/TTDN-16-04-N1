@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cron Job: Kiểm tra hồ sơ hết hạn hàng ngày -->
+    <record id="cron_check_ho_so_het_han" model="ir.cron">
+        <field name="name">Kiểm tra hồ sơ nhân viên hết hạn</field>
+        <field name="model_id" ref="model_ho_so_nhan_vien"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_check_het_han()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True"/>
+        <field name="doall" eval="False"/>
+        <field name="priority">10</field>
+    </record>
+</odoo>

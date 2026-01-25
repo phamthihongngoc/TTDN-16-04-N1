@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- CRL Tree View -->
+    <record id="view_pki_certificate_revocation_tree" model="ir.ui.view">
+        <field name="name">pki.certificate.revocation.tree</field>
+        <field name="model">pki.certificate.revocation</field>
+        <field name="arch" type="xml">
+            <tree string="Certificate Revocation List">
+                <field name="crl_entry_number"/>
+                <field name="certificate_name"/>
+                <field name="reason_code"/>
+                <field name="revoked_at"/>
+                <field name="revoked_by"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- CRL Form View -->
+    <record id="view_pki_certificate_revocation_form" model="ir.ui.view">
+        <field name="name">pki.certificate.revocation.form</field>
+        <field name="model">pki.certificate.revocation</field>
+        <field name="arch" type="xml">
+            <form string="CRL Entry">
+                <header>
+                    <button name="action_remove_from_crl" 
+                            string="Reactivate Certificate"
+                            type="object"
+                            class="btn-success"
+                            attrs="{'invisible': ['|', ('state', '=', 'removed'), ('reason_code', '!=', 'certificate_hold')]}"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_export_crl" 
+                                string="Export CRL"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-download"/>
+                    </div>
+                    
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="certificate_id"/>
+                            <field name="user_id"/>
+                            <field name="crl_entry_number"/>
+                        </group>
+                        <group>
+                            <field name="revoked_at"/>
+                            <field name="revoked_by"/>
+                            <field name="reason_code"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Chi tiết">
+                        <field name="reason_description" nolabel="1"/>
+                    </group>
+                    
+                    <group string="Reactivation Info" attrs="{'invisible': [('state', '!=', 'removed')]}">
+                        <field name="removed_at"/>
+                        <field name="removed_by"/>
+                        <field name="removed_reason"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- CRL Action -->
+    <record id="action_pki_certificate_revocation" model="ir.actions.act_window">
+        <field name="name">Certificate Revocation List (CRL)</field>
+        <field name="res_model">pki.certificate.revocation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Danh sách chứng thư số bị thu hồi
+            </p>
+        </field>
+    </record>
+    
+    <!-- Rotation Tree View -->
+    <record id="view_pki_certificate_rotation_tree" model="ir.ui.view">
+        <field name="name">pki.certificate.rotation.tree</field>
+        <field name="model">pki.certificate.rotation</field>
+        <field name="arch" type="xml">
+            <tree string="Certificate Rotations">
+                <field name="name"/>
+                <field name="old_certificate_id"/>
+                <field name="new_certificate_id"/>
+                <field name="rotation_type"/>
+                <field name="rotation_date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Rotation Form View -->
+    <record id="view_pki_certificate_rotation_form" model="ir.ui.view">
+        <field name="name">pki.certificate.rotation.form</field>
+        <field name="model">pki.certificate.rotation</field>
+        <field name="arch" type="xml">
+            <form string="Certificate Rotation">
+                <header>
+                    <button name="action_execute_rotation"
+                            string="Execute Rotation"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', 'not in', ['pending', 'failed'])]}"/>
+                    <button name="action_cancel"
+                            string="Cancel"
+                            type="object"
+                            attrs="{'invisible': [('state', 'not in', ['pending', 'failed'])]}"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="old_certificate_id"/>
+                            <field name="new_certificate_id" attrs="{'invisible': [('new_certificate_id', '=', False)]}"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="rotation_type"/>
+                            <field name="rotation_date"/>
+                            <field name="created_by"/>
+                            <field name="completed_at" attrs="{'invisible': [('completed_at', '=', False)]}"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Rotation Reason">
+                        <field name="rotation_reason" nolabel="1"/>
+                    </group>
+                    
+                    <group string="Error Message" attrs="{'invisible': [('error_message', '=', False)]}">
+                        <field name="error_message" nolabel="1" class="text-danger"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Rotation Action -->
+    <record id="action_pki_certificate_rotation" model="ir.actions.act_window">
+        <field name="name">Certificate Rotations</field>
+        <field name="res_model">pki.certificate.rotation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    <!-- External Storage Config -->
+    <record id="view_external_storage_config_form" model="ir.ui.view">
+        <field name="name">external.storage.config.form</field>
+        <field name="model">external.storage.config</field>
+        <field name="arch" type="xml">
+            <form string="External Storage Configuration">
+                <header>
+                    <button name="action_test_connection"
+                            string="Test Connection"
+                            type="object"
+                            class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Storage Statistics">
+                            <field name="total_files" readonly="1"/>
+                            <field name="total_size_gb" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group>
+                            <field name="storage_type"/>
+                            <field name="bucket_name"/>
+                            <field name="region_name"/>
+                            <field name="endpoint_url" attrs="{'required': [('storage_type', 'in', ['minio', 'compatible'])]}"/>
+                        </group>
+                        <group>
+                            <field name="access_key_id" password="True"/>
+                            <field name="secret_access_key" password="True"/>
+                            <field name="path_prefix"/>
+                            <field name="use_ssl"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Test Results" attrs="{'invisible': [('last_test_result', '=', False)]}">
+                        <field name="last_test_date"/>
+                        <field name="last_test_result" nolabel="1" widget="text"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- External Storage File Tree -->
+    <record id="view_external_storage_file_tree" model="ir.ui.view">
+        <field name="name">external.storage.file.tree</field>
+        <field name="model">external.storage.file</field>
+        <field name="arch" type="xml">
+            <tree string="External Storage Files">
+                <field name="name"/>
+                <field name="storage_config_id"/>
+                <field name="file_size"/>
+                <field name="uploaded_at"/>
+                <field name="van_ban_id"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Menu Items -->
+    <menuitem id="menu_pki_certificate_revocation"
+              name="Revocation List (CRL)"
+              parent="menu_van_ban_root"
+              action="action_pki_certificate_revocation"
+              sequence="130"/>
+    
+    <menuitem id="menu_pki_certificate_rotation"
+              name="Certificate Rotations"
+              parent="menu_van_ban_root"
+              action="action_pki_certificate_rotation"
+              sequence="140"/>
+    
+</odoo>

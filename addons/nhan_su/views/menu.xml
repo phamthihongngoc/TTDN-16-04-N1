@@ -91,5 +91,18 @@
             sequence="3"
             action="action_chuc_vu"
             groups="nhan_su.group_quan_tri_nhan_su"/>
+
+        <!-- AI Chat -->
+        <record id="action_ai_chat_nhan_su" model="ir.actions.client">
+            <field name="name">AI Assistant - Nhân sự</field>
+            <field name="tag">ai_chat_widget</field>
+            <field name="context">{'default_module': 'nhan_su'}</field>
+        </record>
+
+        <menuitem id="menu_ai_chat_nhan_su"
+                  name="🤖 AI Assistant"
+                  parent="menu_root"
+                  action="action_ai_chat_nhan_su"
+                  sequence="5"/>
     </data>
 </odoo>

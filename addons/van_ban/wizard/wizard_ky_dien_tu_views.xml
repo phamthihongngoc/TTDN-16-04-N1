@@ -25,29 +25,39 @@
                             <field name="loai_van_ban" readonly="1" attrs="{'invisible': [('van_ban_id', '=', False)]}"/>
                         </group>
                         <group string="Người ký">
-                            <field name="nguoi_ky_id" invisible="1"/>
-                            <field name="ten_nguoi_ky"/>
-                            <field name="chuc_vu"/>
+                            <field name="nguoi_ky_id" options="{'no_create': True}" required="1" readonly="1" domain="[('ten_nv','=','Phạm Thị Hồng Ngọc')]"/>
+                            <field name="ten_nguoi_ky" readonly="1"/>
+                            <field name="chuc_vu" readonly="1"/>
                             <field name="ho_ten_xac_nhan" required="1" placeholder="Nhập đúng họ và tên để xác minh"/>
                         </group>
                     </group>
                     
-                    <separator string="Vẽ chữ ký của bạn"/>
+                    <separator string="Upload ảnh chữ ký của bạn"/>
                     
                     <div class="alert alert-info" role="alert">
                         <p><i class="fa fa-info-circle" title="Thông tin"/> <strong>Hướng dẫn:</strong></p>
                         <ul>
-                            <li>Dùng chuột hoặc màn hình cảm ứng để vẽ chữ ký trong khung bên dưới</li>
-                            <li>Click "Xóa" nếu muốn vẽ lại</li>
-                            <li>Chữ ký sẽ được lưu lại và có giá trị pháp lý</li>
+                            <li>Upload ảnh chữ ký có sẵn của bạn (JPG/PNG)</li>
+                            <li>Hệ thống sẽ tự động sinh Private Key và Public Key từ ảnh</li>
+                            <li>Public Key sẽ được lưu vào kho để xác thực sau này</li>
+                            <li>Chữ ký sẽ có giá trị pháp lý</li>
                         </ul>
                     </div>
                     
                     <group>
                         <field name="chu_ky" 
-                               widget="signature" 
-                               options="{'size': [600, 200], 'editable': true, 'clear': true}"
-                               placeholder="Vẽ chữ ký ở đây..."/>
+                               widget="image" 
+                               options="{'size': [400, 200]}"
+                               filename="chu_ky_filename"/>
+                        <field name="chu_ky_filename" invisible="1"/>
+                        <field name="keys_generated" invisible="1"/>
+                        <field name="private_key_generated" invisible="1"/>
+                        <field name="public_key_generated" invisible="1"/>
+                        
+                        <div colspan="2" class="alert alert-success" role="alert" attrs="{'invisible': [('keys_generated', '=', False)]}">
+                            <p><i class="fa fa-check-circle"/> <strong>✓ Private/Public Key đã được sinh tự động!</strong></p>
+                            <p>Public Key sẽ được lưu vào kho khi ký thành công.</p>
+                        </div>
                     </group>
                     
                     <group>
@@ -61,6 +71,67 @@
                                 <li>Chịu trách nhiệm về chữ ký điện tử này</li>
                             </ul>
                         </div>
+                    </group>
+
+                    <group string="🔐 Xác thực 2 lớp (OTP)" col="4" attrs="{'invisible': [('require_otp', '=', False)]}">
+                        <field name="require_otp" colspan="4"/>
+                        <div colspan="4" class="alert alert-warning" role="alert" attrs="{'invisible': ['|', ('otp_sent', '=', True), ('otp_verified', '=', True)]}">
+                            <p><i class="fa fa-shield" title="Bảo mật"/> <strong>Xác thực 2 lớp bằng OTP qua Email</strong></p>
+                            <p>Để tăng cường bảo mật, bạn cần xác thực OTP trước khi ký.</p>
+                        </div>
+                        <field name="otp_sent" invisible="1"/>
+                        <field name="otp_verified" invisible="1"/>
+                        <field name="otp_sent_code" invisible="1"/>
+                        <field name="otp_sent_at" invisible="1"/>
+                        
+                        <!-- Nút Gửi OTP - hiện khi chưa gửi -->
+                        <button name="action_send_otp" 
+                                string="📧 Gửi mã OTP đến Email" 
+                                type="object" 
+                                class="btn-warning oe_highlight"
+                                colspan="4"
+                                attrs="{'invisible': ['|', ('otp_sent', '=', True), ('otp_verified', '=', True)]}"/>
+                        
+                        <!-- Thông báo đã gửi OTP -->
+                        <div colspan="4" class="alert alert-info" role="alert" attrs="{'invisible': ['|', ('otp_sent', '=', False), ('otp_verified', '=', True)]}">
+                            <p><strong>✅ OTP đã được gửi đến email: <field name="user_email" readonly="1" nolabel="1" class="d-inline"/></strong></p>
+                            <p>Vui lòng kiểm tra hộp thư (kể cả Spam) và nhập mã OTP 6 số bên dưới:</p>
+                        </div>
+                        
+                        <!-- Ô nhập OTP - CHỈ hiện khi đã gửi OTP -->
+                        <field name="otp_code" 
+                               string="Nhập mã OTP (6 số)"
+                               placeholder="Nhập 6 số từ email"
+                               colspan="2"
+                               class="o_field_highlight"
+                               attrs="{'invisible': ['|', ('otp_sent', '=', False), ('otp_verified', '=', True)], 'required': [('otp_sent', '=', True), ('otp_verified', '=', False)]}"/>
+                        
+                        <!-- Nút Xác thực OTP - chỉ hiện khi đã gửi -->
+                        <button name="action_verify_otp" 
+                                string="✓ Xác thực OTP" 
+                                type="object" 
+                                class="btn-success oe_highlight"
+                                colspan="2"
+                                attrs="{'invisible': ['|', ('otp_sent', '=', False), ('otp_verified', '=', True)]}"/>
+                        
+                        <!-- Nút Gửi lại OTP -->
+                        <button name="action_send_otp" 
+                                string="🔄 Gửi lại OTP" 
+                                type="object" 
+                                class="btn-link"
+                                colspan="4"
+                                attrs="{'invisible': ['|', ('otp_sent', '=', False), ('otp_verified', '=', True)]}"/>
+                        
+                        <!-- Thông báo xác thực thành công -->
+                        <div colspan="4" class="alert alert-success" role="alert" attrs="{'invisible': [('otp_verified', '=', False)]}">
+                            <p><i class="fa fa-check-circle" title="Thành công"/> <strong>OTP đã được xác thực thành công!</strong></p>
+                            <p>Bạn có thể tiến hành ký văn bản.</p>
+                        </div>
+                    </group>
+                    
+                    <!-- Hiện group require_otp khi tắt -->
+                    <group col="2" attrs="{'invisible': [('require_otp', '=', True)]}">
+                        <field name="require_otp"/>
                     </group>
 
                     <group string="Blockchain" col="2" attrs="{'invisible': [('van_ban_id', '=', False)]}">

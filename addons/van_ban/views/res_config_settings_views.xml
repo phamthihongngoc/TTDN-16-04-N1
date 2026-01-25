@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_inherit_van_ban" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.van_ban</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="Văn bản" string="Văn bản" data-key="van_ban">
+                        <h2>Văn bản</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <label for="van_ban_ocr_provider"/>
+                                    <div class="text-muted">Chọn OCR chạy local (Tesseract) hoặc gọi API (OCR.Space).</div>
+                                    <field name="van_ban_ocr_provider"/>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('van_ban_ocr_provider', '!=', 'ocrspace')]}">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <label for="van_ban_ocrspace_api_key"/>
+                                    <div class="text-muted">API Key do OCR.Space cấp. Có thể dùng key test, nhưng bị giới hạn.</div>
+                                    <field name="van_ban_ocrspace_api_key" password="True"/>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('van_ban_ocr_provider', '!=', 'ocrspace')]}">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <label for="van_ban_ocrspace_language"/>
+                                    <div class="text-muted">Ngôn ngữ OCR (vd: vie, eng). Với ảnh song ngữ, có thể thử eng hoặc vie.</div>
+                                    <field name="van_ban_ocrspace_language"/>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('van_ban_ocr_provider', '!=', 'ocrspace')]}">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <label for="van_ban_ocrspace_engine"/>
+                                    <div class="text-muted">Chọn engine OCR.Space (tùy gói API hỗ trợ).</div>
+                                    <field name="van_ban_ocrspace_engine"/>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <label for="van_ban_ocr_docx_images"/>
+                                    <div class="text-muted">OCR thêm phần ảnh nhúng trong DOCX (hữu ích cho file scan).</div>
+                                    <field name="van_ban_ocr_docx_images"/>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('van_ban_ocr_docx_images', '=', False)]}">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <label for="van_ban_ocr_docx_max_images"/>
+                                    <div class="text-muted">Giới hạn số ảnh trong DOCX sẽ được OCR.</div>
+                                    <field name="van_ban_ocr_docx_max_images"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

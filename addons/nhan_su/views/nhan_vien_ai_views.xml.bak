@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI buttons for nhan.vien form -->
+    <record id="view_nhan_vien_form_ai_inherit" model="ir.ui.view">
+        <field name="name">nhan.vien.form.ai.inherit</field>
+        <field name="model">nhan_vien</field>
+        <field name="inherit_id" ref="nhan_su.view_nhan_vien_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_summarize_profile" type="object" 
+                        string="🤖 Tóm tắt hồ sơ" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_check_documents" type="object" 
+                        string="📋 Kiểm tra hồ sơ" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_suggest_training" type="object" 
+                        string="📚 Đề xuất đào tạo" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_write_review" type="object" 
+                        string="⭐ Viết đánh giá" class="btn-secondary"
+                        groups="ai_integration.group_ai_manager"/>
+                <button name="action_ai_assistant" type="object" 
+                        string="💬 Hỏi AI" class="btn-info"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <notebook position="inside">
+                    <page string="🤖 Phân tích AI" name="ai_analysis" groups="ai_integration.group_ai_user">
+                        <group>
+                            <field name="ai_last_analyzed" readonly="1"/>
+                        </group>
+                        <group string="Tóm tắt hồ sơ">
+                            <field name="ai_profile_summary" nolabel="1" readonly="1"/>
+                        </group>
+                        <group string="Hồ sơ còn thiếu">
+                            <field name="ai_missing_documents" nolabel="1" readonly="1"/>
+                        </group>
+                        <group string="Đề xuất đào tạo">
+                            <field name="ai_training_suggestions" nolabel="1" readonly="1"/>
+                        </group>
+                        <group string="Đánh giá hiệu suất (AI)">
+                            <field name="ai_performance_review" nolabel="1" readonly="1"/>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- AI buttons for ho.so.nhan.vien form -->
+    <record id="view_ho_so_nhan_vien_form_ai_inherit" model="ir.ui.view">
+        <field name="name">ho.so.nhan.vien.form.ai.inherit</field>
+        <field name="model">ho_so.nhan_vien</field>
+        <field name="inherit_id" ref="nhan_su.view_ho_so_nhan_vien_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_extract_from_file" type="object" 
+                        string="📄 Trích xuất từ file" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="🤖 Thông tin trích xuất bởi AI" groups="ai_integration.group_ai_user">
+                    <field name="ai_extracted_info" nolabel="1" readonly="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- AI Recruitment Wizard Action -->
+    <record id="action_ai_recruitment_wizard" model="ir.actions.act_window">
+        <field name="name">🤖 AI Hỗ trợ tuyển dụng</field>
+        <field name="res_model">nhan_vien</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

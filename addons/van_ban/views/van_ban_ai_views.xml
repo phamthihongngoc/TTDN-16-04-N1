@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI buttons for van_ban form -->
+    <record id="view_van_ban_form_ai_inherit" model="ir.ui.view">
+        <field name="name">van.ban.form.ai.inherit</field>
+        <field name="model">van_ban</field>
+        <field name="inherit_id" ref="van_ban.view_van_ban_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_summarize" type="object" 
+                        string="🤖 Tóm tắt AI" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_extract_metadata" type="object" 
+                        string="📋 Trích xuất AI" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_analyze_risk" type="object" 
+                        string="⚠️ Phân tích rủi ro" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_assistant" type="object" 
+                        string="💬 Hỏi AI" class="btn-info"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- AI buttons for van_ban_di form -->
+    <record id="view_van_ban_di_form_ai_inherit" model="ir.ui.view">
+        <field name="name">van.ban.di.form.ai.inherit</field>
+        <field name="model">van_ban_di</field>
+        <field name="inherit_id" ref="van_ban.view_van_ban_di_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_summarize" type="object" 
+                        string="🤖 Tóm tắt AI" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_assistant" type="object" 
+                        string="💬 Hỏi AI" class="btn-info"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- AI buttons for van_ban_den form -->
+    <record id="view_van_ban_den_form_ai_inherit" model="ir.ui.view">
+        <field name="name">van.ban.den.form.ai.inherit</field>
+        <field name="model">van_ban_den</field>
+        <field name="inherit_id" ref="van_ban.view_van_ban_den_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_classify_and_route" type="object" 
+                        string="🤖 Phân loại AI" class="btn-secondary"
+                        groups="ai_integration.group_ai_user"/>
+                <button name="action_ai_assistant" type="object" 
+                        string="💬 Hỏi AI" class="btn-info"
+                        groups="ai_integration.group_ai_user"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

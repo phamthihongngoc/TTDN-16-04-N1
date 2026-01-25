@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- PKI Certificate Tree View -->
+    <record id="view_pki_certificate_tree" model="ir.ui.view">
+        <field name="name">pki.certificate.tree</field>
+        <field name="model">pki.certificate</field>
+        <field name="arch" type="xml">
+            <tree string="Chứng thư số PKI" decoration-success="state=='active' and is_valid==True" decoration-danger="state=='expired' or state=='revoked'" decoration-muted="state=='draft'">
+                <field name="name"/>
+                <field name="user_name"/>
+                <field name="subject_common_name"/>
+                <field name="subject_organization"/>
+                <field name="valid_from"/>
+                <field name="valid_to"/>
+                <field name="key_size"/>
+                <field name="hash_algorithm"/>
+                <field name="is_valid" widget="boolean_toggle"/>
+                <field name="state" widget="badge" decoration-success="state=='active'" decoration-danger="state in ('expired','revoked')" decoration-info="state=='draft'"/>
+                <field name="signature_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- PKI Certificate Form View -->
+    <record id="view_pki_certificate_form" model="ir.ui.view">
+        <field name="name">pki.certificate.form</field>
+        <field name="model">pki.certificate</field>
+        <field name="arch" type="xml">
+            <form string="Chứng thư số PKI">
+                <header>
+                    <button name="action_generate_keypair" string="🔐 Tạo Certificate" type="object" states="draft" class="oe_highlight" help="Tạo cặp khóa Private/Public Key và Certificate"/>
+                    <button name="action_download_public_key" string="📥 Download Public Key" type="object" attrs="{'invisible': [('public_key_pem', '=', False)]}" help="Download public key để chia sẻ"/>
+                    <button name="action_view_signatures" string="📝 Xem văn bản đã ký" type="object" attrs="{'invisible': [('signature_count', '=', 0)]}"/>
+                    <button name="action_revoke" string="❌ Thu hồi Certificate" type="object" states="active" confirm="Bạn có chắc muốn thu hồi certificate này? Hành động này không thể hoàn tác!"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_signatures" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                            <field name="signature_count" widget="statinfo" string="Đã ký"/>
+                        </button>
+                    </div>
+                    
+                    <widget name="web_ribbon" title="Hết hạn" bg_color="bg-danger" attrs="{'invisible': [('state', '!=', 'expired')]}"/>
+                    <widget name="web_ribbon" title="Đã thu hồi" bg_color="bg-warning" attrs="{'invisible': [('state', '!=', 'revoked')]}"/>
+                    <widget name="web_ribbon" title="Còn hiệu lực" bg_color="bg-success" attrs="{'invisible': [('is_valid', '=', False)]}"/>
+                    
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Ví dụ: Certificate PKI - Giám đốc"/>
+                        </h1>
+                        <h3>
+                            <field name="user_name" readonly="1"/>
+                        </h3>
+                    </div>
+                    
+                    <group>
+                        <group string="Thông tin người dùng">
+                            <field name="user_id" options="{'no_create': True}"/>
+                            <field name="nhan_vien_id" readonly="1"/>
+                            <field name="subject_common_name" required="1" placeholder="Họ và tên"/>
+                            <field name="subject_organization" placeholder="Tên công ty"/>
+                            <field name="subject_email" placeholder="email@example.com"/>
+                        </group>
+                        <group string="Cấu hình bảo mật">
+                            <field name="key_size" widget="radio" options="{'horizontal': true}"/>
+                            <field name="hash_algorithm"/>
+                            <field name="private_key_password" password="True" attrs="{'readonly': [('state', '!=', 'draft')]}" placeholder="Password bảo vệ Private Key"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Thời hạn hiệu lực">
+                            <field name="valid_from"/>
+                            <field name="valid_to"/>
+                            <field name="is_valid" readonly="1"/>
+                        </group>
+                        <group string="Thông tin Certificate">
+                            <field name="issuer_name" readonly="1"/>
+                            <field name="created_at" readonly="1"/>
+                            <field name="created_by" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="🔑 Public Key (Công khai)" attrs="{'invisible': [('public_key_pem', '=', False)]}">
+                            <group>
+                                <field name="public_key_pem" widget="text" readonly="1" nolabel="1"/>
+                            </group>
+                            <div class="alert alert-info" role="alert">
+                                <strong>ℹ️ Public Key:</strong> Có thể chia sẻ công khai để người khác xác thực chữ ký của bạn.
+                            </div>
+                        </page>
+                        
+                        <page string="📜 Certificate" attrs="{'invisible': [('certificate_pem', '=', False)]}">
+                            <group>
+                                <field name="certificate_pem" widget="text" readonly="1" nolabel="1"/>
+                            </group>
+                        </page>
+                        
+                        <page string="🔐 Private Key" groups="base.group_system">
+                            <div class="alert alert-danger" role="alert">
+                                <strong>⚠️ CẢNH BÁO:</strong> Private Key là thông tin BẢO MẬT tuyệt đối. KHÔNG BAO GIỜ chia sẻ với bất kỳ ai!
+                            </div>
+                            <group>
+                                <field name="private_key" filename="private_key.pem" readonly="1"/>
+                            </group>
+                        </page>
+                        
+                        <page string="📋 Lịch sử" attrs="{'invisible': [('state', '=', 'draft')]}">
+                            <group string="Audit Trail">
+                                <field name="revoked_at" readonly="1" attrs="{'invisible': [('revoked_at', '=', False)]}"/>
+                                <field name="revoked_reason" readonly="1" attrs="{'invisible': [('revoked_reason', '=', False)]}"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- PKI Certificate Search View -->
+    <record id="view_pki_certificate_search" model="ir.ui.view">
+        <field name="name">pki.certificate.search</field>
+        <field name="model">pki.certificate</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm Chứng thư số">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="subject_common_name"/>
+                <field name="subject_organization"/>
+                <separator/>
+                <filter string="Đang hoạt động" name="active" domain="[('state', '=', 'active')]"/>
+                <filter string="Còn hiệu lực" name="valid" domain="[('is_valid', '=', True)]"/>
+                <filter string="Sắp hết hạn (30 ngày)" name="expiring_soon" 
+                        domain="[('state', '=', 'active'), ('valid_to', '&lt;=', (context_today() + relativedelta(days=30)).strftime('%Y-%m-%d 23:59:59'))]"/>
+                <filter string="Hết hạn" name="expired" domain="[('state', '=', 'expired')]"/>
+                <filter string="Đã thu hồi" name="revoked" domain="[('state', '=', 'revoked')]"/>
+                <separator/>
+                <filter string="Certificate của tôi" name="my_certs" domain="[('user_id', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Người dùng" name="group_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Trạng thái" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Thuật toán Hash" name="group_hash" context="{'group_by': 'hash_algorithm'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_pki_certificate" model="ir.actions.act_window">
+        <field name="name">Chứng thư số PKI</field>
+        <field name="res_model">pki.certificate</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_active': 1, 'search_default_my_certs': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo Chứng thư số PKI đầu tiên!
+            </p>
+            <p>
+                Chứng thư số (PKI Certificate) được sử dụng để:<br/>
+                ✅ Ký điện tử văn bản với Private Key<br/>
+                ✅ Xác thực chữ ký bằng Public Key<br/>
+                ✅ Đảm bảo tính toàn vẹn và không thể chối bỏ<br/><br/>
+                
+                <strong>Quy trình:</strong><br/>
+                1. Tạo Certificate mới → Nhập thông tin<br/>
+                2. Click "Tạo Certificate" → Hệ thống tự động tạo Private/Public Key<br/>
+                3. Sử dụng Certificate để ký văn bản điện tử<br/>
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_pki_certificate"
+              name="Chứng thư số PKI"
+              parent="menu_van_ban_cau_hinh"
+              action="action_pki_certificate"
+              sequence="35"/>
+
+</odoo>

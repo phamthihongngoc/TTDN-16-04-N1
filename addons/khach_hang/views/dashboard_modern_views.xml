@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================ -->
+    <!-- MODERN INTERACTIVE DASHBOARD VIEW -->
+    <!-- Features: Interactive KPI Tiles, Inline Charts, Quick Actions, Color-Coded Status -->
+    <!-- ============================================================ -->
+    
+    <record id="view_dashboard_khach_hang_modern_form" model="ir.ui.view">
+        <field name="name">dashboard.khach_hang.modern.form</field>
+        <field name="model">dashboard.khach_hang</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard CRM" create="false" edit="false" delete="false" class="o_dashboard_crm">
+                <header>
+                    <!-- Quick Actions in Header -->
+                    <button name="action_create_customer" type="object" string="➕ Tạo Khách hàng" class="btn-primary"/>
+                    <button name="action_create_order" type="object" string="🛒 Tạo Đơn hàng" class="btn-success"/>
+                    <button name="action_create_ticket" type="object" string="🎫 Tạo Ticket" class="btn-info"/>
+                </header>
+                
+                <sheet>
+                    <div class="oe_title">
+                        <h1 style="color: #875A7B; font-size: 32px; margin-bottom: 10px;">
+                            📊 Dashboard CRM - Quản Lý Khách Hàng
+                        </h1>
+                        <p style="color: #7f8c8d; font-size: 14px;">
+                            Tổng quan toàn diện về hiệu suất kinh doanh và dịch vụ khách hàng
+                        </p>
+                    </div>
+                    
+                    <!-- Alert Boxes Section -->
+                    <div style="margin: 20px 0;">
+                        <!-- Overdue Orders Alert -->
+                        <div class="dashboard_alert danger" attrs="{'invisible': [('has_overdue_orders_alert', '=', False)]}">
+                            <div class="alert_content">
+                                <span class="alert_icon">🚨</span>
+                                <div>
+                                    <strong>Đơn hàng quá hạn!</strong>
+                                    <span> Có <field name="overdue_orders_count"/> đơn hàng đang xử lý quá 7 ngày.</span>
+                                </div>
+                            </div>
+                            <button name="action_view_overdue_orders" type="object" class="btn btn-sm btn-danger alert_btn">
+                                Xử lý ngay ➜
+                            </button>
+                        </div>
+                        
+                        <!-- Open Tickets Alert -->
+                        <div class="dashboard_alert warning" attrs="{'invisible': [('has_open_tickets_alert', '=', False)]}">
+                            <div class="alert_content">
+                                <span class="alert_icon">⚠️</span>
+                                <div>
+                                    <strong>Nhiều tickets chưa xử lý!</strong>
+                                    <span> Có <field name="open_tickets"/> tickets đang chờ xử lý.</span>
+                                </div>
+                            </div>
+                            <button name="action_view_open_tickets" type="object" class="btn btn-sm btn-warning alert_btn">
+                                Xem ngay ➜
+                            </button>
+                        </div>
+                        
+                        <!-- Low Satisfaction Alert -->
+                        <div class="dashboard_alert info" attrs="{'invisible': [('has_low_satisfaction_alert', '=', False)]}">
+                            <div class="alert_content">
+                                <span class="alert_icon">ℹ️</span>
+                                <div>
+                                    <strong>Điểm hài lòng thấp!</strong>
+                                    <span> CSAT Score hiện tại: <field name="satisfaction_score" widget="percentage"/>. Cần cải thiện chất lượng dịch vụ.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <separator string="📈 CHỈ SỐ HIỆU SUẤT CHÍNH (KPIs)" style="margin: 30px 0 20px 0; font-weight: bold; font-size: 16px;"/>
+                    
+                    <!-- Interactive KPI Tiles Grid -->
+                    <div class="dashboard_grid">
+                        <!-- Revenue Tile - with color coding -->
+                        <div class="kpi_tile" 
+                             decoration-success="revenue_status == 'excellent'"
+                             decoration-info="revenue_status == 'good'"
+                             decoration-warning="revenue_status == 'warning'"
+                             decoration-danger="revenue_status == 'danger'"
+                             style="text-align: left;">
+                            <button name="action_view_revenue_chart" type="object" style="width: 100%; border: none; background: transparent; text-align: left; cursor: pointer; padding: 0;">
+                                <span class="kpi_icon">💰</span>
+                                <div class="kpi_label">Doanh Thu Tháng Này</div>
+                                <div class="kpi_value">
+                                    <field name="monthly_revenue" widget="monetary"/>
+                                </div>
+                                <div class="kpi_trend">
+                                    <span attrs="{'invisible': [('revenue_growth_rate', '&lt;', 0)]}" style="color: #27ae60;">
+                                        ▲ <field name="revenue_growth_rate"/>% so với tháng trước
+                                    </span>
+                                    <span attrs="{'invisible': [('revenue_growth_rate', '>=', 0)]}" style="color: #e74c3c;">
+                                        ▼ <field name="revenue_growth_rate"/>% so với tháng trước
+                                    </span>
+                                </div>
+                                <div style="font-size: 11px; color: #7f8c8d; margin-top: 5px;">
+                                    <field name="revenue_achievement" widget="percentage"/> mục tiêu (<field name="revenue_goal" widget="monetary"/>)
+                                </div>
+                            </button>
+                        </div>
+                        
+                        <!-- Total Customers Tile -->
+                        <div class="kpi_tile"
+                             decoration-success="customer_growth_status == 'excellent'"
+                             decoration-info="customer_growth_status == 'good'"
+                             decoration-warning="customer_growth_status == 'warning'"
+                             style="text-align: left;">
+                            <button name="action_view_all_customers" type="object" style="width: 100%; border: none; background: transparent; text-align: left; cursor: pointer; padding: 0;">
+                                <span class="kpi_icon">👥</span>
+                                <div class="kpi_label">Tổng Khách Hàng</div>
+                                <div class="kpi_value">
+                                    <field name="total_customers"/>
+                                </div>
+                                <div class="kpi_trend" style="color: #27ae60;">
+                                    ➕ <field name="new_customers"/> khách mới (30 ngày)
+                                </div>
+                                <div style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">
+                                    <field name="active_customers"/> đang hoạt động
+                                </div>
+                            </button>
+                        </div>
+                        
+                        <!-- Total Orders Tile -->
+                        <div class="kpi_tile"
+                             decoration-success="order_status_indicator == 'excellent'"
+                             decoration-info="order_status_indicator == 'good'"
+                             decoration-warning="order_status_indicator == 'warning'"
+                             style="text-align: left;">
+                            <button name="action_view_all_orders" type="object" style="width: 100%; border: none; background: transparent; text-align: left; cursor: pointer; padding: 0;">
+                                <span class="kpi_icon">📦</span>
+                                <div class="kpi_label">Tổng Đơn Hàng</div>
+                                <div class="kpi_value">
+                                    <field name="total_orders"/>
+                                </div>
+                                <div style="font-size: 12px; margin-top: 8px;">
+                                    <span style="color: #27ae60;">✓ <field name="completed_orders"/> hoàn thành</span>
+                                    <span style="color: #f39c12; margin-left: 10px;">⏳ <field name="processing_orders"/> đang xử lý</span>
+                                </div>
+                            </button>
+                        </div>
+                        
+                        <!-- Average Order Value Tile -->
+                        <div class="kpi_tile status_good" style="text-align: left;">
+                            <span class="kpi_icon">💳</span>
+                            <div class="kpi_label">Giá Trị Đơn Trung Bình</div>
+                            <div class="kpi_value">
+                                <field name="average_order_value" widget="monetary"/>
+                            </div>
+                            <div style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">
+                                CLV: <field name="customer_lifetime_value" widget="monetary"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Conversion Rate Tile -->
+                        <div class="kpi_tile status_excellent" style="text-align: left;">
+                            <span class="kpi_icon">🎯</span>
+                            <div class="kpi_label">Tỷ Lệ Chuyển Đổi</div>
+                            <div class="kpi_value">
+                                <field name="conversion_rate" widget="percentage"/>
+                            </div>
+                            <div style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">
+                                Retention: <field name="retention_rate" widget="percentage"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Support Tickets Tile -->
+                        <div class="kpi_tile"
+                             decoration-success="support_status == 'excellent'"
+                             decoration-info="support_status == 'good'"
+                             decoration-warning="support_status == 'warning'"
+                             decoration-danger="support_status == 'danger'"
+                             style="text-align: left;">
+                            <button name="action_view_open_tickets" type="object" style="width: 100%; border: none; background: transparent; text-align: left; cursor: pointer; padding: 0;">
+                                <span class="kpi_icon">🎫</span>
+                                <div class="kpi_label">Tickets Hỗ Trợ</div>
+                                <div class="kpi_value">
+                                    <field name="open_tickets"/> / <field name="total_tickets"/>
+                                </div>
+                                <div style="font-size: 12px; margin-top: 8px;">
+                                    <span style="color: #27ae60;">CSAT: <field name="satisfaction_score" widget="percentage"/></span>
+                                    <span style="color: #7f8c8d; margin-left: 10px;">Avg: <field name="avg_response_time"/> giờ</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions Panel -->
+                    <div class="quick_actions_panel" style="margin: 30px 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="margin: 0; color: #2c3e50; font-size: 18px;">⚡ Thao Tác Nhanh</h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 col-sm-6">
+                                <button name="action_create_customer" type="object" class="quick_action_btn primary" style="width: 100%;">
+                                    <i class="fa fa-user-plus"></i>
+                                    <span>Tạo Khách hàng</span>
+                                </button>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <button name="action_create_order" type="object" class="quick_action_btn success" style="width: 100%;">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    <span>Tạo Đơn hàng</span>
+                                </button>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <button name="action_create_ticket" type="object" class="quick_action_btn info" style="width: 100%;">
+                                    <i class="fa fa-ticket"></i>
+                                    <span>Tạo Ticket</span>
+                                </button>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <button name="action_view_top_customers" type="object" class="quick_action_btn warning" style="width: 100%;">
+                                    <i class="fa fa-trophy"></i>
+                                    <span>Top Khách hàng</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Inline Charts Section -->
+                    <separator string="📊 BIỂU ĐỒ PHÂN TÍCH" style="margin: 30px 0 20px 0; font-weight: bold; font-size: 16px;"/>
+                    
+                    <div class="row">
+                        <!-- Revenue Chart Button -->
+                        <div class="col-md-6">
+                            <div class="inline_chart_container">
+                                <div class="chart_header">
+                                    <div>
+                                        <div class="chart_title">📈 Xu Hướng Doanh Thu</div>
+                                        <div class="chart_subtitle">Doanh thu 12 tháng gần nhất</div>
+                                    </div>
+                                </div>
+                                <button name="action_view_revenue_chart" type="object" 
+                                        class="btn btn-primary btn-lg btn-block"
+                                        style="height: 200px; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                                    <i class="fa fa-line-chart fa-3x" style="margin-bottom: 15px;"></i>
+                                    <span>Xem Biểu Đồ Chi Tiết</span>
+                                    <small style="margin-top: 10px; opacity: 0.8;">Click để xem line chart theo tháng</small>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Orders Chart Button -->
+                        <div class="col-md-6">
+                            <div class="inline_chart_container">
+                                <div class="chart_header">
+                                    <div>
+                                        <div class="chart_title">📊 Phân Tích Đơn Hàng</div>
+                                        <div class="chart_subtitle">Đơn hàng theo trạng thái</div>
+                                    </div>
+                                </div>
+                                <button name="action_view_orders_chart" type="object" 
+                                        class="btn btn-info btn-lg btn-block"
+                                        style="height: 200px; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                                    <i class="fa fa-bar-chart fa-3x" style="margin-bottom: 15px;"></i>
+                                    <span>Xem Biểu Đồ Chi Tiết</span>
+                                    <small style="margin-top: 10px; opacity: 0.8;">Click để xem bar chart theo trạng thái</small>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row" style="margin-top: 20px;">
+                        <!-- Customer Segment Chart Button -->
+                        <div class="col-md-6">
+                            <div class="inline_chart_container">
+                                <div class="chart_header">
+                                    <div>
+                                        <div class="chart_title">🎯 Phân Khúc Khách Hàng</div>
+                                        <div class="chart_subtitle">Phân bổ theo RFM segment</div>
+                                    </div>
+                                </div>
+                                <button name="action_view_customers_chart" type="object" 
+                                        class="btn btn-success btn-lg btn-block"
+                                        style="height: 200px; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                                    <i class="fa fa-pie-chart fa-3x" style="margin-bottom: 15px;"></i>
+                                    <span>Xem Biểu Đồ Chi Tiết</span>
+                                    <small style="margin-top: 10px; opacity: 0.8;">Click để xem pie chart phân khúc</small>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Top Customers Pivot Button -->
+                        <div class="col-md-6">
+                            <div class="inline_chart_container">
+                                <div class="chart_header">
+                                    <div>
+                                        <div class="chart_title">💰 Top Khách Hàng</div>
+                                        <div class="chart_subtitle">Xếp hạng theo doanh thu</div>
+                                    </div>
+                                </div>
+                                <button name="action_view_top_customers" type="object" 
+                                        class="btn btn-warning btn-lg btn-block"
+                                        style="height: 200px; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                                    <i class="fa fa-trophy fa-3x" style="margin-bottom: 15px;"></i>
+                                    <span>Xem Bảng Pivot</span>
+                                    <small style="margin-top: 10px; opacity: 0.8;">Click để xem pivot table chi tiết</small>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Details -->
+                    <notebook style="margin-top: 30px;">
+                        <page string="📋 Chi Tiết KPIs">
+                            <group col="4">
+                                <group string="💰 Doanh Thu Chi Tiết">
+                                    <field name="total_revenue" widget="monetary"/>
+                                    <field name="quarterly_revenue" widget="monetary"/>
+                                    <field name="yearly_revenue" widget="monetary"/>
+                                    <field name="revenue_goal" widget="monetary"/>
+                                </group>
+                                <group string="👥 Khách Hàng Chi Tiết">
+                                    <field name="potential_customers"/>
+                                    <field name="inactive_customers"/>
+                                    <field name="customer_growth_rate" widget="percentage"/>
+                                </group>
+                                <group string="📦 Đơn Hàng Chi Tiết">
+                                    <field name="new_orders"/>
+                                    <field name="cancelled_orders"/>
+                                    <field name="order_growth_rate" widget="percentage"/>
+                                </group>
+                                <group string="📊 Chỉ Số Khác">
+                                    <field name="revenue_status"/>
+                                    <field name="customer_growth_status"/>
+                                    <field name="order_status_indicator"/>
+                                    <field name="support_status"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="📖 Hướng Dẫn Sử Dụng">
+                            <div style="padding: 20px; line-height: 1.8;">
+                                <h3 style="color: #875A7B;">✨ Dashboard CRM Hiện Đại</h3>
+                                <p>Dashboard này cung cấp tổng quan trực quan và tương tác về hiệu suất kinh doanh của bạn.</p>
+                                
+                                <h4 style="margin-top: 20px;">🎯 Các Tính Năng Chính:</h4>
+                                <ul>
+                                    <li><strong>Interactive KPI Tiles:</strong> Click vào các ô KPI để xem chi tiết dữ liệu</li>
+                                    <li><strong>Color-Coded Status:</strong> Màu sắc tự động thay đổi theo hiệu suất (Xanh = Tốt, Vàng = Cảnh báo, Đỏ = Nguy hiểm)</li>
+                                    <li><strong>Real-time Alerts:</strong> Cảnh báo tự động khi có vấn đề cần xử lý</li>
+                                    <li><strong>Quick Actions:</strong> Tạo nhanh khách hàng, đơn hàng, ticket chỉ với 1 click</li>
+                                    <li><strong>Growth Indicators:</strong> Hiển thị tốc độ tăng trưởng so với tháng trước</li>
+                                </ul>
+                                
+                                <h4 style="margin-top: 20px;">📊 Các Chỉ Số Quan Trọng:</h4>
+                                <ul>
+                                    <li><strong>CLV (Customer Lifetime Value):</strong> Giá trị trung bình mỗi khách hàng mang lại</li>
+                                    <li><strong>Conversion Rate:</strong> Tỷ lệ chuyển đổi từ tiềm năng sang thực</li>
+                                    <li><strong>CSAT Score:</strong> Điểm hài lòng khách hàng (0-100%)</li>
+                                    <li><strong>Retention Rate:</strong> Tỷ lệ giữ chân khách hàng</li>
+                                    <li><strong>AOV (Average Order Value):</strong> Giá trị đơn hàng trung bình</li>
+                                </ul>
+                                
+                                <h4 style="margin-top: 20px;">🎨 Màu Sắc Chỉ Báo:</h4>
+                                <ul>
+                                    <li><span style="color: #27ae60;">● Xanh lá:</span> Xuất sắc (≥80% mục tiêu)</li>
+                                    <li><span style="color: #2ecc71;">● Xanh nhạt:</span> Tốt (60-80% mục tiêu)</li>
+                                    <li><span style="color: #f39c12;">● Vàng:</span> Cảnh báo (40-60% mục tiêu)</li>
+                                    <li><span style="color: #e74c3c;">● Đỏ:</span> Nguy hiểm (&lt;40% mục tiêu)</li>
+                                </ul>
+                            </div>
+                        </page>
+                    </notebook>
+                    
+                    <!-- Hidden Fields -->
+                    <group invisible="1">
+                        <field name="currency_id"/>
+                        <field name="revenue_trend_data"/>
+                        <field name="top_customers_data"/>
+                        <field name="customer_segment_data"/>
+                        <field name="has_open_tickets_alert"/>
+                        <field name="has_overdue_orders_alert"/>
+                        <field name="has_low_satisfaction_alert"/>
+                        <field name="revenue_achievement"/>
+                        <field name="revenue_growth_rate"/>
+                        <field name="customer_growth_rate"/>
+                        <field name="order_growth_rate"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Update Action to use new view -->
+    <record id="action_dashboard_khach_hang" model="ir.actions.act_window">
+        <field name="name">📊 Dashboard CRM</field>
+        <field name="res_model">dashboard.khach_hang</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_dashboard_khach_hang_modern_form"/>
+        <field name="target">current</field>
+    </record>
+    
+</odoo>

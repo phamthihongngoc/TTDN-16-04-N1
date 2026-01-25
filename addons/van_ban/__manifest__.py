@@ -22,7 +22,7 @@
     """,
     'author': 'FIT-DNU',
     'category': 'Document Management',
-    'depends': ['base', 'mail', 'nhan_su', 'khach_hang'],
+    'depends': ['base', 'mail', 'nhan_su', 'khach_hang', 'ai_integration'],
     'data': [
         'security/van_ban_security.xml',
         'security/ir.model.access.csv',
@@ -30,18 +30,24 @@
         'data/workflow_template_data.xml',
         'data/sequence_data.xml',
         'data/cron.xml',
+        'data/cron_advanced.xml',  # Cron cho Certificate Rotation, Archive
+        'views/res_config_settings_views.xml',
         'wizard/wizard_ky_dien_tu_views.xml',
         'wizard/wizard_ky_khach_hang_views.xml',
         'views/loai_van_ban_views.xml',
         'views/yeu_cau_ky_views.xml',
         'views/lich_su_van_ban_views.xml',
         'views/van_ban_signature_log_views.xml',
+        'views/pki_certificate_views.xml',  # Thêm views cho PKI
+        'views/pki_advanced_views.xml',  # Views cho CRL, Rotation, External Storage
         'views/workflow_template_views.xml',
         'views/van_ban_views.xml',
         'views/van_ban_den_views.xml',
         'views/van_ban_di_views.xml',
         'views/van_ban_ocr_views.xml',
         'views/dashboard_views.xml',
+        'views/van_ban_ai_views.xml',
+        'views/technical_menu.xml',
         'views/menu.xml',
     ],
     'assets': {
@@ -55,6 +61,7 @@
             'Pillow',
             'pdfplumber',
             'docx',
+            'requests',
             'web3',
             'eth_account',
             'textblob',
@@ -62,6 +69,10 @@
             'sklearn',
             'pandas',
             'numpy',
+            'openai',
+            'tiktoken',
+            'cryptography',  # Thêm cryptography cho PKI
+            # 'boto3',  # Thêm boto3 cho External Storage (S3/MinIO) - Optional, comment nếu chưa cài
         ],
         'bin': [
             'tesseract',

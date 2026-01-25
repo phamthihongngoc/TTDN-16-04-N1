@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Cron: Check expiring certificates -->
+    <record id="cron_check_expiring_certificates" model="ir.cron">
+        <field name="name">PKI: Check Expiring Certificates</field>
+        <field name="model_id" ref="model_pki_certificate_rotation"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_check_expiring_certificates()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True"/>
+    </record>
+    
+    <!-- Cron: Archive old documents -->
+    <record id="cron_archive_old_documents" model="ir.cron">
+        <field name="name">Archive: Old Documents (>365 days)</field>
+        <field name="model_id" ref="base.model_ir_cron"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_archive_old_documents()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">months</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="False"/>
+    </record>
+    
+    <!-- Cron: Cleanup transient models -->
+    <record id="cron_cleanup_transient_models" model="ir.cron">
+        <field name="name">Cleanup: Transient Wizard Data</field>
+        <field name="model_id" ref="base.model_ir_cron"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_cleanup_transient_models()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True"/>
+    </record>
+    
+</odoo>

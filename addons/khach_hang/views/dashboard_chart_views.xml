@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard with Embedded Charts using Graph/Pivot -->
+    
+    <!-- Revenue Trend Chart View -->
+    <record id="view_don_hang_revenue_trend_graph" model="ir.ui.view">
+        <field name="name">don.hang.revenue.trend.graph</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <graph string="📈 Xu Hướng Doanh Thu" type="line" stacked="False">
+                <field name="ngay_dat_hang" type="row" interval="month"/>
+                <field name="tong_tien" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    
+    <!-- Orders by Status Chart -->
+    <record id="view_don_hang_by_status_graph" model="ir.ui.view">
+        <field name="name">don.hang.by.status.graph</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <graph string="📊 Đơn Hàng Theo Trạng Thái" type="bar">
+                <field name="trang_thai" type="row"/>
+                <field name="tong_tien" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    
+    <!-- Customers by RFM Segment -->
+    <record id="view_khach_hang_rfm_graph" model="ir.ui.view">
+        <field name="name">khach.hang.rfm.graph</field>
+        <field name="model">khach_hang</field>
+        <field name="arch" type="xml">
+            <graph string="🎯 Phân Khúc Khách Hàng (RFM)" type="pie">
+                <field name="rfm_segment" type="row"/>
+            </graph>
+        </field>
+    </record>
+    
+    <!-- Top Customers by Revenue Pivot -->
+    <record id="view_don_hang_by_customer_pivot" model="ir.ui.view">
+        <field name="name">don.hang.by.customer.pivot</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <pivot string="💰 Top Khách Hàng">
+                <field name="khach_hang_id" type="row"/>
+                <field name="tong_tien" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    
+    <!-- Dashboard Actions for Different Views -->
+    <record id="action_dashboard_revenue_chart" model="ir.actions.act_window">
+        <field name="name">📈 Xu Hướng Doanh Thu</field>
+        <field name="res_model">don_hang</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_don_hang_revenue_trend_graph"/>
+        <field name="domain">[('trang_thai', '=', 'hoan_thanh')]</field>
+        <field name="context">{}</field>
+    </record>
+    
+    <record id="action_dashboard_orders_chart" model="ir.actions.act_window">
+        <field name="name">📊 Phân Tích Đơn Hàng</field>
+        <field name="res_model">don_hang</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="view_id" ref="view_don_hang_by_status_graph"/>
+    </record>
+    
+    <record id="action_dashboard_customers_chart" model="ir.actions.act_window">
+        <field name="name">🎯 Phân Khúc Khách Hàng</field>
+        <field name="res_model">khach_hang</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_khach_hang_rfm_graph"/>
+    </record>
+    
+    <record id="action_dashboard_top_customers" model="ir.actions.act_window">
+        <field name="name">💰 Top Khách Hàng</field>
+        <field name="res_model">don_hang</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="view_id" ref="view_don_hang_by_customer_pivot"/>
+        <field name="domain">[('trang_thai', '=', 'hoan_thanh')]</field>
+    </record>
+    
+</odoo>

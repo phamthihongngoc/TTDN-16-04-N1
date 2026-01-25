@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================ -->
+    <!-- DASHBOARD VIEWS với Charts & KPIs -->
+    <!-- ============================================ -->
+    
+    <!-- Dashboard Form View với KPI Cards & Embedded Charts -->
+    <record id="view_dashboard_khach_hang_form" model="ir.ui.view">
+        <field name="name">dashboard.khach_hang.form</field>
+        <field name="model">dashboard.khach_hang</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard Khách Hàng" create="false" edit="false" delete="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1 style="color: #875A7B;">📊 Dashboard Khách Hàng &amp; Doanh Thu</h1>
+                        <p style="color: #777;">Tổng quan hiệu suất kinh doanh và dịch vụ khách hàng</p>
+                    </div>
+                    
+                    <separator string="📋 TỔNG QUAN CHỈ SỐ" style="margin-top: 20px; font-weight: bold;"/>
+                    
+                    <!-- KPI Summary Cards - Compact Layout -->
+                    <group col="6">
+                        <group string="👥 KHÁCH HÀNG" class="oe_dashboard_column">
+                            <field name="total_customers" class="oe_inline" string="Tổng số"/>
+                            <field name="new_customers" class="oe_inline" string="Mới (30 ngày)"/>
+                            <field name="active_customers" class="oe_inline" string="Đang hoạt động"/>
+                        </group>
+                        
+                        <group string="💰 DOANH THU" class="oe_dashboard_column">
+                            <field name="total_revenue" widget="monetary" class="oe_inline" string="Tổng doanh thu"/>
+                            <field name="monthly_revenue" widget="monetary" class="oe_inline" string="Tháng này"/>
+                            <field name="yearly_revenue" widget="monetary" class="oe_inline" string="Năm nay"/>
+                        </group>
+                        
+                        <group string="📦 ĐỌN HÀNG" class="oe_dashboard_column">
+                            <field name="total_orders" class="oe_inline" string="Tổng số"/>
+                            <field name="completed_orders" class="oe_inline" string="Hoàn thành"/>
+                            <field name="processing_orders" class="oe_inline" string="Đang xử lý"/>
+                        </group>
+                        
+                        <group string="📈 HIỆU SUẤT" class="oe_dashboard_column">
+                            <field name="conversion_rate" widget="percentage" class="oe_inline" string="Tỷ lệ chuyển đổi"/>
+                            <field name="average_order_value" widget="monetary" class="oe_inline" string="Giá trị TB/đơn"/>
+                            <field name="customer_lifetime_value" widget="monetary" class="oe_inline" string="CLV"/>
+                        </group>
+                        
+                        <group string="🎯 HỖ TRỢ" class="oe_dashboard_column">
+                            <field name="total_tickets" class="oe_inline" string="Tổng tickets"/>
+                            <field name="open_tickets" class="oe_inline" string="Đang mở"/>
+                            <field name="satisfaction_score" widget="percentage" class="oe_inline" string="CSAT Score"/>
+                        </group>
+                        
+                        <group string="📊 KHÁC" class="oe_dashboard_column">
+                            <field name="retention_rate" widget="percentage" class="oe_inline" string="Tỷ lệ giữ chân"/>
+                            <field name="potential_customers" class="oe_inline" string="Tiềm năng"/>
+                            <field name="avg_response_time" class="oe_inline" string="TG phản hồi (h)"/>
+                        </group>
+                    </group>
+                    
+                    <separator string="📈 BIỂU ĐỒ PHÂN TÍCH" style="margin-top: 30px; font-weight: bold;"/>
+                    
+                    <!-- Chart Action Buttons -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button name="action_view_revenue_chart" 
+                                    type="object" 
+                                    class="btn btn-primary btn-lg btn-block oe_highlight" 
+                                    style="margin: 10px 5px; padding: 20px; font-size: 16px;">
+                                <i class="fa fa-line-chart"/> 📈 Xu Hướng Doanh Thu (12 tháng)
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button name="action_view_orders_chart" 
+                                    type="object" 
+                                    class="btn btn-info btn-lg btn-block" 
+                                    style="margin: 10px 5px; padding: 20px; font-size: 16px;">
+                                <i class="fa fa-bar-chart"/> 📊 Phân Tích Đơn Hàng
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button name="action_view_customers_chart" 
+                                    type="object" 
+                                    class="btn btn-success btn-lg btn-block" 
+                                    style="margin: 10px 5px; padding: 20px; font-size: 16px;">
+                                <i class="fa fa-pie-chart"/> 🎯 Phân Khúc Khách Hàng
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button name="action_view_top_customers" 
+                                    type="object" 
+                                    class="btn btn-warning btn-lg btn-block" 
+                                    style="margin: 10px 5px; padding: 20px; font-size: 16px;">
+                                <i class="fa fa-trophy"/> 💰 Top Khách Hàng (Doanh thu)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Details in Notebook -->
+                    <notebook>
+                        <page string="📊 Chi Tiết Khách Hàng">
+                            <group col="2">
+                                <group>
+                                    <field name="potential_customers" string="Khách hàng tiềm năng"/>
+                                    <field name="inactive_customers" string="Không hoạt động"/>
+                                </group>
+                                <group>
+                                    <field name="new_orders" string="Đơn hàng mới"/>
+                                    <field name="cancelled_orders" string="Đơn đã hủy"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="💰 Chi Tiết Doanh Thu">
+                            <group>
+                                <field name="quarterly_revenue" widget="monetary" string="Doanh thu quý này"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
+                        </page>
+                        
+                        <page string="📖 Hướng Dẫn">
+                            <div style="padding: 20px;">
+                                <h3>Cách sử dụng Dashboard</h3>
+                                <ul>
+                                    <li>📊 <b>Tổng quan chỉ số:</b> Hiển thị các KPI quan trọng về khách hàng, doanh thu, đơn hàng</li>
+                                    <li>📈 <b>Xu hướng doanh thu:</b> Biểu đồ line chart theo tháng, 12 tháng gần nhất</li>
+                                    <li>📊 <b>Phân tích đơn hàng:</b> Biểu đồ bar chart theo trạng thái đơn hàng</li>
+                                    <li>🎯 <b>Phân khúc khách hàng:</b> Biểu đồ pie chart theo RFM segment</li>
+                                    <li>💰 <b>Top khách hàng:</b> Bảng pivot theo doanh thu</li>
+                                    <li>🔄 <b>Dữ liệu tự động:</b> Dashboard tự động tính toán khi mở</li>
+                                </ul>
+                                
+                                <h3 style="margin-top: 20px;">Các chỉ số quan trọng</h3>
+                                <ul>
+                                    <li><b>CLV (Customer Lifetime Value):</b> Giá trị trung bình khách hàng mang lại</li>
+                                    <li><b>Conversion Rate:</b> Tỷ lệ chuyển đổi từ tiềm năng sang thực</li>
+                                    <li><b>CSAT Score:</b> Điểm hài lòng khách hàng (Customer Satisfaction)</li>
+                                    <li><b>Retention Rate:</b> Tỷ lệ giữ chân khách hàng</li>
+                                </ul>
+                            </div>
+                        </page>
+                    </notebook>
+                    
+                    <!-- Hidden fields for chart data -->
+                    <field name="revenue_trend_data" invisible="1"/>
+                    <field name="top_customers_data" invisible="1"/>
+                    <field name="customer_segment_data" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Dashboard Graph View: Revenue Trend -->
+    <record id="view_dashboard_revenue_trend_graph" model="ir.ui.view">
+        <field name="name">dashboard.revenue.trend.graph</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <graph string="Xu Hướng Doanh Thu" type="line" stacked="False">
+                <field name="ngay_dat_hang" type="row" interval="month"/>
+                <field name="tong_tien" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    
+    <!-- Dashboard Pivot View: Doanh Thu Theo Khách Hàng -->
+    <record id="view_dashboard_revenue_by_customer_pivot" model="ir.ui.view">
+        <field name="name">dashboard.revenue.by.customer.pivot</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <pivot string="Doanh Thu Theo Khách Hàng">
+                <field name="khach_hang_id" type="row"/>
+                <field name="tong_tien" type="measure"/>
+                <field name="ngay_dat_hang" type="col" interval="month"/>
+            </pivot>
+        </field>
+    </record>
+    
+    <!-- Dashboard Action -->
+    <record id="action_dashboard_khach_hang" model="ir.actions.act_window">
+        <field name="name">📊 Dashboard CRM</field>
+        <field name="res_model">dashboard.khach_hang</field>
+        <field name="view_mode">form,graph,pivot</field>
+        <field name="target">current</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">
+                Dashboard tổng quan về khách hàng, doanh thu và hiệu suất kinh doanh
+            </p>
+        </field>
+    </record>
+    
+    <!-- Additional Graph View for Dashboard -->
+    <record id="view_dashboard_orders_graph" model="ir.ui.view">
+        <field name="name">dashboard.orders.graph</field>
+        <field name="model">don_hang</field>
+        <field name="arch" type="xml">
+            <graph string="Biểu Đồ Đơn Hàng" type="bar">
+                <field name="trang_thai" type="row"/>
+                <field name="tong_tien" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    
+    <record id="view_dashboard_customers_graph" model="ir.ui.view">
+        <field name="name">dashboard.customers.graph</field>
+        <field name="model">khach_hang</field>
+        <field name="arch" type="xml">
+            <graph string="Biểu Đồ Khách Hàng" type="pie">
+                <field name="rfm_segment" type="row"/>
+            </graph>
+        </field>
+    </record>
+    
+    <!-- Dashboard Revenue Trend Action (for detail view) -->
+    <record id="action_dashboard_revenue_trend" model="ir.actions.act_window">
+        <field name="name">📈 Xu Hướng Doanh Thu</field>
+        <field name="res_model">don_hang</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="domain">[('trang_thai', '=', 'hoan_thanh')]</field>
+        <field name="context">{'search_default_this_year': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">
+                Phân tích chi tiết xu hướng doanh thu theo thời gian
+            </p>
+        </field>
+    </record>
+    
+    <!-- ============================================ -->
+    <!-- NÂNG CẤP KHÁCH HÀNG VIEW với Smart Buttons -->
+    <!-- ============================================ -->
+    
+    <record id="view_khach_hang_form_smart_buttons" model="ir.ui.view">
+        <field name="name">khach.hang.form.smart.buttons</field>
+        <field name="model">khach_hang</field>
+        <field name="inherit_id" ref="khach_hang.view_khach_hang_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Smart Buttons -->
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <!-- Smart Buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_orders" type="object" class="oe_stat_button" icon="fa-shopping-cart">
+                            <field name="don_hang_count" widget="statinfo" string="Đơn hàng"/>
+                        </button>
+                        
+                        <button name="action_view_support_tickets" type="object" class="oe_stat_button" icon="fa-ticket">
+                            <field name="ho_tro_count" widget="statinfo" string="Tickets"/>
+                        </button>
+                        
+                        <button name="action_view_emails" type="object" class="oe_stat_button" icon="fa-envelope">
+                            <field name="email_count" widget="statinfo" string="Emails"/>
+                        </button>
+                        
+                        <button name="action_create_order" type="object" class="oe_stat_button" icon="fa-plus-circle" string="Tạo đơn hàng"/>
+                        
+                        <button name="action_create_support_ticket" type="object" class="oe_stat_button" icon="fa-life-ring" string="Tạo ticket"/>
+                    </div>
+                </header>
+            </xpath>
+            
+            <!-- Add RFM Analysis Tab -->
+            <xpath expr="//notebook" position="inside">
+                <page string="📊 RFM Analysis &amp; AI Insights">
+                    <group string="RFM Segmentation">
+                        <group>
+                            <field name="rfm_recency" readonly="1"/>
+                            <field name="rfm_frequency" readonly="1"/>
+                            <field name="rfm_monetary" readonly="1" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="rfm_segment" readonly="1" widget="badge" decoration-success="rfm_segment in ['vip', 'loyal']" decoration-warning="rfm_segment == 'at_risk'" decoration-danger="rfm_segment == 'lost'"/>
+                            <field name="last_activity_date" readonly="1"/>
+                            <field name="days_since_last_activity" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="🤖 AI Insights">
+                        <group>
+                            <field name="churn_probability" readonly="1" widget="progressbar"/>
+                            <field name="purchase_probability" readonly="1" widget="progressbar"/>
+                        </group>
+                        <group>
+                            <field name="sentiment_score" readonly="1" widget="gauge" options="{'max_field': 'max_value', 'style': 'width:160px; height: 120px;'}"/>
+                        </group>
+                    </group>
+                    
+                    <group string="📝 Next Best Action">
+                        <field name="next_best_action" readonly="1" widget="html"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Kanban View for Khách Hàng với RFM -->
+    <record id="view_khach_hang_kanban_rfm" model="ir.ui.view">
+        <field name="name">khach.hang.kanban.rfm</field>
+        <field name="model">khach_hang</field>
+        <field name="inherit_id" ref="khach_hang.view_khach_hang_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by">rfm_segment</attribute>
+            </xpath>
+            
+            <xpath expr="//field[@name='mau_sac']" position="after">
+                <field name="rfm_segment"/>
+                <field name="churn_probability"/>
+                <field name="purchase_probability"/>
+            </xpath>
+            
+            <xpath expr="//div[@class='o_kanban_record_body']" position="inside">
+                <div class="mt4">
+                    <span class="badge badge-pill" t-if="record.rfm_segment.raw_value == 'vip'" style="background-color: #28a745;">VIP</span>
+                    <span class="badge badge-pill" t-if="record.rfm_segment.raw_value == 'loyal'" style="background-color: #17a2b8;">Loyal</span>
+                    <span class="badge badge-pill" t-if="record.rfm_segment.raw_value == 'at_risk'" style="background-color: #ffc107;">At Risk</span>
+                    <span class="badge badge-pill" t-if="record.rfm_segment.raw_value == 'lost'" style="background-color: #dc3545;">Lost</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    
+    
+    <!-- Menu Items -->
+    <menuitem id="menu_dashboard_root" 
+              name="📊 Dashboard CRM" 
+              parent="khach_hang.menu_khach_hang_root" 
+              sequence="1" 
+              action="action_dashboard_khach_hang"/>
+    
+</odoo>

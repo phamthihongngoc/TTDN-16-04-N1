@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI Log Tree View -->
+    <record id="view_ai_log_tree" model="ir.ui.view">
+        <field name="name">ai.log.tree</field>
+        <field name="model">ai.log</field>
+        <field name="arch" type="xml">
+            <tree string="AI Logs" decoration-danger="status=='error'" 
+                  decoration-warning="status=='rate_limit'" create="false">
+                <field name="create_date"/>
+                <field name="user_id"/>
+                <field name="action_type"/>
+                <field name="ai_model"/>
+                <field name="model_name"/>
+                <field name="total_tokens"/>
+                <field name="cost_usd"/>
+                <field name="latency_ms"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- AI Log Form View -->
+    <record id="view_ai_log_form" model="ir.ui.view">
+        <field name="name">ai.log.form</field>
+        <field name="model">ai.log</field>
+        <field name="arch" type="xml">
+            <form string="AI Log" create="false" edit="false">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_record" type="object" 
+                                class="oe_stat_button" icon="fa-external-link"
+                                attrs="{'invisible': [('model_name', '=', False)]}">
+                            <span>Xem bản ghi</span>
+                        </button>
+                    </div>
+                    <group>
+                        <group string="Thông tin">
+                            <field name="user_id"/>
+                            <field name="action_type"/>
+                            <field name="ai_model"/>
+                            <field name="create_date"/>
+                            <field name="status"/>
+                        </group>
+                        <group string="Nguồn">
+                            <field name="model_name"/>
+                            <field name="record_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Tokens">
+                            <field name="input_tokens"/>
+                            <field name="output_tokens"/>
+                            <field name="total_tokens"/>
+                        </group>
+                        <group string="Metrics">
+                            <field name="cost_usd"/>
+                            <field name="latency_ms"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Prompt" name="prompt">
+                            <field name="prompt_preview" readonly="1"/>
+                        </page>
+                        <page string="Response" name="response">
+                            <field name="response_preview" readonly="1"/>
+                        </page>
+                        <page string="Error" name="error" attrs="{'invisible': [('status', '!=', 'error')]}">
+                            <field name="error_message" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- AI Log Search View -->
+    <record id="view_ai_log_search" model="ir.ui.view">
+        <field name="name">ai.log.search</field>
+        <field name="model">ai.log</field>
+        <field name="arch" type="xml">
+            <search string="AI Logs">
+                <field name="user_id"/>
+                <field name="action_type"/>
+                <field name="model_name"/>
+                <field name="ai_model"/>
+                <filter string="Thành công" name="success" domain="[('status', '=', 'success')]"/>
+                <filter string="Lỗi" name="error" domain="[('status', '=', 'error')]"/>
+                <separator/>
+                <filter string="Hôm nay" name="today" 
+                        domain="[('create_date', '>=', (context_today()).strftime('%Y-%m-%d'))]"/>
+                <filter string="Tuần này" name="this_week" 
+                        domain="[('create_date', '>=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Của tôi" name="my_logs" domain="[('user_id', '=', uid)]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Ngày" name="group_date" context="{'group_by': 'create_date:day'}"/>
+                    <filter string="Người dùng" name="group_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Loại" name="group_action" context="{'group_by': 'action_type'}"/>
+                    <filter string="Model" name="group_model" context="{'group_by': 'model_name'}"/>
+                    <filter string="AI Model" name="group_ai_model" context="{'group_by': 'ai_model'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- AI Log Action -->
+    <record id="action_ai_log" model="ir.actions.act_window">
+        <field name="name">AI Logs</field>
+        <field name="res_model">ai.log</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Chưa có log AI nào
+            </p>
+            <p>
+                Tất cả các request đến OpenAI sẽ được ghi log tại đây.
+            </p>
+        </field>
+    </record>
+</odoo>

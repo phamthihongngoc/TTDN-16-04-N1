@@ -51,6 +51,36 @@ class KhachHang(models.Model):
     tong_chi_tieu = fields.Monetary('Tổng tiền đã chi tiêu', compute='_compute_tong_chi_tieu', 
                                      store=True, currency_field='currency_id')
     
+    # Smart Button Counts
+    don_hang_count = fields.Integer('Số đơn hàng', compute='_compute_smart_button_counts')
+    ho_tro_count = fields.Integer('Số tickets', compute='_compute_smart_button_counts')
+    email_count = fields.Integer('Số email', compute='_compute_smart_button_counts')
+    
+    # RFM Analysis
+    rfm_recency = fields.Integer('Recency (days)', compute='_compute_rfm_score', store=True,
+                                  help='Số ngày kể từ lần mua hàng cuối')
+    rfm_frequency = fields.Integer('Frequency', compute='_compute_rfm_score', store=True,
+                                    help='Số lần mua hàng')
+    rfm_monetary = fields.Monetary('Monetary Value', compute='_compute_rfm_score', store=True,
+                                    currency_field='currency_id', help='Tổng giá trị đã mua')
+    rfm_segment = fields.Selection([
+        ('vip', 'VIP'),
+        ('loyal', 'Loyal'),
+        ('at_risk', 'At Risk'),
+        ('lost', 'Lost'),
+        ('new', 'New')
+    ], string='RFM Segment', compute='_compute_rfm_score', store=True)
+    
+    # AI Insights
+    churn_probability = fields.Float('Churn Risk (%)', compute='_compute_ai_insights',
+                                      help='Xác suất khách hàng rời đi')
+    purchase_probability = fields.Float('Purchase Probability (%)', compute='_compute_ai_insights',
+                                         help='Xác suất mua hàng trong 30 ngày tới')
+    sentiment_score = fields.Float('Sentiment Score', compute='_compute_sentiment_analysis',
+                                    help='Điểm cảm xúc từ email và hỗ trợ (-1 đến 1)')
+    next_best_action = fields.Text('Next Best Action', compute='_compute_ai_insights',
+                                    help='Hành động đề xuất tiếp theo')
+    
     # Nhân viên phụ trách
     nhan_vien_phu_trach_id = fields.Many2one('nhan_vien', string='Nhân viên phụ trách',
                                                tracking=True,
@@ -60,6 +90,11 @@ class KhachHang(models.Model):
     don_hang_ids = fields.One2many('don_hang', 'khach_hang_id', string='Đơn hàng')
     ho_tro_ids = fields.One2many('ho_tro_khach_hang', 'khach_hang_id', string='Yêu cầu hỗ trợ')
     email_ids = fields.Many2many('email_khach_hang', string='Email đã nhận')
+    
+    # Engagement tracking
+    last_activity_date = fields.Date('Last Activity', compute='_compute_last_activity')
+    days_since_last_activity = fields.Integer('Days Since Last Activity', 
+                                                compute='_compute_last_activity')
     
     # Dự đoán sản phẩm bằng AI
     san_pham_du_doan_ids = fields.Many2many('san_pham', string='Sản phẩm dự đoán', compute='_compute_du_doan_san_pham', store=True)
@@ -174,10 +209,7 @@ class KhachHang(models.Model):
         """Hiển thị tên khách hàng kèm công ty"""
         result = []
         for record in self:
-            if record.cong_ty:
-                name = f"{record.ten_khach_hang} ({record.cong_ty})"
-            else:
-                name = record.ten_khach_hang
+            name = record.ten_khach_hang
             result.append((record.id, name))
         return result
     
@@ -208,3 +240,223 @@ class KhachHang(models.Model):
                 'default_khach_hang_ids': [(6, 0, [self.id])],
             }
         }
+    
+    # ============ SMART BUTTON COUNTS ============
+    
+    @api.depends('don_hang_ids', 'ho_tro_ids', 'email_ids')
+    def _compute_smart_button_counts(self):
+        """Tính số lượng cho smart buttons"""
+        for record in self:
+            record.don_hang_count = len(record.don_hang_ids)
+            record.ho_tro_count = len(record.ho_tro_ids)
+            record.email_count = len(record.email_ids)
+    
+    # ============ RFM ANALYSIS ============
+    
+    @api.depends('don_hang_ids', 'don_hang_ids.ngay_dat_hang', 'don_hang_ids.tong_tien')
+    def _compute_rfm_score(self):
+        """Tính RFM score và phân loại khách hàng"""
+        from datetime import timedelta
+        
+        for record in self:
+            completed_orders = record.don_hang_ids.filtered(lambda o: o.trang_thai == 'hoan_thanh')
+            
+            if not completed_orders:
+                record.rfm_recency = 999
+                record.rfm_frequency = 0
+                record.rfm_monetary = 0.0
+                record.rfm_segment = 'new'
+                continue
+            
+            # Recency: Số ngày kể từ lần mua cuối
+            last_order_date = max(completed_orders.mapped('ngay_dat_hang'))
+            record.rfm_recency = (fields.Date.today() - last_order_date).days
+            
+            # Frequency: Số lần mua hàng
+            record.rfm_frequency = len(completed_orders)
+            
+            # Monetary: Tổng giá trị đã mua
+            record.rfm_monetary = sum(completed_orders.mapped('tong_tien'))
+            
+            # Phân loại dựa trên RFM
+            if record.rfm_recency <= 30 and record.rfm_frequency >= 5 and record.rfm_monetary >= 10000000:
+                record.rfm_segment = 'vip'
+            elif record.rfm_recency <= 60 and record.rfm_frequency >= 3:
+                record.rfm_segment = 'loyal'
+            elif record.rfm_recency > 90 and record.rfm_frequency >= 2:
+                record.rfm_segment = 'at_risk'
+            elif record.rfm_recency > 180:
+                record.rfm_segment = 'lost'
+            else:
+                record.rfm_segment = 'new'
+    
+    # ============ AI INSIGHTS ============
+    
+    @api.depends('rfm_recency', 'rfm_frequency', 'rfm_monetary', 'ho_tro_ids')
+    def _compute_ai_insights(self):
+        """Tính AI insights: churn prediction, purchase probability, next best action"""
+        for record in self:
+            try:
+                # Churn Prediction
+                if record.rfm_recency > 180:
+                    record.churn_probability = 90.0
+                elif record.rfm_recency > 90:
+                    record.churn_probability = 60.0
+                elif record.rfm_recency > 60:
+                    record.churn_probability = 30.0
+                else:
+                    record.churn_probability = 10.0
+                
+                # Purchase Probability
+                if record.rfm_segment == 'vip':
+                    record.purchase_probability = 85.0
+                elif record.rfm_segment == 'loyal':
+                    record.purchase_probability = 65.0
+                elif record.rfm_segment == 'at_risk':
+                    record.purchase_probability = 25.0
+                else:
+                    record.purchase_probability = 10.0
+                
+                # Next Best Action
+                if record.rfm_segment == 'vip':
+                    record.next_best_action = "✨ Gửi ưu đãi VIP đặc biệt\n📞 Gọi điện cảm ơn và giới thiệu sản phẩm mới"
+                elif record.rfm_segment == 'loyal':
+                    record.next_best_action = "🎁 Gửi chương trình loyalty rewards\n📧 Email khuyến mãi cho khách hàng trung thành"
+                elif record.rfm_segment == 'at_risk':
+                    record.next_best_action = "⚠️ GỌI NGAY để tìm hiểu nguyên nhân\n💰 Gửi voucher giảm giá đặc biệt"
+                elif record.rfm_segment == 'lost':
+                    record.next_best_action = "🔄 Gửi email win-back campaign\n🎯 Khảo sát lý do ngừng mua hàng"
+                else:
+                    record.next_best_action = "👋 Gửi email chào mừng\n📱 Giới thiệu sản phẩm phù hợp"
+                    
+            except Exception as e:
+                _logger.warning("Error in AI insights: %s", e)
+                record.churn_probability = 0.0
+                record.purchase_probability = 0.0
+                record.next_best_action = "Không có dữ liệu đủ để phân tích"
+    
+    @api.depends('ho_tro_ids', 'ho_tro_ids.mo_ta', 'ho_tro_ids.nhan_xet')
+    def _compute_sentiment_analysis(self):
+        """Phân tích cảm xúc từ tickets và feedback"""
+        for record in self:
+            try:
+                # Simple sentiment analysis based on keywords
+                positive_keywords = ['tốt', 'hài lòng', 'xuất sắc', 'tuyệt vời', 'tốt', 'cảm ơn', 'thanks', 'good', 'excellent']
+                negative_keywords = ['tệ', 'không hài lòng', 'kém', 'chậm', 'bad', 'poor', 'disappointed', 'angry']
+                
+                sentiment_score = 0
+                total_texts = 0
+                
+                for ticket in record.ho_tro_ids:
+                    texts = []
+                    if ticket.mo_ta:
+                        texts.append(ticket.mo_ta.lower())
+                    if ticket.nhan_xet:
+                        texts.append(ticket.nhan_xet.lower())
+                    
+                    for text in texts:
+                        total_texts += 1
+                        positive_count = sum(1 for word in positive_keywords if word in text)
+                        negative_count = sum(1 for word in negative_keywords if word in text)
+                        
+                        if positive_count > negative_count:
+                            sentiment_score += 0.5
+                        elif negative_count > positive_count:
+                            sentiment_score -= 0.5
+                
+                if total_texts > 0:
+                    record.sentiment_score = sentiment_score / total_texts
+                else:
+                    record.sentiment_score = 0.0
+                    
+            except Exception as e:
+                _logger.warning("Error in sentiment analysis: %s", e)
+                record.sentiment_score = 0.0
+    
+    @api.depends('don_hang_ids', 'don_hang_ids.ngay_dat_hang', 'ho_tro_ids', 'ho_tro_ids.ngay_tao')
+    def _compute_last_activity(self):
+        """Tính ngày hoạt động cuối cùng"""
+        for record in self:
+            dates = []
+            
+            if record.don_hang_ids:
+                dates.extend(record.don_hang_ids.mapped('ngay_dat_hang'))
+            
+            if record.ho_tro_ids:
+                dates.extend([d.date() for d in record.ho_tro_ids.mapped('ngay_tao') if d])
+            
+            if dates:
+                record.last_activity_date = max(dates)
+                record.days_since_last_activity = (fields.Date.today() - record.last_activity_date).days
+            else:
+                record.last_activity_date = False
+                record.days_since_last_activity = 0
+    
+    # ============ SMART BUTTON ACTIONS ============
+    
+    def action_view_orders(self):
+        """Xem tất cả đơn hàng của khách hàng"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Đơn hàng - {self.ten_khach_hang}',
+            'res_model': 'don_hang',
+            'view_mode': 'tree,form,kanban',
+            'domain': [('khach_hang_id', '=', self.id)],
+            'context': {'default_khach_hang_id': self.id}
+        }
+    
+    def action_view_support_tickets(self):
+        """Xem tất cả tickets của khách hàng"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Hỗ trợ - {self.ten_khach_hang}',
+            'res_model': 'ho_tro_khach_hang',
+            'view_mode': 'tree,form',
+            'domain': [('khach_hang_id', '=', self.id)],
+            'context': {'default_khach_hang_id': self.id}
+        }
+    
+    def action_view_emails(self):
+        """Xem tất cả email đã gửi"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Emails - {self.ten_khach_hang}',
+            'res_model': 'email_khach_hang',
+            'view_mode': 'tree,form',
+            'domain': [('khach_hang_ids', 'in', self.id)]
+        }
+    
+    def action_create_order(self):
+        """Tạo đơn hàng mới cho khách hàng"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Tạo đơn hàng mới',
+            'res_model': 'don_hang',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {'default_khach_hang_id': self.id}
+        }
+    
+    def action_create_support_ticket(self):
+        """Tạo ticket hỗ trợ mới"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Tạo yêu cầu hỗ trợ',
+            'res_model': 'ho_tro_khach_hang',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_khach_hang_id': self.id}
+        }
+    
+    @api.model
+    def cron_update_rfm_segments(self):
+        """Cron job cập nhật RFM segments cho tất cả khách hàng"""
+        customers = self.search([])
+        customers._compute_rfm_score()
+        customers._compute_ai_insights()
+        _logger.info(f"Updated RFM segments for {len(customers)} customers")

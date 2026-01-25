@@ -12,6 +12,45 @@
             <field name="doall">False</field>
             <field name="active">True</field>
         </record>
+        
+        <!-- Cron: Update RFM Segments -->
+        <record id="cron_update_rfm_segments" model="ir.cron">
+            <field name="name">Cập nhật RFM Segmentation</field>
+            <field name="model_id" ref="model_khach_hang"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_update_rfm_segments()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall">False</field>
+            <field name="active">True</field>
+        </record>
+        
+        <!-- Cron: Check SLA Violations -->
+        <record id="cron_check_sla_violations" model="ir.cron">
+            <field name="name">Kiểm tra SLA Violations</field>
+            <field name="model_id" ref="model_ho_tro_khach_hang"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_check_sla_violations()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall">False</field>
+            <field name="active">True</field>
+        </record>
+        
+        <!-- Cron: Auto-assign Tickets -->
+        <record id="cron_auto_assign_tickets" model="ir.cron">
+            <field name="name">Tự động phân công tickets</field>
+            <field name="model_id" ref="model_ho_tro_khach_hang"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_auto_assign_tickets()</field>
+            <field name="interval_number">30</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall">False</field>
+            <field name="active">True</field>
+        </record>
     </data>
 
     <data>

@@ -30,7 +30,7 @@
     'license': 'LGPL-3',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mail'],
+    'depends': ['base', 'mail', 'ai_integration'],
 
     # always loaded
     'data': [
@@ -39,7 +39,9 @@
         'data/vai_tro_data.xml',
         'data/sequence.xml',
         'data/cron.xml',
+        'data/cron_ho_so.xml',
         'data/email_template.xml',
+        'data/email_template_ho_so.xml',
         'views/res_config_settings_views.xml',
         'views/nhan_vien.xml',
         'views/phong_ban.xml',
@@ -47,6 +49,9 @@
         'views/vai_tro.xml',
         'views/cham_cong.xml',
         'views/bang_luong.xml',
+        'views/ho_so_nhan_vien_views.xml',
+        'wizard/wizard_tu_choi_ho_so_views.xml',
+        'views/nhan_vien_ai_views.xml',
         'views/menu.xml',
     ],
     'installable': True,
