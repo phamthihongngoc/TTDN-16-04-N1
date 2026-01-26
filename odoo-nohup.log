@@ -879,3 +879,69 @@ NoneType: None
 2026-01-25 21:55:29,324 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
 2026-01-25 21:55:29,332 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
 2026-01-25 21:55:29,336 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:56:33,628 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:56:33,633 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:56:33,644 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:56:33,648 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:57:37,787 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:57:37,792 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:57:37,800 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:57:37,802 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:58:42,006 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:58:42,011 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:58:42,018 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:58:42,021 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 21:59:46,157 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 21:59:46,163 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 21:59:46,174 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 21:59:46,179 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:00:50,381 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `AI: Xử lý tác vụ AI chờ`. 
+2026-01-25 22:00:50,385 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `AI: Xử lý tác vụ AI chờ` done. 
+2026-01-25 22:00:50,393 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 22:00:50,395 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 22:00:50,401 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 22:00:50,403 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:01:54,582 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 22:01:54,586 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 22:01:54,596 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 22:01:54,600 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:02:25,668 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 22:02:25,671 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 22:02:25,678 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 22:02:25,681 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:03:28,837 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 22:03:28,844 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 22:03:28,860 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 22:03:28,866 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:04:32,100 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 22:04:32,115 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 22:04:32,151 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 22:04:32,165 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:05:35,279 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 22:05:35,284 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 22:05:35,300 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 22:05:35,306 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:06:11,293 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `AI: Xử lý tác vụ AI chờ`. 
+2026-01-25 22:06:11,302 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `AI: Xử lý tác vụ AI chờ` done. 
+2026-01-25 22:06:38,508 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 22:06:38,530 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 22:06:38,543 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 22:06:38,555 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:07:41,744 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 22:07:41,754 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 22:07:41,772 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 22:07:41,780 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:08:45,030 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 22:08:45,036 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 22:08:45,049 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 22:08:45,056 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:09:48,168 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 22:09:48,174 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 22:09:48,186 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 22:09:48,192 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:10:28,067 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Cấp mã cho đơn hàng thiếu`. 
+2026-01-25 22:10:28,076 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Cấp mã cho đơn hàng thiếu` done. 
+2026-01-25 22:10:28,098 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `Mail: Email Queue Manager`. 
+2026-01-25 22:10:28,108 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `Mail: Email Queue Manager` done. 
+2026-01-25 22:10:51,452 44263 INFO ngoc odoo.addons.base.models.ir_cron: Starting job `AI: Xử lý tác vụ AI chờ`. 
+2026-01-25 22:10:51,457 44263 INFO ngoc odoo.addons.base.models.ir_cron: Job `AI: Xử lý tác vụ AI chờ` done. 
