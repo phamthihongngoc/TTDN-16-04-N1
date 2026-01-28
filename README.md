@@ -10,9 +10,9 @@
 
 <div align="center">
     <p align="center">
-        <img src="assets/aiotlab_logo.png" alt="AIoTLab Logo" width="170"/>
+        <img src="assets/LogoAIoTLab.png" alt="AIoTLab Logo" width="170"/>
         <img src="assets/fitdnu_logo.png" alt="FIT DNU Logo" width="180"/>
-        <img src="assets/dnu_logo.png" alt="DaiNam University Logo" width="200"/>
+        <img src="assets/logoDaiNam.png" alt="DaiNam University Logo" width="200"/>
     </p>
 
 [![AIoTLab](https://img.shields.io/badge/AIoTLab-green?style=for-the-badge)](https://www.facebook.com/DNUAIoTLab)
@@ -279,7 +279,7 @@ Truy cập hệ thống tại: **http://localhost:8069**
 ## 7. Poster
 
 <p align="center">
-    <img src="assets/Poster.pdf" alt="Poster" width="800"/>
+    <img src="assets/Poster.pdf" alt="Poster" width="500"/>
     <br><em>Poster giới thiệu hệ thống Platform ERP</em>
 </p>
 
