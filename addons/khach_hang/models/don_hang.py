@@ -92,6 +92,13 @@ class DonHang(models.Model):
     ], string='Trạng thái thanh toán', default='chua_thanh_toan', tracking=True)
     
     payment_url = fields.Char('Link thanh toán', readonly=True)
+
+    # Chứng từ liên quan
+    phieu_xuat_kho_id = fields.Many2one('phieu_xuat_kho', string='Phiếu xuất kho', copy=False)
+    hoa_don_id = fields.Many2one('hoa_don', string='Hóa đơn', copy=False)
+
+    phieu_xuat_kho_count = fields.Integer('Số phiếu xuất kho', compute='_compute_doc_counts')
+    hoa_don_count = fields.Integer('Số hóa đơn', compute='_compute_doc_counts')
     
     _sql_constraints = [
         ('ma_don_hang_unique', 'unique(ma_don_hang)', 'Mã đơn hàng đã tồn tại!')
@@ -109,6 +116,12 @@ class DonHang(models.Model):
                 record.color = 4  # Blue
             else:
                 record.color = 0  # Default
+
+    @api.depends('phieu_xuat_kho_id', 'hoa_don_id')
+    def _compute_doc_counts(self):
+        for record in self:
+            record.phieu_xuat_kho_count = 1 if record.phieu_xuat_kho_id else 0
+            record.hoa_don_count = 1 if record.hoa_don_id else 0
 
     def _is_placeholder_ma_don_hang(self, value):
         return not value or value in {'New', 'Mới', _('New')}
@@ -133,7 +146,9 @@ class DonHang(models.Model):
             ma_don_hang = vals.get('ma_don_hang')
             if self._is_placeholder_ma_don_hang(ma_don_hang):
                 vals['ma_don_hang'] = self._generate_unique_ma_don_hang()
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        records._ensure_documents()
+        return records
 
     def action_assign_ma_don_hang(self):
         for record in self:
@@ -189,10 +204,11 @@ class DonHang(models.Model):
         """Hoàn thành đơn hàng"""
         for record in self:
             record.trang_thai = 'hoan_thanh'
-            # Cập nhật tồn kho
-            for line in record.line_ids:
-                if line.san_pham_id:
-                    line.san_pham_id.so_luong_ton_kho -= line.so_luong
+            # Cập nhật tồn kho (tránh trừ 2 lần nếu đã xuất kho)
+            if not record.phieu_xuat_kho_id or record.phieu_xuat_kho_id.trang_thai != 'da_xuat':
+                for line in record.line_ids:
+                    if line.san_pham_id:
+                        line.san_pham_id.so_luong_ton_kho -= line.so_luong
     
     def action_huy(self):
         """Hủy đơn hàng"""
@@ -208,6 +224,101 @@ class DonHang(models.Model):
                 record._create_paypal_payment()
             else:
                 raise ValidationError('Chọn phương thức thanh toán online!')
+
+    def _prepare_phieu_xuat_kho_line_vals(self, line):
+        return {
+            'san_pham_id': line.san_pham_id.id,
+            'so_luong': line.so_luong,
+        }
+
+    def _prepare_hoa_don_line_vals(self, line):
+        return {
+            'san_pham_id': line.san_pham_id.id,
+            'so_luong': line.so_luong,
+            'don_gia': line.don_gia,
+        }
+
+    def _ensure_documents(self):
+        for record in self:
+            if not record.line_ids:
+                continue
+
+            hoa_don_created = False
+
+            if not record.phieu_xuat_kho_id:
+                phieu = self.env['phieu_xuat_kho'].create({
+                    'don_hang_id': record.id,
+                })
+                record.with_context(skip_auto_docs=True).write({
+                    'phieu_xuat_kho_id': phieu.id
+                })
+
+            if not record.hoa_don_id:
+                hoa_don = self.env['hoa_don'].create({
+                    'don_hang_id': record.id,
+                })
+                record.with_context(skip_auto_docs=True).write({
+                    'hoa_don_id': hoa_don.id
+                })
+                hoa_don_created = True
+
+            record._sync_document_lines()
+
+            if hoa_don_created and record.hoa_don_id.trang_thai == 'nhap':
+                record.hoa_don_id.action_gui_hoa_don()
+
+    def _sync_document_lines(self):
+        for record in self:
+            if record.phieu_xuat_kho_id:
+                record.phieu_xuat_kho_id.line_ids.unlink()
+                record.phieu_xuat_kho_id.line_ids = [
+                    (0, 0, record._prepare_phieu_xuat_kho_line_vals(line))
+                    for line in record.line_ids
+                    if line.san_pham_id
+                ]
+
+            if record.hoa_don_id:
+                record.hoa_don_id.line_ids.unlink()
+                record.hoa_don_id.line_ids = [
+                    (0, 0, record._prepare_hoa_don_line_vals(line))
+                    for line in record.line_ids
+                    if line.san_pham_id
+                ]
+
+    def write(self, vals):
+        res = super().write(vals)
+        if self.env.context.get('skip_auto_docs'):
+            return res
+
+        if any(key in vals for key in ['line_ids', 'khach_hang_id', 'ngay_dat_hang']):
+            self._ensure_documents()
+        return res
+
+    def action_view_phieu_xuat_kho(self):
+        self.ensure_one()
+        if not self.phieu_xuat_kho_id:
+            return False
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Phiếu xuất kho - {self.ma_don_hang}',
+            'res_model': 'phieu_xuat_kho',
+            'view_mode': 'form',
+            'res_id': self.phieu_xuat_kho_id.id,
+            'target': 'current',
+        }
+
+    def action_view_hoa_don(self):
+        self.ensure_one()
+        if not self.hoa_don_id:
+            return False
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Hóa đơn - {self.ma_don_hang}',
+            'res_model': 'hoa_don',
+            'view_mode': 'form',
+            'res_id': self.hoa_don_id.id,
+            'target': 'current',
+        }
     
     def _create_stripe_payment(self):
         """Tạo payment intent với Stripe"""

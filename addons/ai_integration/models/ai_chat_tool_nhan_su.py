@@ -48,7 +48,7 @@ class AIChatToolNhanSu(models.AbstractModel):
             ma_nhan_vien: Mã nhân viên (nếu không có ID)
         """
         employee_id = arguments.get('employee_id')
-        ma_nhan_vien = arguments.get('ma_nhan_vien')
+        ma_nhan_vien = arguments.get('ma_nhan_vien') or arguments.get('ma_dinh_danh')
         
         # If no employee_id, try to get from session context
         if not employee_id and not ma_nhan_vien and session:
@@ -57,9 +57,9 @@ class AIChatToolNhanSu(models.AbstractModel):
         
         try:
             if employee_id:
-                emp = self.env['nhan_vien'].browse(int(employee_id))
+                emp = self.env['nhan_vien'].sudo().browse(int(employee_id))
             elif ma_nhan_vien:
-                emp = self.env['nhan_vien'].search([('ma_nhan_vien', '=', ma_nhan_vien)], limit=1)
+                emp = self.env['nhan_vien'].sudo().search([('ma_dinh_danh', '=', ma_nhan_vien)], limit=1)
             else:
                 return {'error': 'Cần cung cấp employee_id hoặc ma_nhan_vien'}
             
@@ -122,14 +122,14 @@ class AIChatToolNhanSu(models.AbstractModel):
         
         # If no dept_id, try to get from session context
         if not department_id and not department_name and session:
-            if session.active_model == 'phong_ban':
+            if session.active_model in ['phong_ban', 'nhan_su.phong_ban']:
                 department_id = session.active_res_id
         
         try:
             if department_id:
-                dept = self.env['phong_ban'].browse(int(department_id))
+                dept = self.env['nhan_su.phong_ban'].sudo().browse(int(department_id))
             elif department_name:
-                dept = self.env['phong_ban'].search([('name', 'ilike', department_name)], limit=1)
+                dept = self.env['nhan_su.phong_ban'].sudo().search([('name', 'ilike', department_name)], limit=1)
             else:
                 return {'error': 'Cần cung cấp department_id hoặc department_name'}
             
@@ -137,7 +137,7 @@ class AIChatToolNhanSu(models.AbstractModel):
                 return {'error': 'Không tìm thấy phòng ban'}
             
             provider = self.env['ai.context.nhan_su']
-            return provider.get_context('phong_ban', dept.id)
+            return provider.get_context('nhan_su.phong_ban', dept.id)
             
         except Exception as e:
             _logger.error(f"Error in tool_get_department_info: {e}")
@@ -172,11 +172,15 @@ class AIChatToolNhanSu(models.AbstractModel):
         Arguments: None
         """
         try:
-            employees = self.env['nhan_vien'].search([])
-            departments = self.env['phong_ban'].search([])
+            employees = self.env['nhan_vien'].sudo().search([])
+            departments = self.env['nhan_su.phong_ban'].sudo().search([])
             
             total = len(employees)
-            active = len(employees.filtered(lambda e: e.trang_thai == 'dang_lam' if hasattr(e, 'trang_thai') else True))
+            active = len(employees.filtered(
+                lambda e: e.trang_thai_lam_viec == 'dang_lam'
+                if hasattr(e, 'trang_thai_lam_viec') else e.trang_thai == 'dang_lam'
+                if hasattr(e, 'trang_thai') else True
+            ))
             
             # Contract types
             contract_stats = {}
@@ -191,6 +195,8 @@ class AIChatToolNhanSu(models.AbstractModel):
             # Department distribution
             dept_stats = {}
             for emp in employees:
+                if hasattr(emp, 'trang_thai_lam_viec') and emp.trang_thai_lam_viec != 'dang_lam':
+                    continue
                 if hasattr(emp, 'trang_thai') and emp.trang_thai != 'dang_lam':
                     continue
                 dept = emp.phong_ban_id.display_name if hasattr(emp, 'phong_ban_id') and emp.phong_ban_id else 'Chưa phân phòng'
@@ -277,14 +283,41 @@ class AIChatToolNhanSu(models.AbstractModel):
         Arguments: None
         """
         try:
-            departments = self.env['phong_ban'].search([])
+            department_name = arguments.get('department_name')
+            dept_model = self.env['nhan_su.phong_ban'].sudo()
+            if department_name:
+                departments = dept_model.search([('name', 'ilike', department_name)])
+            else:
+                departments = dept_model.search([])
             result = []
-            
+            employee_model = self.env['nhan_vien'].sudo()
+            fields_map = employee_model._fields
+
+            if department_name and not departments:
+                if 'phong_ban' in fields_map:
+                    count = employee_model.search_count([('phong_ban', 'ilike', department_name)])
+                    return {
+                        'departments': [{'department': department_name, 'count': count}],
+                        'message': f'Không tìm thấy phòng ban, đếm theo tên văn bản: {department_name}'
+                    }
+                return {'error': f'Không tìm thấy phòng ban: {department_name}'}
+
             for dept in departments:
-                count = self.env['nhan_vien'].search_count([
-                    ('phong_ban_id', '=', dept.id),
-                    ('trang_thai', '=', 'dang_lam')
-                ])
+                count_domain = []
+                if 'phong_ban_id' in fields_map:
+                    count_domain = [('phong_ban_id', '=', dept.id)]
+                if 'phong_ban' in fields_map:
+                    if count_domain:
+                        count_domain = ['|'] + count_domain + [('phong_ban', 'ilike', dept.name)]
+                    else:
+                        count_domain = [('phong_ban', 'ilike', dept.name)]
+
+                if 'trang_thai_lam_viec' in fields_map:
+                    count_domain.append(('trang_thai_lam_viec', '=', 'dang_lam'))
+                elif 'trang_thai' in fields_map:
+                    count_domain.append(('trang_thai', '=', 'dang_lam'))
+
+                count = employee_model.search_count(count_domain)
                 result.append({
                     'department': dept.display_name,
                     'count': count,

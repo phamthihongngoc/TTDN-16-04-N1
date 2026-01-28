@@ -373,11 +373,11 @@ Viết bằng tiếng Việt:"""
         }
     
     def action_ai_assistant(self):
-        """Open AI Assistant."""
+        """Open Trợ lý AI."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'AI Assistant - Nhân sự',
+            'name': 'Trợ lý AI - Nhân sự',
             'res_model': 'ai.assistant.wizard',
             'view_mode': 'form',
             'target': 'new',

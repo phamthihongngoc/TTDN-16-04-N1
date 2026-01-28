@@ -342,11 +342,11 @@ Viết bằng tiếng Việt, tone thân thiện nhưng chuyên nghiệp:"""
         }
     
     def action_ai_assistant(self):
-        """Open AI Assistant."""
+        """Open Trợ lý AI."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'AI Assistant - Khách hàng',
+            'name': 'Trợ lý AI - Khách hàng',
             'res_model': 'ai.assistant.wizard',
             'view_mode': 'form',
             'target': 'new',

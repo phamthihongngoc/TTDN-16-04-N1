@@ -3,7 +3,7 @@
 
     <!-- Main Menu -->
     <menuitem id="menu_khach_hang_root" 
-              name="Quản lý Khách hàng" 
+              name="Khách hàng" 
               sequence="10"/>
 
     <!-- Customers -->
@@ -72,6 +72,18 @@
               action="action_don_hang" 
               sequence="10"/>
 
+    <menuitem id="menu_phieu_xuat_kho" 
+              name="Phiếu xuất kho" 
+              parent="menu_don_hang" 
+              action="action_phieu_xuat_kho" 
+              sequence="15"/>
+
+    <menuitem id="menu_hoa_don" 
+              name="Hóa đơn" 
+              parent="menu_don_hang" 
+              action="action_hoa_don" 
+              sequence="18"/>
+
     <menuitem id="menu_thong_ke_don_hang" 
               name="Phân tích đơn hàng" 
               parent="menu_don_hang" 
@@ -109,17 +121,17 @@
               sequence="100"
               groups="group_khach_hang_manager"/>
 
-    <!-- AI Chat -->
+    <!-- AI Chat (trực tiếp, có icon) -->
     <record id="action_ai_chat_khach_hang" model="ir.actions.client">
-        <field name="name">AI Assistant - Khách hàng</field>
+        <field name="name">Trợ lý AI - Khách hàng</field>
         <field name="tag">ai_chat_widget</field>
         <field name="context">{'default_module': 'khach_hang'}</field>
     </record>
 
     <menuitem id="menu_ai_chat_khach_hang"
-              name="🤖 AI Assistant"
+              name="🤖 Trợ lý AI"
               parent="menu_khach_hang_root"
               action="action_ai_chat_khach_hang"
-              sequence="5"/>
+              sequence="55"/>
 
 </odoo>

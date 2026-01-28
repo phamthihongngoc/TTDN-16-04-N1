@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit form view để thêm các trường mới -->
+    <record id="view_van_ban_form_extension" model="ir.ui.view">
+        <field name="name">van.ban.form.extension</field>
+        <field name="model">van_ban</field>
+        <field name="inherit_id" ref="van_ban.view_van_ban_form"/>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            
+            <!-- Thêm Độ mật/Độ khẩn sau tên văn bản -->
+            <xpath expr="//field[@name='ten_van_ban']" position="after">
+                <div class="d-flex gap-2 mt-2 mb-2">
+                    <field name="do_mat" widget="badge" 
+                           decoration-success="do_mat == 'thuong'"
+                           decoration-warning="do_mat == 'mat'"
+                           decoration-danger="do_mat in ('toi_mat', 'tuyet_mat')"/>
+                    <field name="do_khan" widget="badge"
+                           decoration-info="do_khan == 'thuong'"
+                           decoration-warning="do_khan == 'khan'"
+                           decoration-danger="do_khan in ('thuong_khan', 'hoa_toc')"/>
+                    <field name="qua_han" invisible="1"/>
+                    <span attrs="{'invisible': [('qua_han', '=', False)]}" class="badge bg-danger">
+                        <i class="fa fa-exclamation-triangle"/> QUÁ HẠN!
+                    </span>
+                </div>
+            </xpath>
+            
+            <!-- Thêm Số hiệu văn bản trước loại văn bản -->
+            <xpath expr="//field[@name='loai_van_ban_id']" position="before">
+                <field name="so_hieu_van_ban" placeholder="Tự sinh (có thể sửa khi Nháp)"
+                       attrs="{'readonly': [('trang_thai', '!=', 'nhap')]}"/>
+            </xpath>
+            
+            <!-- Thêm Cơ quan ban hành -->
+            <xpath expr="//field[@name='loai_van_ban_id']" position="after">
+                <field name="co_quan_ban_hanh" placeholder="Tên cơ quan/đơn vị"/>
+            </xpath>
+            
+            <!-- Thêm Hạn xử lý sau ngày hết hạn -->
+            <xpath expr="//field[@name='ngay_het_han']" position="after">
+                <field name="han_xu_ly"/>
+                <field name="so_gio_con_lai" readonly="1" 
+                       attrs="{'invisible': [('han_xu_ly', '=', False)]}"
+                       widget="float_time"/>
+            </xpath>
+            
+            <!-- Thêm section Ủy quyền sau người ký -->
+            <xpath expr="//field[@name='nguoi_ky_id']" position="after">
+                <field name="nguoi_uy_quyen_id" 
+                       options="{'no_create': True}"
+                       attrs="{'invisible': [('nguoi_ky_id', '=', False)]}"/>
+                <field name="ngay_uy_quyen_tu" attrs="{'invisible': [('nguoi_uy_quyen_id', '=', False)]}"/>
+                <field name="ngay_uy_quyen_den" attrs="{'invisible': [('nguoi_uy_quyen_id', '=', False)]}"/>
+                <field name="ly_do_uy_quyen" attrs="{'invisible': [('nguoi_uy_quyen_id', '=', False)]}"/>
+                <field name="ky_thay" readonly="1" attrs="{'invisible': [('ky_thay', '=', False)]}"/>
+            </xpath>
+            
+            <!-- Thêm tab Phiên bản vào notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="📋 Phiên bản" name="version_page">
+                    <group>
+                        <group string="Thông tin phiên bản hiện tại">
+                            <field name="version"/>
+                            <field name="is_latest_version"/>
+                            <field name="parent_version_id"/>
+                            <field name="version_note" placeholder="Ghi chú về phiên bản này..."/>
+                        </group>
+                        <group string="Thao tác">
+                            <button name="action_create_new_version" type="object"
+                                    string="📝 Tạo phiên bản mới" class="btn-primary"
+                                    attrs="{'invisible': [('trang_thai', 'in', ['nhap', 'huy'])]}"
+                                    confirm="Bạn có chắc muốn tạo phiên bản mới từ văn bản này?"/>
+                        </group>
+                    </group>
+                    <group string="Lịch sử các phiên bản" attrs="{'invisible': [('child_version_ids', '=', [])]}">
+                        <field name="child_version_ids" nolabel="1" readonly="1">
+                            <tree>
+                                <field name="version"/>
+                                <field name="ma_van_ban"/>
+                                <field name="ten_van_ban"/>
+                                <field name="trang_thai"/>
+                                <field name="is_latest_version"/>
+                                <field name="create_date"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+            
+        </field>
+    </record>
+    
+    <!-- Thêm filters vào search view -->
+    <record id="view_van_ban_search_extension" model="ir.ui.view">
+        <field name="name">van.ban.search.extension</field>
+        <field name="model">van_ban</field>
+        <field name="inherit_id" ref="van_ban.view_van_ban_search"/>
+        <field name="arch" type="xml">
+            
+            <!-- Thêm field search -->
+            <xpath expr="//field[@name='ten_van_ban']" position="after">
+                <field name="so_hieu_van_ban"/>
+                <field name="co_quan_ban_hanh"/>
+            </xpath>
+            
+            <!-- Thêm filters -->
+            <xpath expr="//filter[last()]" position="after">
+                <separator/>
+                <filter name="filter_qua_han" string="⚠️ Quá hạn" 
+                        domain="[('qua_han', '=', True)]"/>
+                <filter name="filter_sap_het_han" string="⏰ Sắp hết hạn (24h)" 
+                        domain="[('han_xu_ly', '!=', False), 
+                                 ('han_xu_ly', '&lt;=', (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')),
+                                 ('han_xu_ly', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                                 ('trang_thai', 'not in', ['da_ky', 'da_gui', 'huy'])]"/>
+                <separator/>
+                <filter name="filter_thuong" string="🟢 Thường" domain="[('do_mat', '=', 'thuong')]"/>
+                <filter name="filter_mat" string="🟡 Mật" domain="[('do_mat', '=', 'mat')]"/>
+                <filter name="filter_toi_mat" string="🟠 Tối mật" domain="[('do_mat', '=', 'toi_mat')]"/>
+                <filter name="filter_tuyet_mat" string="🔴 Tuyệt mật" domain="[('do_mat', '=', 'tuyet_mat')]"/>
+                <separator/>
+                <filter name="filter_khan" string="⚡ Khẩn" domain="[('do_khan', '!=', 'thuong')]"/>
+                <filter name="filter_hoa_toc" string="🔥 Hỏa tốc" domain="[('do_khan', '=', 'hoa_toc')]"/>
+                <separator/>
+                <filter name="filter_latest_version" string="📋 Phiên bản mới nhất" domain="[('is_latest_version', '=', True)]"/>
+                <filter name="filter_ky_thay" string="✍️ Ký thay" domain="[('ky_thay', '=', True)]"/>
+            </xpath>
+            
+            <!-- Thêm group by -->
+            <xpath expr="//group/filter[last()]" position="after">
+                <filter name="group_do_mat" string="Độ mật" context="{'group_by': 'do_mat'}"/>
+                <filter name="group_do_khan" string="Độ khẩn" context="{'group_by': 'do_khan'}"/>
+                <filter name="group_version" string="Phiên bản" context="{'group_by': 'version'}"/>
+                <filter name="group_co_quan" string="Cơ quan ban hành" context="{'group_by': 'co_quan_ban_hanh'}"/>
+            </xpath>
+            
+        </field>
+    </record>
+    
+    <!-- Thêm columns vào tree view -->
+    <record id="view_van_ban_tree_extension" model="ir.ui.view">
+        <field name="name">van.ban.tree.extension</field>
+        <field name="model">van_ban</field>
+        <field name="inherit_id" ref="van_ban.view_van_ban_tree"/>
+        <field name="arch" type="xml">
+            
+            <xpath expr="//field[@name='ma_van_ban']" position="after">
+                <field name="so_hieu_van_ban" optional="show"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='trang_thai']" position="before">
+                <field name="do_mat" widget="badge"
+                       decoration-success="do_mat == 'thuong'"
+                       decoration-warning="do_mat == 'mat'"
+                       decoration-danger="do_mat in ('toi_mat', 'tuyet_mat')"
+                       optional="show"/>
+                <field name="do_khan" widget="badge"
+                       decoration-info="do_khan == 'thuong'"
+                       decoration-warning="do_khan in ('khan', 'thuong_khan')"
+                       decoration-danger="do_khan == 'hoa_toc'"
+                       optional="hide"/>
+                <field name="han_xu_ly" optional="hide"/>
+                <field name="qua_han" invisible="1"/>
+            </xpath>
+            
+        </field>
+    </record>
+    
+    <!-- Server actions cho bulk operations -->
+    <record id="action_bulk_approve_van_ban" model="ir.actions.server">
+        <field name="name">✅ Duyệt hàng loạt</field>
+        <field name="model_id" ref="van_ban.model_van_ban"/>
+        <field name="binding_model_id" ref="van_ban.model_van_ban"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_bulk_approve()
+        </field>
+    </record>
+    
+    <record id="action_bulk_send_sign_van_ban" model="ir.actions.server">
+        <field name="name">✍️ Gửi ký hàng loạt</field>
+        <field name="model_id" ref="van_ban.model_van_ban"/>
+        <field name="binding_model_id" ref="van_ban.model_van_ban"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_bulk_send_sign()
+        </field>
+    </record>
+    
+</odoo>

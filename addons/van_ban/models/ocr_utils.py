@@ -4,6 +4,81 @@ import io
 import re
 
 
+def fix_spacing_artifacts(text):
+    """Best-effort cleanup for text extracted from PDFs/OCR.
+
+    Common issue: some PDF extractors or OCR outputs insert spaces between every character
+    (e.g. "V ũ  D u y" -> "Vũ Duy", "Th ái" -> "Thái"), which breaks matching and autofill.
+
+    This function:
+    - normalizes odd whitespace (NBSP, tabs)
+    - removes zero-width characters
+    - joins runs of small-character tokens (1-2 chars) into a word unless there are wide gaps
+    - collapses remaining whitespace
+    """
+    if not text:
+        return text
+
+    def _clean_line(line):
+        if not line:
+            return ''
+
+        # Normalize whitespace characters early
+        line = (line or '')
+        line = line.replace('\u00a0', ' ').replace('\t', ' ')
+        line = line.replace('\u200b', '').replace('\u200c', '').replace('\u200d', '').replace('\ufeff', '')
+
+        # Simple approach: join 1-2 char fragments, but use Vietnamese word length heuristics
+        tokens = re.split(r'\s+', line.strip())
+        if not tokens:
+            return ''
+        
+        result_tokens = []
+        current_word = []
+        
+        for token in tokens:
+            if not token:
+                continue
+                
+            # If this is a small fragment (1-2 chars), accumulate into current_word
+            if len(token) <= 2 and re.match(r'^[a-zA-ZàáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđĐ]+$', token):
+                current_word.append(token)
+                
+                # Vietnamese words are typically 1-8 characters. If we reach reasonable length, consider it a word.
+                joined_word = ''.join(current_word)
+                # Flush word when it's 3-7 chars (good Vietnamese word length)
+                if len(joined_word) >= 3 and len(joined_word) <= 7:
+                    result_tokens.append(joined_word)
+                    current_word = []
+                elif len(joined_word) > 7:
+                    # Too long, likely multiple words joined, split at reasonable point
+                    if len(joined_word) <= 10:
+                        result_tokens.append(joined_word)
+                    else:
+                        # Split at 4-5 chars for first word
+                        mid = 4 if len(joined_word) >= 8 else 3
+                        result_tokens.append(joined_word[:mid])
+                        result_tokens.append(joined_word[mid:])
+                    current_word = []
+            else:
+                # Longer token or non-alphabetic: flush current_word first
+                if current_word:
+                    result_tokens.append(''.join(current_word))
+                    current_word = []
+                result_tokens.append(token)
+        
+        # Flush any remaining current_word
+        if current_word:
+            result_tokens.append(''.join(current_word))
+        
+        return ' '.join(result_tokens)
+
+    # Preserve line structure but fix each line.
+    lines = (text or '').splitlines()
+    fixed_lines = [_clean_line(ln) for ln in lines]
+    return ('\n'.join([ln for ln in fixed_lines if ln is not None])).strip()
+
+
 def _otsu_threshold(gray_image):
     """Compute Otsu threshold for a grayscale (mode 'L') PIL image."""
     hist = gray_image.histogram()
@@ -111,4 +186,4 @@ def ocr_image_bytes(Image, ImageOps, ImageFilter, pytesseract, image_bytes, *, l
     if not config:
         config = "--oem 3 --psm 6 -c preserve_interword_spaces=1"
     text = pytesseract.image_to_string(processed, lang=lang, config=config)
-    return (text or "").strip()
+    return fix_spacing_artifacts((text or "").strip())

@@ -4,7 +4,7 @@
         <!-- Root Menu -->
         <menuitem
             id="menu_root"
-            name="Quản lý nhân sự"
+            name="Nhân sự"
             sequence="10"
             web_icon="nhan_su,static/description/icon.png"/>
         
@@ -52,6 +52,44 @@
             action="action_bang_luong"
             groups="nhan_su.group_truong_phong,nhan_su.group_quan_tri_nhan_su"/>
         
+        <menuitem 
+            name="Ca làm việc" 
+            id="menu_ca_lam_viec" 
+            parent="menu_cham_cong_luong" 
+            sequence="3"
+            action="action_ca_lam_viec"
+            groups="nhan_su.group_quan_tri_nhan_su"/>
+        
+        <!-- Submenu: Nghi phep -->
+        <menuitem 
+            id="menu_nghi_phep"
+            name="Nghỉ phép"
+            parent="menu_root"
+            sequence="3"/>
+        
+        <menuitem 
+            name="Đơn nghỉ phép" 
+            id="menu_don_nghi_phep" 
+            parent="menu_nghi_phep" 
+            sequence="1"
+            action="action_don_nghi_phep"/>
+        
+        <menuitem 
+            name="Chờ duyệt" 
+            id="menu_don_nghi_phep_cho_duyet" 
+            parent="menu_nghi_phep" 
+            sequence="2"
+            action="action_don_nghi_phep_cho_duyet"
+            groups="nhan_su.group_truong_phong,nhan_su.group_quan_tri_nhan_su"/>
+        
+        <menuitem 
+            name="Loại nghỉ phép" 
+            id="menu_loai_nghi_phep" 
+            parent="menu_nghi_phep" 
+            sequence="10"
+            action="action_loai_nghi_phep"
+            groups="nhan_su.group_quan_tri_nhan_su"/>
+        
         <!-- Submenu: Cấu hình -->
         <menuitem 
             id="menu_cau_hinh"
@@ -91,18 +129,50 @@
             sequence="3"
             action="action_chuc_vu"
             groups="nhan_su.group_quan_tri_nhan_su"/>
+        
+        <menuitem
+            id="menu_loai_phu_cap"
+            name="Loại phụ cấp"
+            parent="menu_cau_hinh"
+            sequence="4"
+            action="action_loai_phu_cap"
+            groups="nhan_su.group_quan_tri_nhan_su"/>
+        
+        <menuitem
+            id="menu_phu_cap_nhan_vien"
+            name="Phụ cấp nhân viên"
+            parent="menu_cau_hinh"
+            sequence="5"
+            action="action_phu_cap_nhan_vien"
+            groups="nhan_su.group_quan_tri_nhan_su"/>
+        
+        <menuitem
+            id="menu_cau_hinh_bhxh"
+            name="Cấu hình BHXH"
+            parent="menu_cau_hinh"
+            sequence="6"
+            action="action_cau_hinh_bhxh"
+            groups="nhan_su.group_quan_tri_nhan_su"/>
+        
+        <menuitem
+            id="menu_bang_thue_tncn"
+            name="Bảng thuế TNCN"
+            parent="menu_cau_hinh"
+            sequence="7"
+            action="action_bang_thue_tncn"
+            groups="nhan_su.group_quan_tri_nhan_su"/>
 
-        <!-- AI Chat -->
+        <!-- AI Chat (trực tiếp, có icon) -->
         <record id="action_ai_chat_nhan_su" model="ir.actions.client">
-            <field name="name">AI Assistant - Nhân sự</field>
+            <field name="name">Trợ lý AI - Nhân sự</field>
             <field name="tag">ai_chat_widget</field>
             <field name="context">{'default_module': 'nhan_su'}</field>
         </record>
 
         <menuitem id="menu_ai_chat_nhan_su"
-                  name="🤖 AI Assistant"
+                  name="Trợ lý AI"
                   parent="menu_root"
                   action="action_ai_chat_nhan_su"
-                  sequence="5"/>
+                  sequence="90"/>
     </data>
 </odoo>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cron nhắc nhở văn bản sắp hết hạn -->
+    <record id="ir_cron_van_ban_deadline_reminder" model="ir.cron">
+        <field name="name">Văn bản: Nhắc nhở sắp hết hạn</field>
+        <field name="model_id" ref="van_ban.model_van_ban"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_check_deadline_reminder()</field>
+        <field name="interval_number">4</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+        <field name="doall">False</field>
+    </record>
+    
+    <!-- Cron kiểm tra văn bản quá hạn -->
+    <record id="ir_cron_van_ban_overdue_check" model="ir.cron">
+        <field name="name">Văn bản: Kiểm tra quá hạn</field>
+        <field name="model_id" ref="van_ban.model_van_ban"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_mark_overdue()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+        <field name="doall">False</field>
+    </record>
+</odoo>

@@ -301,11 +301,11 @@ Trả lời bằng tiếng Việt, ngắn gọn và thực tế."""
         }
     
     def action_ai_assistant(self):
-        """Mở AI Assistant để chat hỏi đáp về văn bản."""
+        """Mở Trợ lý AI để chat hỏi đáp về văn bản."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'AI Assistant - Văn bản',
+            'name': 'Trợ lý AI - Văn bản',
             'res_model': 'ai.assistant.wizard',
             'view_mode': 'form',
             'target': 'new',
@@ -419,11 +419,11 @@ class VanBanDiAI(models.Model):
         }
     
     def action_ai_assistant(self):
-        """Open AI Assistant."""
+        """Open Trợ lý AI."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'AI Assistant',
+            'name': 'Trợ lý AI',
             'res_model': 'ai.assistant.wizard',
             'view_mode': 'form',
             'target': 'new',
@@ -508,11 +508,11 @@ class VanBanDenAI(models.Model):
         }
     
     def action_ai_assistant(self):
-        """Open AI Assistant."""
+        """Open Trợ lý AI."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'AI Assistant',
+            'name': 'Trợ lý AI',
             'res_model': 'ai.assistant.wizard',
             'view_mode': 'form',
             'target': 'new',

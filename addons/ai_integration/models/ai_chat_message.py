@@ -24,7 +24,7 @@ class AIChatMessage(models.Model):
     # Message content
     role = fields.Selection([
         ('user', 'Người dùng'),
-        ('assistant', 'AI Assistant'),
+        ('assistant', 'Trợ lý AI'),
         ('system', 'Hệ thống'),
         ('tool', 'Tool Result'),
     ], string='Vai trò', required=True)
@@ -166,7 +166,7 @@ class AIChatMessage(models.Model):
     @api.model
     def create_assistant_message(self, session_id, content, tokens_info=None, 
                                   tool_calls=None, model_used=None, latency=0):
-        """Tạo tin nhắn từ AI assistant"""
+        """Tạo tin nhắn từ Trợ lý AI"""
         values = {
             'session_id': session_id,
             'role': 'assistant',

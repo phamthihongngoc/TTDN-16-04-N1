@@ -8,11 +8,14 @@
         <field name="arch" type="xml">
             <form string="Văn bản">
                 <header>
-                    <!-- Workflow buttons -->
-                    <button name="action_gui_duyet" string="Gửi duyệt" type="object" 
+                    <!-- Workflow buttons - Luồng: Nháp → Chờ duyệt (Trưởng phòng) → Đã duyệt → Chờ ký (Giám đốc) → Đã ký → Đã gửi -->
+                    
+                    <!-- Bước 1: Nhân viên gửi văn bản để Trưởng phòng Sales duyệt -->
+                    <button name="action_gui_duyet" string="Gửi duyệt (đến Trưởng phòng)" type="object" 
                             class="oe_highlight"
                             attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}"/>
                     
+                    <!-- Bước 2: Trưởng phòng Sales duyệt văn bản -->
                     <button name="action_duyet" string="Duyệt" type="object" 
                             class="oe_highlight"
                             attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}"
@@ -22,14 +25,16 @@
                             attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}"
                             groups="van_ban.group_truong_phong_duyet"/>
                     
-                    <button name="action_gui_ky" string="Gửi ký" type="object" 
-                            class="oe_highlight"
+                    <!-- Bước 3: Trưởng phòng gửi văn bản đến Giám đốc để ký -->
+                    <button name="action_gui_ky" string="Gửi ký (đến Giám đốc)" type="object" 
+                            class="oe_highlight btn-warning"
                             attrs="{'invisible': [('trang_thai', '!=', 'da_duyet')]}"
                             groups="van_ban.group_truong_phong_duyet"/>
                     
+                    <!-- Bước 4: Giám đốc ký điện tử văn bản -->
                     <button name="action_ky_noi_bo" string="Ký điện tử" type="object" 
                             class="btn-success"
-                            attrs="{'invisible': [('trang_thai', 'not in', ['da_duyet', 'cho_ky'])]}"
+                            attrs="{'invisible': [('trang_thai', '!=', 'cho_ky')]}"
                             groups="van_ban.group_giam_doc_ky"/>
                     
                     <button name="action_xac_thuc_chu_ky" string="🔍 Xác thực chữ ký" type="object" 
@@ -42,6 +47,7 @@
                             attrs="{'invisible': ['|', ('trang_thai', '!=', 'da_ky'), ('khach_hang_id', '=', False)]}"
                             groups="van_ban.group_truong_phong_duyet"/>
                     
+                    <!-- Bước 5: Gửi văn bản sau khi đã ký -->
                     <button name="action_gui_van_ban" string="Gửi văn bản" type="object" 
                             class="oe_highlight btn-primary"
                             attrs="{'invisible': [('trang_thai', '!=', 'da_ky')]}"
@@ -97,22 +103,61 @@
                 </div>
                 
                 <sheet>
+                    <!-- SMART BUTTONS - Enhanced -->
                     <div class="oe_button_box" name="button_box">
+                        <!-- File gốc -->
+                        <button class="oe_stat_button" type="object" name="action_view_file_goc"
+                                icon="fa-file-pdf-o" attrs="{'invisible': [('file_dinh_kem', '=', False)]}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">File gốc</span>
+                            </div>
+                        </button>
+                        
+                        <!-- File đã ký -->
+                        <button class="oe_stat_button" type="object" name="action_view_file_da_ky"
+                                icon="fa-file-signature" attrs="{'invisible': [('file_da_ky', '=', False)]}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text text-success">File đã ký</span>
+                            </div>
+                        </button>
+                        
+                        <!-- Yêu cầu ký -->
                         <button class="oe_stat_button" name="%(action_yeu_cau_ky)d" type="action"
-                                icon="fa-pencil" attrs="{'invisible': [('so_yeu_cau_ky', '=', 0)]}">
+                                icon="fa-pencil-square-o" attrs="{'invisible': [('so_yeu_cau_ky', '=', 0)]}">
                             <field string="Yêu cầu ký" name="so_yeu_cau_ky" widget="statinfo"/>
+                        </button>
+                        
+                        <!-- Lịch sử ký -->
+                        <button class="oe_stat_button" type="object" name="action_view_signature_log"
+                                icon="fa-history" attrs="{'invisible': [('da_ky_noi_bo', '=', False)]}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Lịch sử ký</span>
+                            </div>
+                        </button>
+                        
+                        <!-- Trạng thái AI -->
+                        <button class="oe_stat_button" type="object" name="action_analyze_ai"
+                                icon="fa-magic" attrs="{'invisible': [('ai_risk_level', '=', False)]}">
+                            <div class="o_stat_info">
+                                <field name="ai_risk_level" widget="badge" 
+                                       decoration-danger="ai_risk_level in ('high', 'critical')"
+                                       decoration-warning="ai_risk_level == 'medium'"
+                                       decoration-success="ai_risk_level == 'low'"/>
+                                <span class="o_stat_text">Rủi ro AI</span>
+                            </div>
                         </button>
                     </div>
                     
-                    <widget name="web_ribbon" title="Đã gửi ✓" bg_color="bg-success"
+                    <!-- RIBBONS - Enhanced -->
+                    <widget name="web_ribbon" title="✓ Đã gửi" bg_color="bg-success"
                             attrs="{'invisible': [('trang_thai', '!=', 'da_gui')]}"/>
-                    <widget name="web_ribbon" title="Đã ký" bg_color="bg-info"
+                    <widget name="web_ribbon" title="🖊️ Đã ký" bg_color="bg-info"
                             attrs="{'invisible': [('trang_thai', '!=', 'da_ky')]}"/>
-                    <widget name="web_ribbon" title="Hết hiệu lực" bg_color="bg-danger"
+                    <widget name="web_ribbon" title="⚠️ Hết hiệu lực" bg_color="bg-danger"
                             attrs="{'invisible': [('trang_thai', '!=', 'het_hieu_luc')]}"/>
-                    <widget name="web_ribbon" title="Đã hủy" bg_color="bg-secondary"
+                    <widget name="web_ribbon" title="🚫 Đã hủy" bg_color="bg-secondary"
                             attrs="{'invisible': [('trang_thai', '!=', 'huy')]}"/>
-                    <widget name="web_ribbon" title="Đã khóa 🔒" bg_color="bg-warning"
+                    <widget name="web_ribbon" title="🔒 Đã khóa" bg_color="bg-warning"
                             attrs="{'invisible': [('bi_khoa', '=', False)]}"/>
                     
                     <div class="oe_title">
@@ -133,8 +178,8 @@
                             <field name="khach_hang_trong_hop_dong" string="Khách hàng (trong hợp đồng)"
                                 placeholder="Tên khách hàng/bên trong hợp đồng"/>
                             <field name="khach_hang_id" invisible="1"/>
-                            <field name="don_hang_id" attrs="{'invisible': [('khach_hang_id', '=', False)]}"/>
                             <field name="gia_tri_hop_dong" widget="monetary"/>
+                            <field name="don_hang_id" attrs="{'invisible': ['|', ('ai_pdf_extract_state', '!=', 'done'), ('khach_hang_id', '=', False)]}"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                         <group string="Thời hạn">
@@ -145,14 +190,31 @@
                     </group>
                     
                     <group>
-                        <group string="Người xử lý">
-                            <field name="nguoi_tao_id"/>
+                        <group string="Quy trình xử lý">
+                            <!-- Người tạo văn bản -->
+                            <field name="nguoi_tao_id" string="Người tạo"/>
                             <field name="ten_nguoi_tao" readonly="1" attrs="{'invisible': [('ten_nguoi_tao', '=', False)]}"/>
                             <field name="phong_ban_nguoi_tao" readonly="1" attrs="{'invisible': [('phong_ban_nguoi_tao', '=', False)]}"/>
-                            <field name="nguoi_duyet_id"/>
-                            <field name="ten_nguoi_duyet" readonly="1" attrs="{'invisible': [('ten_nguoi_duyet', '=', False)]}"/>
-                            <field name="nguoi_ky_id"/>
-                            <field name="ten_nguoi_ky" readonly="1" attrs="{'invisible': [('ten_nguoi_ky', '=', False)]}"/>
+                            
+                            <!-- Trưởng phòng duyệt (Bước 1) -->
+                            <field name="truong_phong_duyet_id" string="Trưởng phòng duyệt"
+                                options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"
+                                help="Trưởng phòng Sales sẽ duyệt nội dung văn bản"/>
+                            
+                            <!-- Giám đốc ký (Bước 2) -->
+                            <field name="nguoi_ky_id" string="Giám đốc ký"
+                                options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"
+                                attrs="{'required': [('trang_thai', 'in', ['cho_ky', 'da_ky', 'da_gui'])]}"
+                                help="Giám đốc sẽ duyệt và ký điện tử văn bản"/>
+                            
+                            <!-- Thông tin từ PDF -->
+                            <field name="nguoi_ky_trong_pdf" string="Tên người ký (trong văn bản)" readonly="1"
+                                attrs="{'invisible': ['|', ('da_ky_noi_bo', '=', False), ('nguoi_ky_trong_pdf', '=', False)]}"/>
+                            <field name="chuc_vu_nguoi_ky_trong_pdf" string="Chức vụ (trong văn bản)" readonly="1"
+                                attrs="{'invisible': ['|', ('da_ky_noi_bo', '=', False), ('chuc_vu_nguoi_ky_trong_pdf', '=', False)]}"/>
+                            
+                            <!-- Hidden field for compatibility -->
+                            <field name="nguoi_duyet_id" invisible="1"/>
                         </group>
                         <group string="Trạng thái ký">
                             <field name="da_ky_noi_bo"/>
@@ -228,6 +290,19 @@
                                 </tree>
                             </field>
                         </page>
+
+                        <page string="Yêu cầu ký">
+                            <field name="yeu_cau_ky_ids" readonly="1">
+                                <tree>
+                                    <field name="khach_hang_id"/>
+                                    <field name="email"/>
+                                    <field name="ngay_gui"/>
+                                    <field name="ngay_het_han"/>
+                                    <field name="ngay_ky"/>
+                                    <field name="trang_thai" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
                         
                         <page string="Mô tả &amp; Ghi chú">
                             <group>
@@ -253,9 +328,9 @@
                             </field>
                         </page>
                         
-                        <page string="AI Assistant" name="ai_assistant">
+                        <page string="Trợ lý AI" name="ai_assistant">
                             <group>
-                                <group string="AI Suggestions">
+                                <group string="Gợi ý AI">
                                     <button name="action_ai_apply_suggestions" string="Áp dụng đề xuất AI" 
                                             type="object" class="btn-primary" icon="fa-magic"/>
                                     <field name="ai_suggested_approver" readonly="1"/>
@@ -263,7 +338,7 @@
                                     <field name="ai_category_suggestion" readonly="1"/>
                                     <field name="ai_approver_suggestion" readonly="1" widget="many2many_tags"/>
                                 </group>
-                                <group string="AI Assessment">
+                                <group string="Đánh giá AI">
                                     <field name="ai_risk_level" readonly="1" widget="badge"/>
                                     <field name="ai_priority_score" readonly="1" widget="progressbar"/>
                                     <field name="ai_sentiment" readonly="1" widget="badge"/>
@@ -274,7 +349,7 @@
                                     <field name="sla_breached" readonly="1"/>
                                 </group>
                             </group>
-                            <group string="AI Summary">
+                            <group string="Tóm tắt AI">
                                 <field name="ai_summary" readonly="1"/>
                             </group>
                             <group string="Automation Stats">
@@ -363,36 +438,115 @@
         </field>
     </record>
 
-    <!-- Kanban View -->
+    <!-- Kanban View - ENHANCED -->
     <record id="view_van_ban_kanban" model="ir.ui.view">
         <field name="name">van_ban.kanban</field>
         <field name="model">van_ban</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="trang_thai">
+            <kanban default_group_by="trang_thai" class="o_kanban_small_column" quick_create="false">
                 <field name="ma_van_ban"/>
                 <field name="ten_van_ban"/>
                 <field name="loai_van_ban_id"/>
                 <field name="khach_hang_id"/>
                 <field name="trang_thai"/>
                 <field name="da_ky_noi_bo"/>
+                <field name="da_khach_ky"/>
                 <field name="sap_het_han"/>
+                <field name="ngay_het_han"/>
+                <field name="nguoi_ky_id"/>
+                <field name="gia_tri_hop_dong"/>
+                <field name="ai_risk_level"/>
+                <field name="bi_khoa"/>
+                <field name="activity_ids"/>
+                
+                <progressbar field="trang_thai" colors='{"nhap": "secondary", "cho_duyet": "warning", "da_duyet": "info", "cho_ky": "primary", "da_ky": "success", "da_gui": "success", "huy": "danger"}'/>
+                
                 <templates>
                     <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_card oe_kanban_global_click #{record.sap_het_han.raw_value ? 'bg-warning-light' : ''}">
-                            <div class="oe_kanban_content">
-                                <div class="o_kanban_record_top">
-                                    <strong><field name="ma_van_ban"/></strong>
-                                    <span t-if="record.da_ky_noi_bo.raw_value" class="badge bg-success">Đã ký</span>
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click" style="position: relative;">
+                            <!-- Badge sắp hết hạn - Nhỏ gọn, góc trên phải -->
+                            <div t-if="record.sap_het_han.raw_value" style="position: absolute; top: 5px; right: 5px; z-index: 10;">
+                                <span class="badge badge-warning" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">⏰ Sắp hạn</span>
+                            </div>
+                            
+                            <!-- Badge bị khóa - Nhỏ gọn, góc trên trái -->
+                            <div t-if="record.bi_khoa.raw_value" style="position: absolute; top: 5px; left: 5px; z-index: 10;">
+                                <span class="badge badge-secondary" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">🔒 Khóa</span>
+                            </div>
+                            
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong><field name="ma_van_ban"/></strong>
+                                    </div>
+                                    <div class="o_secondary text-truncate" style="max-width: 180px;">
+                                        <field name="ten_van_ban"/>
+                                    </div>
                                 </div>
-                                <div><field name="ten_van_ban"/></div>
-                                <div class="text-muted">
-                                    <field name="loai_van_ban_id"/>
+                                
+                                <div class="o_dropdown_kanban dropdown" groups="base.group_user">
+                                    <a class="dropdown-toggle o-no-caret btn" role="button" data-toggle="dropdown" href="#" aria-label="Menu">
+                                        <span class="fa fa-ellipsis-v"/>
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <a role="menuitem" type="edit" class="dropdown-item">Xem/Sửa</a>
+                                        <a role="menuitem" type="object" name="action_ky_noi_bo" class="dropdown-item" groups="van_ban.group_giam_doc_ky">Ký điện tử</a>
+                                        <a role="menuitem" type="delete" class="dropdown-item text-danger">Xóa</a>
+                                    </div>
                                 </div>
-                                <div t-if="record.khach_hang_id.value">
-                                    <i class="fa fa-user" title="Khách hàng"/> <field name="khach_hang_id"/>
+                            </div>
+                            
+                            <div class="o_kanban_card_content">
+                                <div class="o_kanban_record_body">
+                                    <!-- Loại văn bản -->
+                                    <div class="mb-1">
+                                        <span class="badge badge-pill badge-secondary" style="font-size: 11px;"><field name="loai_van_ban_id"/></span>
+                                    </div>
+                                    
+                                    <!-- Khách hàng -->
+                                    <div t-if="record.khach_hang_id.raw_value" class="mb-1 text-truncate">
+                                        <i class="fa fa-building text-primary" title="Khách hàng"/> <field name="khach_hang_id"/>
+                                    </div>
+                                    
+                                    <!-- Giá trị hợp đồng -->
+                                    <div t-if="record.gia_tri_hop_dong.raw_value" class="mb-1">
+                                        <i class="fa fa-money text-success" title="Giá trị"/> <field name="gia_tri_hop_dong" widget="monetary"/>
+                                    </div>
+                                    
+                                    <!-- Người ký -->
+                                    <div t-if="record.nguoi_ky_id.raw_value" class="mb-1 small text-muted">
+                                        <i class="fa fa-pencil" title="Người ký"/> <field name="nguoi_ky_id"/>
+                                    </div>
+                                    
+                                    <!-- Ngày hết hạn -->
+                                    <div t-if="record.ngay_het_han.raw_value" class="mb-1 small">
+                                        <i class="fa fa-calendar" title="Hạn"/> <field name="ngay_het_han"/>
+                                    </div>
+                                    
+                                    <!-- Badges trạng thái ký - Nhỏ gọn hơn -->
+                                    <div class="mt-2">
+                                        <span t-if="record.da_ky_noi_bo.raw_value" class="badge badge-success mr-1" style="font-size: 10px; padding: 2px 6px;" title="Nội bộ đã ký">✓ Đã gửi</span>
+                                        <span t-if="record.da_khach_ky.raw_value" class="badge badge-info mr-1" style="font-size: 10px; padding: 2px 6px;" title="Khách hàng đã ký">✓ Nhận bộ</span>
+                                        <span t-if="!record.da_ky_noi_bo.raw_value and !record.da_khach_ky.raw_value" class="badge badge-light mr-1" style="font-size: 10px; padding: 2px 6px; border: 1px solid #ddd;" title="Chưa gửi">✗ Mở bộ</span>
+                                        <span t-if="record.ai_risk_level.raw_value == 'high'" class="badge badge-danger" style="font-size: 10px; padding: 2px 6px;" title="Rủi ro cao">⚠ Risk</span>
+                                        <span t-if="record.ai_risk_level.raw_value == 'critical'" class="badge badge-dark" style="font-size: 10px; padding: 2px 6px;" title="Rủi ro nghiêm trọng">🔴 Critical</span>
+                                    </div>
                                 </div>
-                                <div t-if="record.sap_het_han.raw_value" class="text-danger">
-                                    <i class="fa fa-warning" title="Cảnh báo"/> Sắp hết hạn
+                            </div>
+                            
+                            <div class="o_kanban_card_footer">
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <span t-if="record.trang_thai.raw_value == 'nhap'" class="badge badge-secondary" style="font-size: 11px;">Nháp</span>
+                                        <span t-if="record.trang_thai.raw_value == 'cho_duyet'" class="badge badge-warning" style="font-size: 11px;">Chờ duyệt</span>
+                                        <span t-if="record.trang_thai.raw_value == 'da_duyet'" class="badge badge-info" style="font-size: 11px;">Đã duyệt</span>
+                                        <span t-if="record.trang_thai.raw_value == 'cho_ky'" class="badge badge-primary" style="font-size: 11px;">Chờ ký</span>
+                                        <span t-if="record.trang_thai.raw_value == 'da_ky'" class="badge badge-success" style="font-size: 11px;">Đã ký</span>
+                                        <span t-if="record.trang_thai.raw_value == 'da_gui'" class="badge badge-success" style="font-size: 11px;">✓ Đã gửi</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -402,34 +556,61 @@
         </field>
     </record>
 
-    <!-- Search View -->
+    <!-- Search View - ENHANCED -->
     <record id="view_van_ban_search" model="ir.ui.view">
         <field name="name">van_ban.search</field>
         <field name="model">van_ban</field>
         <field name="arch" type="xml">
             <search>
-                <field name="ma_van_ban"/>
+                <field name="ma_van_ban" string="Mã/Tên" filter_domain="['|', ('ma_van_ban', 'ilike', self), ('ten_van_ban', 'ilike', self)]"/>
                 <field name="ten_van_ban"/>
                 <field name="khach_hang_id"/>
+                <field name="khach_hang_trong_hop_dong" string="Tên KH trong HĐ"/>
                 <field name="loai_van_ban_id"/>
                 <field name="nguoi_tao_id"/>
+                <field name="nguoi_ky_id"/>
+                <field name="nguoi_duyet_id"/>
                 
+                <separator/>
                 <filter string="Nháp" name="nhap" domain="[('trang_thai', '=', 'nhap')]"/>
                 <filter string="Chờ duyệt" name="cho_duyet" domain="[('trang_thai', '=', 'cho_duyet')]"/>
                 <filter string="Đã duyệt" name="da_duyet" domain="[('trang_thai', '=', 'da_duyet')]"/>
+                <filter string="Chờ ký" name="cho_ky" domain="[('trang_thai', '=', 'cho_ky')]"/>
                 <filter string="Đã ký" name="da_ky" domain="[('trang_thai', '=', 'da_ky')]"/>
                 <filter string="Đã gửi" name="da_gui" domain="[('trang_thai', '=', 'da_gui')]"/>
+                
                 <separator/>
                 <filter string="Sắp hết hạn" name="sap_het_han" domain="[('sap_het_han', '=', True)]"/>
                 <filter string="Hết hiệu lực" name="het_hieu_luc" domain="[('trang_thai', '=', 'het_hieu_luc')]"/>
-                <separator/>
-                <filter string="Văn bản của tôi" name="cua_toi" domain="[('nguoi_tao_id.user_id', '=', uid)]"/>
+                <filter string="Đã hủy" name="da_huy" domain="[('trang_thai', '=', 'huy')]"/>
                 
-                <group expand="0" string="Nhóm theo">
+                <separator/>
+                <filter string="Đã khóa" name="bi_khoa" domain="[('bi_khoa', '=', True)]"/>
+                <filter string="Nội bộ đã ký" name="da_ky_noi_bo" domain="[('da_ky_noi_bo', '=', True)]"/>
+                <filter string="KH đã ký" name="da_khach_ky" domain="[('da_khach_ky', '=', True)]"/>
+                <filter string="Chưa có người ký" name="chua_co_nguoi_ky" domain="[('nguoi_ky_id', '=', False), ('trang_thai', 'in', ['da_duyet', 'cho_ky'])]"/>
+                
+                <separator/>
+                <filter string="Rủi ro cao" name="risk_high" domain="[('ai_risk_level', 'in', ['high', 'critical'])]"/>
+                <filter string="Vi phạm SLA" name="sla_breached" domain="[('sla_breached', '=', True)]"/>
+                
+                <separator/>
+                <filter string="Văn bản của tôi" name="cua_toi" domain="['|', ('create_uid', '=', uid), ('nguoi_tao_id.user_id', '=', uid)]"/>
+                <filter string="Tôi cần ký" name="toi_can_ky" domain="[('nguoi_ky_id.user_id', '=', uid), ('trang_thai', 'in', ['da_duyet', 'cho_ky'])]"/>
+                <filter string="Tôi cần duyệt" name="toi_can_duyet" domain="[('trang_thai', '=', 'cho_duyet')]"/>
+                
+                <separator/>
+                <filter string="Tháng này" name="thang_nay" domain="[('ngay_tao', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Quý này" name="quy_nay" domain="[('ngay_tao', '&gt;=', (context_today() - relativedelta(months=((context_today().month - 1) % 3), day=1)).strftime('%Y-%m-%d'))]"/>
+                
+                <group expand="1" string="Nhóm theo">
                     <filter string="Trạng thái" name="group_trang_thai" context="{'group_by':'trang_thai'}"/>
                     <filter string="Loại văn bản" name="group_loai" context="{'group_by':'loai_van_ban_id'}"/>
                     <filter string="Khách hàng" name="group_khach_hang" context="{'group_by':'khach_hang_id'}"/>
                     <filter string="Người tạo" name="group_nguoi_tao" context="{'group_by':'nguoi_tao_id'}"/>
+                    <filter string="Người ký" name="group_nguoi_ky" context="{'group_by':'nguoi_ky_id'}"/>
+                    <filter string="Mức rủi ro" name="group_risk" context="{'group_by':'ai_risk_level'}"/>
+                    <filter string="Tháng tạo" name="group_thang" context="{'group_by':'ngay_tao:month'}"/>
                 </group>
             </search>
         </field>
@@ -474,6 +655,58 @@
         <field name="res_model">van_ban</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('trang_thai', '=', 'da_gui')]</field>
+    </record>
+
+    <!-- Action: Văn bản tôi cần ký -->
+    <record id="action_van_ban_toi_can_ky" model="ir.actions.act_window">
+        <field name="name">Chờ ký</field>
+        <field name="res_model">van_ban</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('trang_thai', '=', 'cho_ky')]</field>
+        <field name="context">{'search_default_cho_ky': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Không có văn bản nào chờ ký
+            </p>
+        </field>
+    </record>
+
+    <!-- Action: Văn bản rủi ro cao -->
+    <record id="action_van_ban_rui_ro_cao" model="ir.actions.act_window">
+        <field name="name">Rủi ro cao</field>
+        <field name="res_model">van_ban</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="domain">[('ai_risk_level', 'in', ['high', 'critical']), ('trang_thai', 'not in', ['huy', 'het_hieu_luc'])]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Không có văn bản rủi ro cao
+            </p>
+        </field>
+    </record>
+
+    <!-- Action: Văn bản vi phạm SLA -->
+    <record id="action_van_ban_vi_pham_sla" model="ir.actions.act_window">
+        <field name="name">Vi phạm SLA</field>
+        <field name="res_model">van_ban</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('sla_breached', '=', True)]</field>
+    </record>
+
+    <!-- Action: Kanban Pipeline -->
+    <record id="action_van_ban_pipeline" model="ir.actions.act_window">
+        <field name="name">Pipeline Văn bản</field>
+        <field name="res_model">van_ban</field>
+        <field name="view_mode">kanban,tree,form,pivot,graph</field>
+        <field name="search_view_id" ref="view_van_ban_search"/>
+        <field name="context">{'search_default_group_trang_thai': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo văn bản mới
+            </p>
+            <p>
+                Quản lý văn bản theo pipeline: Nháp → Chờ duyệt → Đã duyệt → Chờ ký → Đã ký → Đã gửi
+            </p>
+        </field>
     </record>
 
 </odoo>

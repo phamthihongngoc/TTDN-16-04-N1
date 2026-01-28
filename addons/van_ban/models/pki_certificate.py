@@ -27,7 +27,7 @@ class PKICertificate(models.Model):
     3. Certificate: Chứng thư số xác thực danh tính người ký
     """
     _name = 'pki.certificate'
-    _description = 'Chứng thư số PKI'
+    _description = 'Quản lý chứng thư số'
     _inherit = ['mail.thread']
     _order = 'created_at desc'
 
@@ -38,34 +38,34 @@ class PKICertificate(models.Model):
     nhan_vien_id = fields.Many2one('nhan_vien', string='Nhân viên', 
                                     compute='_compute_nhan_vien', store=True)
     
-    # === PRIVATE KEY (BẢO MẬT) ===
-    private_key = fields.Binary('Private Key (Encrypted)', 
+    # === KHÓA RIÊNG TƯ (BẢO MẬT) ===
+    private_key = fields.Binary('Khóa riêng tư (mã hóa)', 
                                 help='Khóa riêng tư - Dùng để ký văn bản. KHÔNG BAO GIỜ chia sẻ!',
                                 groups='base.group_system')
-    private_key_password = fields.Char('Password bảo vệ Private Key',
+    private_key_password = fields.Char('Mật khẩu bảo vệ khóa riêng',
                                       groups='base.group_system',
-                                      help='Password để mở khóa private key khi ký')
+                                      help='Mật khẩu để mở khóa riêng tư khi ký')
     
-    # === PUBLIC KEY (CÔNG KHAI) ===
-    public_key = fields.Binary('Public Key', 
+    # === KHÓA CÔNG KHAI ===
+    public_key = fields.Binary('Khóa công khai', 
                               help='Khóa công khai - Dùng để xác thực chữ ký. Có thể chia sẻ công khai.')
-    public_key_pem = fields.Text('Public Key (PEM format)', 
-                                 help='Public key ở định dạng văn bản PEM')
+    public_key_pem = fields.Text('Khóa công khai (định dạng PEM)', 
+                                 help='Khóa công khai ở định dạng văn bản PEM')
     
-    # === CERTIFICATE (CHỨNG THƯ SỐ) ===
-    certificate = fields.Binary('Certificate (X.509)', 
+    # === CHỨNG THƯ SỐ ===
+    certificate = fields.Binary('Chứng thư số (X.509)', 
                                help='Chứng thư số X.509 xác thực danh tính người ký')
-    certificate_pem = fields.Text('Certificate (PEM format)',
-                                  help='Certificate ở định dạng văn bản PEM')
+    certificate_pem = fields.Text('Chứng thư số (định dạng PEM)',
+                                  help='Chứng thư số ở định dạng văn bản PEM')
     
     # === THÔNG TIN CERTIFICATE ===
-    subject_common_name = fields.Char('Common Name (CN)', tracking=True,
-                                     help='Tên người ký trong certificate')
-    subject_organization = fields.Char('Organization (O)', tracking=True,
+    subject_common_name = fields.Char('Tên người ký', tracking=True,
+                                     help='Tên người ký trong chứng thư số')
+    subject_organization = fields.Char('Tổ chức', tracking=True,
                                       help='Tổ chức/Công ty')
     subject_email = fields.Char('Email', tracking=True)
     
-    issuer_name = fields.Char('Issuer', readonly=True,
+    issuer_name = fields.Char('Tổ chức cấp phát', readonly=True,
                              help='Tổ chức cấp chứng thư số')
     
     # === THỜI HẠN ===
@@ -86,7 +86,7 @@ class PKICertificate(models.Model):
     is_valid = fields.Boolean('Còn hiệu lực', compute='_compute_is_valid', store=True)
     
     # === THUẬT TOÁN ===
-    key_size = fields.Integer('Key Size (bits)', default=2048, required=True,
+    key_size = fields.Integer('Độ dài khóa (bits)', default=2048, required=True,
                              help='Độ dài khóa: 2048, 3072, 4096 bits')
     hash_algorithm = fields.Selection([
         ('SHA256', 'SHA-256 (Khuyến nghị)'),

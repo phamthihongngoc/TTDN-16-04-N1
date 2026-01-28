@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_hoa_don_form" model="ir.ui.view">
+        <field name="name">hoa_don.form</field>
+        <field name="model">hoa_don</field>
+        <field name="arch" type="xml">
+            <form string="Hóa đơn">
+                <header>
+                    <button name="action_gui_hoa_don" string="Gửi hóa đơn" type="object"
+                            class="oe_highlight" attrs="{'invisible': [('trang_thai', '=', 'da_gui')]}"/>
+                    <button name="action_thanh_toan" string="Thanh toán" type="object"
+                            class="oe_highlight" attrs="{'invisible': [('trang_thai', '=', 'da_thanh_toan')]}"/>
+                    <field name="trang_thai" widget="statusbar" statusbar_visible="nhap,da_gui,da_thanh_toan"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="ma_hoa_don" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Thông tin hóa đơn">
+                            <field name="don_hang_id"/>
+                            <field name="khach_hang_id" readonly="1"/>
+                            <field name="ngay_hoa_don"/>
+                        </group>
+                        <group string="Tổng cộng">
+                            <field name="tong_tien" widget="monetary" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Chi tiết hóa đơn">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="san_pham_id"/>
+                                    <field name="so_luong"/>
+                                    <field name="don_gia"/>
+                                    <field name="thanh_tien" sum="Tổng"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_hoa_don_tree" model="ir.ui.view">
+        <field name="name">hoa_don.tree</field>
+        <field name="model">hoa_don</field>
+        <field name="arch" type="xml">
+            <tree string="Hóa đơn">
+                <field name="ma_hoa_don"/>
+                <field name="don_hang_id"/>
+                <field name="khach_hang_id"/>
+                <field name="ngay_hoa_don"/>
+                <field name="tong_tien" widget="monetary" sum="Tổng"/>
+                <field name="trang_thai" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_hoa_don_search" model="ir.ui.view">
+        <field name="name">hoa_don.search</field>
+        <field name="model">hoa_don</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="ma_hoa_don"/>
+                <field name="don_hang_id"/>
+                <field name="khach_hang_id"/>
+                <filter string="Nháp" name="nhap" domain="[('trang_thai', '=', 'nhap')]"/>
+                <filter string="Đã gửi" name="da_gui" domain="[('trang_thai', '=', 'da_gui')]"/>
+                <filter string="Đã thanh toán" name="da_thanh_toan" domain="[('trang_thai', '=', 'da_thanh_toan')]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Khách hàng" name="group_khach_hang" context="{'group_by': 'khach_hang_id'}"/>
+                    <filter string="Trạng thái" name="group_trang_thai" context="{'group_by': 'trang_thai'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_hoa_don" model="ir.actions.act_window">
+        <field name="name">Hóa đơn</field>
+        <field name="res_model">hoa_don</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_hoa_don_search"/>
+    </record>
+
+</odoo>

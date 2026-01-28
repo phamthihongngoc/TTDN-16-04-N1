@@ -145,14 +145,21 @@ class AIChatToolKhachHang(models.AbstractModel):
             if status:
                 domain.append(('trang_thai', '=', status))
             
-            orders = self.env['don_hang'].search(domain, limit=limit, order='create_date desc')
+            orders = self.env['don_hang'].sudo().search(domain, limit=limit, order='create_date desc')
             
             result = []
             for order in orders:
+                # Check both field names for order date
+                order_date = None
+                if hasattr(order, 'ngay_dat_hang') and order.ngay_dat_hang:
+                    order_date = order.ngay_dat_hang.strftime('%d/%m/%Y')
+                elif hasattr(order, 'ngay_dat') and order.ngay_dat:
+                    order_date = order.ngay_dat.strftime('%d/%m/%Y')
+                
                 result.append({
                     'id': order.id,
                     'name': order.display_name,
-                    'date': order.ngay_dat.strftime('%d/%m/%Y') if hasattr(order, 'ngay_dat') and order.ngay_dat else None,
+                    'date': order_date,
                     'total': order.tong_tien if hasattr(order, 'tong_tien') else 0,
                     'status': order.trang_thai if hasattr(order, 'trang_thai') else None,
                 })

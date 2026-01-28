@@ -25,17 +25,27 @@ class AIContextKhachHang(models.AbstractModel):
     def _get_customer_context(self, customer_id):
         """Lấy context chi tiết khách hàng"""
         try:
-            customer = self.env['khach_hang'].browse(customer_id)
+            customer = self.env['khach_hang'].sudo().browse(customer_id)
             if not customer.exists():
                 return None
             
+            # Get phone - check both field names
+            phone = customer.so_dien_thoai if hasattr(customer, 'so_dien_thoai') and customer.so_dien_thoai else (customer.dien_thoai if hasattr(customer, 'dien_thoai') else 'N/A')
+            
+            # Get classification - check both field names
+            classification = 'N/A'
+            if hasattr(customer, 'phan_loai') and customer.phan_loai:
+                classification = dict(customer._fields['phan_loai'].selection).get(customer.phan_loai, 'N/A')
+            elif hasattr(customer, 'loai_khach_hang') and customer.loai_khach_hang:
+                classification = dict(customer._fields['loai_khach_hang'].selection).get(customer.loai_khach_hang, 'N/A')
+            
             # Basic info
             context = f"""KHÁCH HÀNG: {customer.display_name}
-- Mã: {customer.ma_khach_hang or 'N/A'}
+- Mã: {customer.id}
 - Email: {customer.email or 'N/A'}
-- Điện thoại: {customer.dien_thoai or 'N/A'}
+- Điện thoại: {phone}
 - Địa chỉ: {customer.dia_chi or 'N/A'}
-- Loại: {dict(customer._fields['loai_khach_hang'].selection).get(customer.loai_khach_hang, 'N/A') if hasattr(customer, 'loai_khach_hang') else 'N/A'}
+- Phân loại: {classification}
 - Trạng thái: {dict(customer._fields['trang_thai'].selection).get(customer.trang_thai, 'N/A') if hasattr(customer, 'trang_thai') else 'N/A'}
 """
             
@@ -95,25 +105,44 @@ GHI CHÚ: {customer.ghi_chu}
     def _get_order_context(self, order_id):
         """Lấy context đơn hàng"""
         try:
-            order = self.env['don_hang'].browse(order_id)
+            order = self.env['don_hang'].sudo().browse(order_id)
             if not order.exists():
                 return None
+            
+            # Get order date - check both field names
+            order_date = 'N/A'
+            if hasattr(order, 'ngay_dat_hang') and order.ngay_dat_hang:
+                order_date = order.ngay_dat_hang.strftime('%d/%m/%Y')
+            elif hasattr(order, 'ngay_dat') and order.ngay_dat:
+                order_date = order.ngay_dat.strftime('%d/%m/%Y')
+            
+            # Get total amount
+            total = order.tong_tien if hasattr(order, 'tong_tien') else 0
             
             context = f"""ĐƠN HÀNG: {order.display_name}
 - Mã: {order.ma_don_hang if hasattr(order, 'ma_don_hang') else order.id}
 - Khách hàng: {order.khach_hang_id.display_name if hasattr(order, 'khach_hang_id') and order.khach_hang_id else 'N/A'}
-- Ngày đặt: {order.ngay_dat.strftime('%d/%m/%Y') if hasattr(order, 'ngay_dat') and order.ngay_dat else 'N/A'}
-- Tổng tiền: {order.tong_tien:,.0f} VND if hasattr(order, 'tong_tien') else 'N/A'
+- Ngày đặt: {order_date}
+- Tổng tiền: {total:,.0f} VND
 - Trạng thái: {dict(order._fields['trang_thai'].selection).get(order.trang_thai, 'N/A') if hasattr(order, 'trang_thai') else 'N/A'}
 """
             
-            # Order lines
-            if hasattr(order, 'chi_tiet_ids') and order.chi_tiet_ids:
+            # Order lines - check both field names
+            order_lines = None
+            if hasattr(order, 'line_ids') and order.line_ids:
+                order_lines = order.line_ids
+            elif hasattr(order, 'chi_tiet_ids') and order.chi_tiet_ids:
+                order_lines = order.chi_tiet_ids
+            
+            if order_lines:
                 context += "\nCHI TIẾT ĐƠN:\n"
-                for line in order.chi_tiet_ids[:10]:
-                    product = line.san_pham_id.display_name if hasattr(line, 'san_pham_id') else 'N/A'
+                for line in order_lines[:10]:
+                    product = line.san_pham_id.display_name if hasattr(line, 'san_pham_id') and line.san_pham_id else 'N/A'
                     qty = line.so_luong if hasattr(line, 'so_luong') else 0
-                    context += f"  • {product}: {qty} x {line.don_gia:,.0f} = {line.thanh_tien:,.0f}\n" if hasattr(line, 'don_gia') else f"  • {product}\n"
+                    if hasattr(line, 'don_gia') and hasattr(line, 'thanh_tien'):
+                        context += f"  • {product}: {qty} x {line.don_gia:,.0f} = {line.thanh_tien:,.0f}\n"
+                    else:
+                        context += f"  • {product}: {qty}\n"
             
             return context
             
@@ -164,31 +193,49 @@ GIẢI PHÁP:
     def search_customers(self, query, filters=None, limit=10):
         """Tìm kiếm khách hàng"""
         try:
-            domain = []
+            KhachHang = self.env['khach_hang'].sudo()
+            fields_map = KhachHang._fields
             
+            domain = []
             if query:
-                domain = ['|', '|', '|',
-                    ('name', 'ilike', query),
-                    ('ma_khach_hang', 'ilike', query),
-                    ('email', 'ilike', query),
-                    ('dien_thoai', 'ilike', query),
-                ]
+                or_parts = []
+                # Check available fields for search
+                if 'ten_khach_hang' in fields_map:
+                    or_parts.append(('ten_khach_hang', 'ilike', query))
+                if 'name' in fields_map:
+                    or_parts.append(('name', 'ilike', query))
+                if 'email' in fields_map:
+                    or_parts.append(('email', 'ilike', query))
+                if 'so_dien_thoai' in fields_map:
+                    or_parts.append(('so_dien_thoai', 'ilike', query))
+                if 'dien_thoai' in fields_map:
+                    or_parts.append(('dien_thoai', 'ilike', query))
+                if 'cong_ty' in fields_map:
+                    or_parts.append(('cong_ty', 'ilike', query))
+                
+                if or_parts:
+                    domain = ['|'] * (len(or_parts) - 1) + or_parts
             
             if filters:
-                if filters.get('loai_khach_hang'):
+                if filters.get('phan_loai') and 'phan_loai' in fields_map:
+                    domain.append(('phan_loai', '=', filters['phan_loai']))
+                if filters.get('loai_khach_hang') and 'loai_khach_hang' in fields_map:
                     domain.append(('loai_khach_hang', '=', filters['loai_khach_hang']))
                 if filters.get('trang_thai'):
                     domain.append(('trang_thai', '=', filters['trang_thai']))
             
-            customers = self.env['khach_hang'].search(domain, limit=limit)
+            customers = KhachHang.search(domain, limit=limit)
             
-            return [{
-                'id': c.id,
-                'name': c.display_name,
-                'ma': c.ma_khach_hang if hasattr(c, 'ma_khach_hang') else None,
-                'email': c.email if hasattr(c, 'email') else None,
-                'dien_thoai': c.dien_thoai if hasattr(c, 'dien_thoai') else None,
-            } for c in customers]
+            result = []
+            for c in customers:
+                phone = c.so_dien_thoai if hasattr(c, 'so_dien_thoai') and c.so_dien_thoai else (c.dien_thoai if hasattr(c, 'dien_thoai') else None)
+                result.append({
+                    'id': c.id,
+                    'name': c.display_name,
+                    'email': c.email if hasattr(c, 'email') else None,
+                    'dien_thoai': phone,
+                })
+            return result
             
         except Exception as e:
             _logger.warning(f"Error searching customers: {e}")

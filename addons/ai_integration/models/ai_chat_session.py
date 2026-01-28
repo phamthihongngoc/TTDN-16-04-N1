@@ -9,7 +9,7 @@ _logger = logging.getLogger(__name__)
 
 
 class AIChatSession(models.Model):
-    """Phiên chat với AI Assistant"""
+    """Phiên chat với Trợ lý AI"""
     _name = 'ai.chat.session'
     _description = 'AI Chat Session'
     _order = 'last_activity desc, id desc'
@@ -129,6 +129,17 @@ class AIChatSession(models.Model):
         for session in self:
             session.message_count = len(session.message_ids)
 
+    def _infer_module_from_model(self, model_name):
+        if not model_name:
+            return None
+        if 'khach_hang' in model_name or 'don_hang' in model_name or 'ho_tro' in model_name:
+            return 'khach_hang'
+        if 'van_ban' in model_name or 'yeu_cau_ky' in model_name:
+            return 'van_ban'
+        if 'nhan_vien' in model_name or 'phong_ban' in model_name or 'cham_cong' in model_name or 'bang_luong' in model_name or 'ho_so' in model_name:
+            return 'nhan_su'
+        return None
+
     @api.depends('message_ids.tokens_used', 'message_ids.cost')
     def _compute_stats(self):
         for session in self:
@@ -166,11 +177,17 @@ class AIChatSession(models.Model):
         session = self.search(domain, limit=1, order='last_activity desc')
         
         if not session:
+            module = self._infer_module_from_model(active_model)
             session = self.create({
                 'user_id': self.env.uid,
                 'active_model': active_model,
                 'active_res_id': active_res_id,
+                'module': module,
             })
+        else:
+            module = self._infer_module_from_model(active_model)
+            if module and session.module != module:
+                session.write({'module': module})
         
         return session
 
@@ -191,6 +208,7 @@ class AIChatSession(models.Model):
         """
         active_model = context_data.get('active_model')
         active_res_id = context_data.get('active_res_id')
+        module = context_data.get('module') or self._infer_module_from_model(active_model)
         
         # Tìm session đang active của user với context tương tự
         domain = [
@@ -211,9 +229,12 @@ class AIChatSession(models.Model):
                 'user_id': self.env.user.id,
                 'active_model': active_model,
                 'active_res_id': active_res_id,
+                'module': module,
                 'state': 'active',
             })
         else:
+            if module and session.module != module:
+                session.write({'module': module})
             session.update_activity()
         
         # Lấy messages

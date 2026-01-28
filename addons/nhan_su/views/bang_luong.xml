@@ -5,28 +5,27 @@
         <field name="name">bang_luong.tree</field>
         <field name="model">bang_luong</field>
         <field name="arch" type="xml">
-            <tree string="Bảng lương"
+            <tree string="Bang luong"
                   decoration-info="trang_thai=='chua_duyet'" 
                   decoration-success="trang_thai=='da_duyet'"
                   decoration-muted="trang_thai=='da_thanh_toan'"
                   create="false">
                 <header>
-                    <button name="action_tao_bang_luong_thang_nay" string="➕ Tạo bảng lương tháng này" 
+                    <button name="action_tao_bang_luong_thang_nay" string="Tao bang luong thang nay" 
                             type="object" class="btn-primary"/>
                 </header>
                 <field name="nhan_vien_id"/>
                 <field name="thang"/>
                 <field name="nam"/>
-                <field name="so_cong_thuc_te" string="Số công"/>
-                <field name="so_lan_di_tre" optional="show" decoration-warning="so_lan_di_tre &gt; 0"/>
-                <field name="so_lan_ve_som" optional="show" decoration-warning="so_lan_ve_som &gt; 0"/>
-                <field name="so_cong_chuan" optional="hide"/>
-                <field name="luong_co_ban" widget="monetary" optional="hide"/>
+                <field name="so_cong_thuc_te" string="So cong"/>
                 <field name="luong_theo_cong" widget="monetary" optional="hide"/>
-                <field name="thuong" widget="monetary" sum="Tổng thưởng" decoration-success="1"/>
-                <field name="phat_di_tre_ve_som" widget="monetary" optional="show" sum="Tổng phạt trễ/sớm" decoration-warning="1"/>
-                <field name="phat" widget="monetary" sum="Tổng phạt khác" decoration-danger="1"/>
-                <field name="luong_nhan" widget="monetary" sum="Tổng lương" decoration-bf="1" decoration-info="1"/>
+                <field name="luong_tang_ca" widget="monetary" optional="hide"/>
+                <field name="tong_phu_cap" widget="monetary" optional="show" sum="Tong phu cap"/>
+                <field name="khau_tru_bhxh" widget="monetary" optional="show" sum="Tong BHXH"/>
+                <field name="thue_tncn" widget="monetary" optional="hide" sum="Tong thue TNCN"/>
+                <field name="thuong" widget="monetary" sum="Tong thuong" optional="hide"/>
+                <field name="phat" widget="monetary" sum="Tong phat" optional="hide"/>
+                <field name="luong_nhan" widget="monetary" sum="Tong luong" decoration-bf="1" decoration-info="1"/>
                 <field name="trang_thai"/>
                 <field name="currency_id" invisible="1"/>
             </tree>
@@ -38,13 +37,13 @@
         <field name="name">bang_luong.form</field>
         <field name="model">bang_luong</field>
         <field name="arch" type="xml">
-            <form string="Bảng lương">
+            <form string="Bang luong">
                 <header>
-                    <button name="action_tinh_lai_luong" string="🔄 Tính lại" type="object" 
+                    <button name="action_tinh_lai_luong" string="Tinh lai" type="object" 
                             class="btn-secondary"/>
-                    <button name="action_duyet" string="✅ Duyệt" type="object" 
+                    <button name="action_duyet" string="Duyet" type="object" 
                             class="oe_highlight"/>
-                    <button name="action_thanh_toan" string="💰 Thanh toán" type="object" 
+                    <button name="action_thanh_toan" string="Thanh toan" type="object" 
                             class="oe_highlight"/>
                     <field name="trang_thai" widget="statusbar" 
                            statusbar_visible="chua_duyet,da_duyet,da_thanh_toan"/>
@@ -52,69 +51,105 @@
                 <sheet>
                     <div class="oe_title">
                         <h1 class="d-flex">
-                            <field name="nhan_vien_id" placeholder="Chọn nhân viên..." 
+                            <field name="nhan_vien_id" placeholder="Chon nhan vien..." 
                                    required="1" options="{'no_create': True}" class="oe_inline"/>
                         </h1>
                         <h3 class="text-muted">
-                            Tháng <field name="thang" required="1" class="oe_inline" style="width: 80px;"/>
+                            Thang <field name="thang" required="1" class="oe_inline" style="width: 80px;"/>
                             / <field name="nam" required="1" class="oe_inline" style="width: 100px;"/>
                         </h3>
                     </div>
                     
-                    <group>
-                        <group string="📊 Thông Tin Công">
-                            <field name="so_cong_thuc_te" string="Số công thực tế"
-                                   readonly="1" class="text-primary font-weight-bold"/>
-                            <field name="so_cong_chuan" string="Số công chuẩn"
-                                   readonly="1" class="text-muted"/>
-                            <separator string="⚠️ Thống kê vi phạm" colspan="2"/>
-                            <field name="so_lan_di_tre" readonly="1" class="text-warning"/>
-                            <field name="so_lan_ve_som" readonly="1" class="text-warning"/>
-                            <field name="phat_di_tre_ve_som" readonly="1" widget="monetary"
-                                   options="{'currency_field': 'currency_id'}"
-                                   class="text-danger font-weight-bold"/>
-                        </group>
+                    <notebook>
+                        <page string="Thong tin chung" name="general">
+                            <group>
+                                <group string="Thong Tin Cong">
+                                    <field name="so_cong_thuc_te" string="So cong thuc te"
+                                           readonly="1" class="text-primary font-weight-bold"/>
+                                    <field name="so_cong_chuan" string="So cong chuan"
+                                           readonly="1" class="text-muted"/>
+                                    <field name="so_lan_di_tre" readonly="1"/>
+                                    <field name="so_lan_ve_som" readonly="1"/>
+                                </group>
+                                
+                                <group string="Luong Co Ban">
+                                    <field name="luong_co_ban" readonly="1" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="luong_theo_cong" readonly="1" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="luong_tang_ca" readonly="1" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Thuong / Phat">
+                                    <field name="thuong" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="phat" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}" 
+                                           help="Phat khac"/>
+                                    <field name="phat_di_tre_ve_som" readonly="1" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                
+                                <group string="Tong Luong">
+                                    <field name="luong_nhan" readonly="1" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           class="text-success font-weight-bold"
+                                           style="font-size: 24px;"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <field name="ghi_chu" placeholder="Ghi chu ve bang luong..."/>
+                            </group>
+                        </page>
                         
-                        <group string="💵 Chi Tiết Lương">
-                            <field name="luong_co_ban" readonly="1" widget="monetary"
-                                   options="{'currency_field': 'currency_id'}"/>
-                            <field name="luong_theo_cong" readonly="1" widget="monetary"
-                                   options="{'currency_field': 'currency_id'}"/>
-                            <separator string="Điều chỉnh" colspan="2"/>
-                            <field name="thuong" widget="monetary"
-                                   options="{'currency_field': 'currency_id'}"/>
-                            <field name="phat" widget="monetary"
-                                   options="{'currency_field': 'currency_id'}" 
-                                   help="Phạt khác (không bao gồm đi trễ/về sớm)"/>
-                            <field name="currency_id" invisible="1"/>
-                        </group>
-                    </group>
-                    
-                    <!-- Tổng lương nổi bật -->
-                    <group>
-                        <group></group>
-                        <group>
-                            <label for="luong_nhan" string="Tổng Lương Nhận" 
-                                   class="font-weight-bold" style="font-size: 16px;"/>
-                            <field name="luong_nhan" readonly="1" widget="monetary"
-                                   options="{'currency_field': 'currency_id'}"
-                                   class="text-success font-weight-bold"
-                                   style="font-size: 28px;"/>
-                        </group>
-                    </group>
-                    
-                    <group>
-                        <field name="ghi_chu" nolabel="1" 
-                               placeholder="Ghi chú về bảng lương..."/>
-                    </group>
-                    
-                    <!-- Công thức tính lương -->
-                    <div class="alert alert-success mt-3" role="alert" aria-live="polite">
-                        <h5 class="mb-2">📐 Công thức tính lương:</h5>
-                        <p class="mb-0">
-                            <strong>Lương nhận</strong> = (Số công × Lương cơ bản) ÷ Số công chuẩn + Thưởng - Phạt
-                        </p>
-                    </div>
+                        <page string="Phu cap" name="phu_cap">
+                            <group>
+                                <group>
+                                    <field name="tong_phu_cap" readonly="1" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           class="text-success font-weight-bold"/>
+                                </group>
+                            </group>
+                            <field name="chi_tiet_phu_cap" readonly="1" 
+                                   placeholder="Chi tiet cac khoan phu cap se hien thi o day..." nolabel="1"/>
+                        </page>
+                        
+                        <page string="BHXH va Thue" name="bhxh_thue">
+                            <group>
+                                <group string="Bao Hiem Xa Hoi">
+                                    <field name="luong_dong_bhxh" readonly="1" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="khau_tru_bhxh" readonly="1" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           class="text-danger"/>
+                                    <field name="bhxh_doanh_nghiep" readonly="1" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           class="text-warning"/>
+                                </group>
+                                
+                                <group string="Thue Thu Nhap Ca Nhan">
+                                    <field name="so_nguoi_phu_thuoc"/>
+                                    <field name="thu_nhap_chiu_thue" readonly="1" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="thue_tncn" readonly="1" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           class="text-danger font-weight-bold"/>
+                                </group>
+                            </group>
+                            
+                            <div class="alert alert-info mt-3" role="alert">
+                                <strong>Cong thuc tinh:</strong><br/>
+                                - BHXH nguoi lao dong: BHXH 8% + BHYT 1.5% + BHTN 1% = 10.5%<br/>
+                                - BHXH doanh nghiep: BHXH 17.5% + BHYT 3% + BHTN 1% = 21.5%<br/>
+                                - Thu nhap chiu thue = Thu nhap - BHXH - Giam tru ban than (11 trieu) - Giam tru phu thuoc (4.4 trieu/nguoi)
+                            </div>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -150,32 +185,32 @@
         <field name="name">bang_luong.search</field>
         <field name="model">bang_luong</field>
         <field name="arch" type="xml">
-            <search string="Tìm kiếm bảng lương">
+            <search string="Tim kiem bang luong">
                 <field name="nhan_vien_id"/>
                 <field name="thang"/>
                 <field name="nam"/>
                 
-                <filter string="Tháng này" name="this_month" 
+                <filter string="Thang nay" name="this_month" 
                         domain="[('thang', '=', str(context_today().month)), ('nam', '=', context_today().year)]"/>
-                <filter string="Năm nay" name="this_year" 
+                <filter string="Nam nay" name="this_year" 
                         domain="[('nam', '=', context_today().year)]"/>
                 
                 <separator/>
-                <filter string="⏳ Chưa duyệt" name="chua_duyet" 
+                <filter string="Chua duyet" name="chua_duyet" 
                         domain="[('trang_thai', '=', 'chua_duyet')]"/>
-                <filter string="✅ Đã duyệt" name="da_duyet" 
+                <filter string="Da duyet" name="da_duyet" 
                         domain="[('trang_thai', '=', 'da_duyet')]"/>
-                <filter string="💰 Đã thanh toán" name="da_thanh_toan" 
+                <filter string="Da thanh toan" name="da_thanh_toan" 
                         domain="[('trang_thai', '=', 'da_thanh_toan')]"/>
                 
-                <group expand="0" string="Nhóm theo">
-                    <filter string="Nhân viên" name="group_nhan_vien" 
+                <group expand="0" string="Nhom theo">
+                    <filter string="Nhan vien" name="group_nhan_vien" 
                             context="{'group_by': 'nhan_vien_id'}"/>
-                    <filter string="Tháng" name="group_thang" 
+                    <filter string="Thang" name="group_thang" 
                             context="{'group_by': 'thang'}"/>
-                    <filter string="Năm" name="group_nam" 
+                    <filter string="Nam" name="group_nam" 
                             context="{'group_by': 'nam'}"/>
-                    <filter string="Trạng thái" name="group_trang_thai" 
+                    <filter string="Trang thai" name="group_trang_thai" 
                             context="{'group_by': 'trang_thai'}"/>
                 </group>
             </search>

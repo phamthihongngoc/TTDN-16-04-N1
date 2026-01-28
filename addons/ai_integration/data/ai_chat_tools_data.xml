@@ -523,7 +523,7 @@
 }</field>
             <field name="sequence">200</field>
             <field name="icon">fa-search</field>
-            <field name="applicable_models">nhan_vien,phong_ban,cham_cong,bang_luong</field>
+            <field name="applicable_models">nhan_vien,nhan_su.phong_ban,phong_ban,cham_cong,bang_luong</field>
         </record>
         
         <record id="tool_get_employee_info" model="ai.chat.tool">
@@ -544,6 +544,10 @@
         "ma_nhan_vien": {
             "type": "string",
             "description": "Mã nhân viên (nếu không có ID)"
+        },
+        "ma_dinh_danh": {
+            "type": "string",
+            "description": "Mã nhân viên chuẩn (ma_dinh_danh)"
         }
     }
 }</field>
@@ -584,7 +588,7 @@
 }</field>
             <field name="sequence">220</field>
             <field name="icon">fa-users</field>
-            <field name="applicable_models">nhan_vien,phong_ban</field>
+            <field name="applicable_models">nhan_vien,nhan_su.phong_ban,phong_ban</field>
         </record>
         
         <record id="tool_get_departments_summary" model="ai.chat.tool">
@@ -604,7 +608,7 @@
             <field name="is_quick_action">True</field>
             <field name="quick_action_label">Danh sách phòng ban</field>
             <field name="quick_action_prompt">Liệt kê tất cả phòng ban và số nhân viên</field>
-            <field name="applicable_models">phong_ban,nhan_vien</field>
+            <field name="applicable_models">nhan_su.phong_ban,phong_ban,nhan_vien</field>
         </record>
         
         <record id="tool_get_department_info" model="ai.chat.tool">
@@ -630,7 +634,7 @@
 }</field>
             <field name="sequence">240</field>
             <field name="icon">fa-building</field>
-            <field name="applicable_models">phong_ban</field>
+            <field name="applicable_models">nhan_su.phong_ban,phong_ban</field>
         </record>
         
         <record id="tool_get_attendance_report" model="ai.chat.tool">
@@ -683,7 +687,7 @@
             <field name="is_quick_action">True</field>
             <field name="quick_action_label">Thống kê nhân sự</field>
             <field name="quick_action_prompt">Thống kê tổng quan về nhân sự công ty</field>
-            <field name="applicable_models">nhan_vien,phong_ban</field>
+            <field name="applicable_models">nhan_vien,nhan_su.phong_ban,phong_ban</field>
         </record>
         
         <record id="tool_get_payroll_info" model="ai.chat.tool">
@@ -726,11 +730,16 @@
             <field name="is_read_only">True</field>
             <field name="parameters_schema">{
     "type": "object",
-    "properties": {}
+    "properties": {
+        "department_name": {
+            "type": "string",
+            "description": "Tên phòng ban cần đếm (ví dụ: Sales)"
+        }
+    }
 }</field>
             <field name="sequence">280</field>
             <field name="icon">fa-bar-chart</field>
-            <field name="applicable_models">phong_ban,nhan_vien</field>
+            <field name="applicable_models">nhan_su.phong_ban,phong_ban,nhan_vien</field>
         </record>
         
     </data>

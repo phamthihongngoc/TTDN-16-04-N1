@@ -1,0 +1,3 @@
+ van_ban_pkey              | CREATE UNIQUE INDEX van_ban_pkey ON public.van_ban USING btree (id)
+ van_ban_ma_van_ban_unique | CREATE UNIQUE INDEX van_ban_ma_van_ban_unique ON public.van_ban USING btree (ma_van_ban)
+

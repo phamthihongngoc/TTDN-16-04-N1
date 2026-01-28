@@ -28,10 +28,10 @@
         <field name="arch" type="xml">
             <form string="Chứng thư số PKI">
                 <header>
-                    <button name="action_generate_keypair" string="🔐 Tạo Certificate" type="object" states="draft" class="oe_highlight" help="Tạo cặp khóa Private/Public Key và Certificate"/>
-                    <button name="action_download_public_key" string="📥 Download Public Key" type="object" attrs="{'invisible': [('public_key_pem', '=', False)]}" help="Download public key để chia sẻ"/>
+                    <button name="action_generate_keypair" string="🔐 Tạo chứng thư số" type="object" states="draft" class="oe_highlight" help="Tạo cặp khóa riêng tư/công khai và chứng thư số"/>
+                    <button name="action_download_public_key" string="📥 Tải khóa công khai" type="object" attrs="{'invisible': [('public_key_pem', '=', False)]}" help="Tải khóa công khai để chia sẻ"/>
                     <button name="action_view_signatures" string="📝 Xem văn bản đã ký" type="object" attrs="{'invisible': [('signature_count', '=', 0)]}"/>
-                    <button name="action_revoke" string="❌ Thu hồi Certificate" type="object" states="active" confirm="Bạn có chắc muốn thu hồi certificate này? Hành động này không thể hoàn tác!"/>
+                    <button name="action_revoke" string="❌ Thu hồi chứng thư số" type="object" states="active" confirm="Bạn có chắc muốn thu hồi chứng thư số này? Hành động này không thể hoàn tác!"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,active"/>
                 </header>
                 <sheet>
@@ -47,7 +47,7 @@
                     
                     <div class="oe_title">
                         <h1>
-                            <field name="name" placeholder="Ví dụ: Certificate PKI - Giám đốc"/>
+                            <field name="name" placeholder="Ví dụ: Chứng thư số - Giám đốc"/>
                         </h1>
                         <h3>
                             <field name="user_name" readonly="1"/>
@@ -65,7 +65,7 @@
                         <group string="Cấu hình bảo mật">
                             <field name="key_size" widget="radio" options="{'horizontal': true}"/>
                             <field name="hash_algorithm"/>
-                            <field name="private_key_password" password="True" attrs="{'readonly': [('state', '!=', 'draft')]}" placeholder="Password bảo vệ Private Key"/>
+                            <field name="private_key_password" password="True" attrs="{'readonly': [('state', '!=', 'draft')]}" placeholder="Mật khẩu bảo vệ khóa riêng tư"/>
                         </group>
                     </group>
                     
@@ -75,7 +75,7 @@
                             <field name="valid_to"/>
                             <field name="is_valid" readonly="1"/>
                         </group>
-                        <group string="Thông tin Certificate">
+                        <group string="Thông tin chứng thư số">
                             <field name="issuer_name" readonly="1"/>
                             <field name="created_at" readonly="1"/>
                             <field name="created_by" readonly="1"/>
@@ -83,24 +83,24 @@
                     </group>
                     
                     <notebook>
-                        <page string="🔑 Public Key (Công khai)" attrs="{'invisible': [('public_key_pem', '=', False)]}">
+                        <page string="🔑 Khóa công khai" attrs="{'invisible': [('public_key_pem', '=', False)]}">
                             <group>
                                 <field name="public_key_pem" widget="text" readonly="1" nolabel="1"/>
                             </group>
                             <div class="alert alert-info" role="alert">
-                                <strong>ℹ️ Public Key:</strong> Có thể chia sẻ công khai để người khác xác thực chữ ký của bạn.
+                                <strong>ℹ️ Khóa công khai:</strong> Có thể chia sẻ công khai để người khác xác thực chữ ký của bạn.
                             </div>
                         </page>
                         
-                        <page string="📜 Certificate" attrs="{'invisible': [('certificate_pem', '=', False)]}">
+                        <page string="📜 Chứng thư số" attrs="{'invisible': [('certificate_pem', '=', False)]}">
                             <group>
                                 <field name="certificate_pem" widget="text" readonly="1" nolabel="1"/>
                             </group>
                         </page>
                         
-                        <page string="🔐 Private Key" groups="base.group_system">
+                        <page string="🔐 Khóa riêng tư" groups="base.group_system">
                             <div class="alert alert-danger" role="alert">
-                                <strong>⚠️ CẢNH BÁO:</strong> Private Key là thông tin BẢO MẬT tuyệt đối. KHÔNG BAO GIỜ chia sẻ với bất kỳ ai!
+                                <strong>⚠️ CẢNH BÁO:</strong> Khóa riêng tư là thông tin BẢO MẬT tuyệt đối. KHÔNG BAO GIỜ chia sẻ với bất kỳ ai!
                             </div>
                             <group>
                                 <field name="private_key" filename="private_key.pem" readonly="1"/>
@@ -159,27 +159,32 @@
         <field name="context">{'search_default_active': 1, 'search_default_my_certs': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Tạo Chứng thư số PKI đầu tiên!
+                Tạo chứng thư số đầu tiên!
             </p>
             <p>
-                Chứng thư số (PKI Certificate) được sử dụng để:<br/>
-                ✅ Ký điện tử văn bản với Private Key<br/>
-                ✅ Xác thực chữ ký bằng Public Key<br/>
+                Chứng thư số được sử dụng để:<br/>
+                ✅ Ký điện tử văn bản với khóa riêng tư<br/>
+                ✅ Xác thực chữ ký bằng khóa công khai<br/>
                 ✅ Đảm bảo tính toàn vẹn và không thể chối bỏ<br/><br/>
                 
                 <strong>Quy trình:</strong><br/>
-                1. Tạo Certificate mới → Nhập thông tin<br/>
-                2. Click "Tạo Certificate" → Hệ thống tự động tạo Private/Public Key<br/>
-                3. Sử dụng Certificate để ký văn bản điện tử<br/>
+                1. Tạo chứng thư số mới → Nhập thông tin<br/>
+                2. Click "Tạo chứng thư số" → Hệ thống tự động tạo khóa riêng tư/công khai<br/>
+                3. Sử dụng chứng thư số để ký văn bản điện tử<br/>
             </p>
         </field>
     </record>
 
     <!-- Menu Item -->
     <menuitem id="menu_pki_certificate"
-              name="Chứng thư số PKI"
-              parent="menu_van_ban_cau_hinh"
+              name="Chứng thư số"
+              parent="menu_van_ban_root"
+              sequence="85"/>
+    
+    <menuitem id="menu_pki_certificate_main"
+              name="Quản lý chứng thư số"
+              parent="menu_pki_certificate"
               action="action_pki_certificate"
-              sequence="35"/>
+              sequence="1"/>
 
 </odoo>

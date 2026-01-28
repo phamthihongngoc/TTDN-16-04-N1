@@ -55,6 +55,9 @@ class KhachHang(models.Model):
     don_hang_count = fields.Integer('Số đơn hàng', compute='_compute_smart_button_counts')
     ho_tro_count = fields.Integer('Số tickets', compute='_compute_smart_button_counts')
     email_count = fields.Integer('Số email', compute='_compute_smart_button_counts')
+    yeu_cau_ky_count = fields.Integer('Số yêu cầu ký', compute='_compute_smart_button_counts')
+    hoa_don_count = fields.Integer('Số hóa đơn', compute='_compute_smart_button_counts')
+    phieu_xuat_kho_count = fields.Integer('Số phiếu xuất kho', compute='_compute_smart_button_counts')
     
     # RFM Analysis
     rfm_recency = fields.Integer('Recency (days)', compute='_compute_rfm_score', store=True,
@@ -90,6 +93,8 @@ class KhachHang(models.Model):
     don_hang_ids = fields.One2many('don_hang', 'khach_hang_id', string='Đơn hàng')
     ho_tro_ids = fields.One2many('ho_tro_khach_hang', 'khach_hang_id', string='Yêu cầu hỗ trợ')
     email_ids = fields.Many2many('email_khach_hang', string='Email đã nhận')
+    hoa_don_ids = fields.One2many('hoa_don', 'khach_hang_id', string='Hóa đơn')
+    phieu_xuat_kho_ids = fields.One2many('phieu_xuat_kho', 'khach_hang_id', string='Phiếu xuất kho')
     
     # Engagement tracking
     last_activity_date = fields.Date('Last Activity', compute='_compute_last_activity')
@@ -243,13 +248,22 @@ class KhachHang(models.Model):
     
     # ============ SMART BUTTON COUNTS ============
     
-    @api.depends('don_hang_ids', 'ho_tro_ids', 'email_ids')
+    @api.depends('don_hang_ids', 'ho_tro_ids', 'email_ids', 'hoa_don_ids', 'phieu_xuat_kho_ids')
     def _compute_smart_button_counts(self):
         """Tính số lượng cho smart buttons"""
         for record in self:
             record.don_hang_count = len(record.don_hang_ids)
             record.ho_tro_count = len(record.ho_tro_ids)
             record.email_count = len(record.email_ids)
+            record.hoa_don_count = len(record.hoa_don_ids)
+            record.phieu_xuat_kho_count = len(record.phieu_xuat_kho_ids)
+            if 'yeu_cau_ky' in self.env:
+                record.yeu_cau_ky_count = self.env['yeu_cau_ky'].search_count([
+                    ('khach_hang_id', '=', record.id),
+                    ('trang_thai', '=', 'cho_ky')
+                ])
+            else:
+                record.yeu_cau_ky_count = 0
     
     # ============ RFM ANALYSIS ============
     
@@ -406,6 +420,10 @@ class KhachHang(models.Model):
             'context': {'default_khach_hang_id': self.id}
         }
     
+    def action_view_don_hang(self):
+        """Xem tất cả đơn hàng của khách hàng (for smart button)"""
+        return self.action_view_orders()
+    
     def action_view_support_tickets(self):
         """Xem tất cả tickets của khách hàng"""
         self.ensure_one()
@@ -418,6 +436,10 @@ class KhachHang(models.Model):
             'context': {'default_khach_hang_id': self.id}
         }
     
+    def action_view_ho_tro(self):
+        """Xem tất cả hỗ trợ của khách hàng (for smart button)"""
+        return self.action_view_support_tickets()
+    
     def action_view_emails(self):
         """Xem tất cả email đã gửi"""
         self.ensure_one()
@@ -427,6 +449,42 @@ class KhachHang(models.Model):
             'res_model': 'email_khach_hang',
             'view_mode': 'tree,form',
             'domain': [('khach_hang_ids', 'in', self.id)]
+        }
+
+    def action_view_hoa_don(self):
+        """Xem tất cả hóa đơn của khách hàng"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Hóa đơn - {self.ten_khach_hang}',
+            'res_model': 'hoa_don',
+            'view_mode': 'tree,form',
+            'domain': [('khach_hang_id', '=', self.id)],
+            'context': {'default_khach_hang_id': self.id}
+        }
+    
+    def action_view_van_ban(self):
+        """Xem tất cả văn bản liên quan đến khách hàng"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Văn bản - {self.ten_khach_hang}',
+            'res_model': 'van_ban',
+            'view_mode': 'tree,form,kanban',
+            'domain': [('khach_hang_id', '=', self.id)],
+            'context': {'default_khach_hang_id': self.id}
+        }
+
+    def action_view_yeu_cau_ky(self):
+        """Xem yêu cầu ký của khách hàng"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Yêu cầu ký - {self.ten_khach_hang}',
+            'res_model': 'yeu_cau_ky',
+            'view_mode': 'tree,kanban,form',
+            'domain': [('khach_hang_id', '=', self.id)],
+            'context': {'search_default_cho_ky': 1}
         }
     
     def action_create_order(self):

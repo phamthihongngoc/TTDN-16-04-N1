@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quản lý Văn bản',
-    'version': '15.0.1.0.0',
-    'summary': 'Quản lý văn bản với ký điện tử',
+    'version': '15.0.2.0.0',
+    'summary': 'Quản lý văn bản với ký điện tử - Phiên bản nâng cấp',
     'description': """
         Module Quản lý Văn bản với Ký Điện tử
         =====================================
@@ -31,6 +31,7 @@
         'data/sequence_data.xml',
         'data/cron.xml',
         'data/cron_advanced.xml',  # Cron cho Certificate Rotation, Archive
+        'data/cron_reminder.xml',  # Cron nhắc nhở hạn xử lý
         'views/res_config_settings_views.xml',
         'wizard/wizard_ky_dien_tu_views.xml',
         'wizard/wizard_ky_khach_hang_views.xml',
@@ -42,6 +43,7 @@
         'views/pki_advanced_views.xml',  # Views cho CRL, Rotation, External Storage
         'views/workflow_template_views.xml',
         'views/van_ban_views.xml',
+        'views/van_ban_fields_extension_views.xml',  # Views cho Độ mật, Độ khẩn, Phiên bản
         'views/van_ban_den_views.xml',
         'views/van_ban_di_views.xml',
         'views/van_ban_ocr_views.xml',
@@ -53,6 +55,7 @@
     'assets': {
         'web.assets_backend': [
             'van_ban/static/src/css/signature_pad.css',
+            'van_ban/static/src/css/menu_icons.css',
         ],
     },
     'external_dependencies': {
@@ -72,6 +75,9 @@
             'openai',
             'tiktoken',
             'cryptography',  # Thêm cryptography cho PKI
+            # PAdES signing dependencies (optional):
+            # 'pyhanko',
+            # 'pyhanko_certvalidator',
             # 'boto3',  # Thêm boto3 cho External Storage (S3/MinIO) - Optional, comment nếu chưa cài
         ],
         'bin': [

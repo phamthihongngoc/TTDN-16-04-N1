@@ -96,6 +96,20 @@ class YeuCauKy(models.Model):
                 self.env['mail.mail'].create(mail_values).send()
             
             record.message_post(body=f'Đã gửi email yêu cầu ký đến {record.email}')
+
+    def action_open_wizard_ky_khach(self):
+        """Mở wizard ký điện tử cho khách hàng"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Ký điện tử - Khách hàng',
+            'res_model': 'wizard.ky.khach.hang',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_yeu_cau_ky_id': self.id,
+            }
+        }
     
     def action_gui_otp(self):
         """Gửi mã OTP xác thực"""
@@ -165,6 +179,39 @@ class YeuCauKy(models.Model):
         # Ghi lịch sử
         self.van_ban_id._ghi_lich_su('khach_ky', 
             f'Khách hàng {self.khach_hang_id.ten_khach_hang} đã ký văn bản - Sẵn sàng gửi đi')
+
+        # Thông báo cho admin/QL văn bản
+        self._notify_admin_khach_ky()
+
+    def _notify_admin_khach_ky(self):
+        """Thông báo admin khi khách hàng ký xong"""
+        self.ensure_one()
+
+        # Post vào chatter của văn bản
+        if self.van_ban_id:
+            self.van_ban_id.message_post(
+                body=(
+                    f'✅ Khách hàng <strong>{self.khach_hang_id.ten_khach_hang}</strong> '
+                    f'đã ký văn bản <strong>{self.van_ban_id.ten_van_ban}</strong>. '
+                    'Vui lòng kiểm tra và gửi văn bản.'
+                )
+            )
+
+        # Tạo activity cho nhóm quản trị văn bản
+        admin_group = self.env.ref('van_ban.group_quan_tri_van_ban', raise_if_not_found=False)
+        if admin_group:
+            for user in admin_group.users:
+                if user and user.active:
+                    self.van_ban_id.activity_schedule(
+                        'mail.mail_activity_data_todo',
+                        user_id=user.id,
+                        summary=_('Khách hàng đã ký văn bản'),
+                        note=(
+                            f'Văn bản: {self.van_ban_id.ten_van_ban}<br/>'
+                            f'Khách hàng: {self.khach_hang_id.ten_khach_hang}<br/>'
+                            f'Thời gian ký: {self.ngay_ky or ""}'
+                        ),
+                    )
     
     def _gui_email_xac_nhan_ky(self):
         """Gửi email xác nhận đã ký thành công"""
@@ -198,3 +245,20 @@ class YeuCauKy(models.Model):
             record.so_lan_nhap_sai = 0
             record.ngay_het_han = fields.Date.today() + timedelta(days=7)
             record.action_gui_email_yeu_cau_ky()
+
+    def action_open_wizard_ky_khach(self):
+        """Mở wizard ký điện tử cho khách hàng"""
+        self.ensure_one()
+
+        wizard = self.env['wizard.ky.khach.hang'].create({
+            'yeu_cau_ky_id': self.id,
+        })
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Ký điện tử - Khách hàng',
+            'res_model': 'wizard.ky.khach.hang',
+            'view_mode': 'form',
+            'res_id': wizard.id,
+            'target': 'new',
+        }

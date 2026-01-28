@@ -42,6 +42,7 @@
         'data/cron_ho_so.xml',
         'data/email_template.xml',
         'data/email_template_ho_so.xml',
+        'data/phu_cap_bhxh_data.xml',
         'views/res_config_settings_views.xml',
         'views/nhan_vien.xml',
         'views/phong_ban.xml',
@@ -52,8 +53,17 @@
         'views/ho_so_nhan_vien_views.xml',
         'wizard/wizard_tu_choi_ho_so_views.xml',
         'views/nhan_vien_ai_views.xml',
+        # Tinh nang moi: Ca lam viec, Nghi phep, Phu cap, BHXH
+        'views/ca_lam_viec_views.xml',
+        'views/don_nghi_phep_views.xml',
+        'views/phu_cap_views.xml',
         'views/menu.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'nhan_su/static/src/css/nhan_su_modern.css',
+        ],
+    },
     'installable': True,
     'application': True,
     'auto_install': False,

@@ -10,36 +10,36 @@ _logger = logging.getLogger(__name__)
 
 class PKICertificateRotation(models.Model):
     """
-    Key Rotation Policy
-    Quản lý chính sách xoay vòng khóa và gia hạn certificate
+    Chính sách xoay vòng chứng thư số
+    Quản lý chính sách xoay vòng khóa và gia hạn chứng thư số
     """
     _name = 'pki.certificate.rotation'
-    _description = 'Certificate Rotation Policy'
+    _description = 'Chính sách xoay vòng chứng thư số'
     _inherit = ['mail.thread']
     _order = 'rotation_date desc'
     
     name = fields.Char('Tên', compute='_compute_name', store=True)
     
-    # === CERTIFICATE CŨ & MỚI ===
+    # === CHỨNG THƯ SỐ CŨ & MỚI ===
     old_certificate_id = fields.Many2one('pki.certificate', 
-                                        string='Certificate cũ',
+                                        string='Chứng thư số cũ',
                                         required=True, ondelete='cascade')
     new_certificate_id = fields.Many2one('pki.certificate',
-                                        string='Certificate mới',
+                                        string='Chứng thư số mới',
                                         ondelete='set null')
     
-    # === THÔNG TIN ROTATION ===
-    rotation_date = fields.Datetime('Ngày rotation', 
+    # === THÔNG TIN XOAY VÒNG ===
+    rotation_date = fields.Datetime('Ngày xoay vòng', 
                                    default=fields.Datetime.now,
                                    readonly=True)
     rotation_type = fields.Selection([
-        ('manual', 'Manual'),
+        ('manual', 'Thủ công'),
         ('auto_expiring', 'Tự động - Sắp hết hạn'),
         ('auto_policy', 'Tự động - Theo chính sách'),
         ('revocation', 'Do thu hồi'),
-    ], string='Loại rotation', required=True, default='manual')
+    ], string='Loại xoay vòng', required=True, default='manual')
     
-    rotation_reason = fields.Text('Lý do rotation')
+    rotation_reason = fields.Text('Lý do xoay vòng')
     
     # === TRẠNG THÁI ===
     state = fields.Selection([

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-AI Assistant Wizard - Chat với AI theo ngữ cảnh
+Trợ lý AI Wizard - Chat với AI theo ngữ cảnh
 """
 
 from odoo import models, fields, api, _
@@ -14,7 +14,7 @@ class AIAssistantWizard(models.TransientModel):
     Có thể mở từ bất kỳ record nào để hỏi đáp theo ngữ cảnh.
     """
     _name = 'ai.assistant.wizard'
-    _description = 'AI Assistant'
+    _description = 'Trợ lý AI'
 
     # Source context
     model_name = fields.Char('Model', default=lambda self: self._context.get('active_model'))

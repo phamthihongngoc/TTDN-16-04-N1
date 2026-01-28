@@ -9,18 +9,18 @@ _logger = logging.getLogger(__name__)
 
 class PKICertificateRevocation(models.Model):
     """
-    Certificate Revocation List (CRL)
+    Danh sách chứng thư số bị thu hồi (CRL)
     Quản lý danh sách chứng thư số bị thu hồi
     Theo chuẩn RFC 5280 - X.509 PKI Certificate and CRL Profile
     """
     _name = 'pki.certificate.revocation'
-    _description = 'Certificate Revocation List (CRL)'
+    _description = 'Danh sách chứng thư số bị thu hồi (CRL)'
     _inherit = ['mail.thread']
     _order = 'revoked_at desc'
     
     # === THÔNG TIN CƠ BẢN ===
     name = fields.Char('Tên', compute='_compute_name', store=True)
-    certificate_id = fields.Many2one('pki.certificate', string='Certificate bị thu hồi',
+    certificate_id = fields.Many2one('pki.certificate', string='Chứng thư số bị thu hồi',
                                     required=True, ondelete='cascade', tracking=True)
     
     # === THÔNG TIN THU HỒI ===
@@ -33,15 +33,15 @@ class PKICertificateRevocation(models.Model):
     
     reason_code = fields.Selection([
         ('unspecified', 'Không xác định'),
-        ('key_compromise', 'Private Key bị lộ'),
-        ('ca_compromise', 'CA bị xâm nhập'),
+        ('key_compromise', 'Khóa riêng bị lộ'),
+        ('ca_compromise', 'Tổ chức cấp phát bị xâm nhập'),
         ('affiliation_changed', 'Thay đổi tổ chức'),
-        ('superseded', 'Được thay thế bởi certificate mới'),
+        ('superseded', 'Được thay thế bởi chứng thư mới'),
         ('cessation_of_operation', 'Ngừng hoạt động'),
         ('certificate_hold', 'Tạm đình chỉ'),
-        ('remove_from_crl', 'Gỡ khỏi CRL (reactivate)'),
+        ('remove_from_crl', 'Gỡ khỏi danh sách thu hồi (kích hoạt lại)'),
         ('privilege_withdrawn', 'Thu hồi đặc quyền'),
-        ('aa_compromise', 'Attribute Authority bị xâm nhập'),
+        ('aa_compromise', 'Cơ quan xác thực bị xâm nhập'),
     ], string='Lý do thu hồi', required=True, default='unspecified',
        tracking=True, help='Mã lý do theo RFC 5280')
     
@@ -50,23 +50,23 @@ class PKICertificateRevocation(models.Model):
     # === TRẠNG THÁI ===
     state = fields.Selection([
         ('active', 'Đang có hiệu lực'),
-        ('removed', 'Đã gỡ khỏi CRL'),
+        ('removed', 'Đã gỡ khỏi danh sách thu hồi'),
     ], string='Trạng thái', default='active', required=True, tracking=True)
     
     # === THÔNG TIN LIÊN QUAN ===
     user_id = fields.Many2one(related='certificate_id.user_id', 
                               string='User', store=True, readonly=True)
     certificate_name = fields.Char(related='certificate_id.name',
-                                   string='Tên certificate', store=True, readonly=True)
+                                   string='Tên chứng thư số', store=True, readonly=True)
     
     # === AUDIT ===
-    removed_at = fields.Datetime('Thời gian gỡ khỏi CRL', readonly=True)
+    removed_at = fields.Datetime('Thời gian gỡ khỏi danh sách thu hồi', readonly=True)
     removed_by = fields.Many2one('res.users', string='Người gỡ', readonly=True)
-    removed_reason = fields.Text('Lý do gỡ khỏi CRL')
+    removed_reason = fields.Text('Lý do gỡ khỏi danh sách thu hồi')
     
     # === CRL SERIAL ===
-    crl_entry_number = fields.Integer('CRL Entry Number', readonly=True,
-                                     help='Serial number trong CRL')
+    crl_entry_number = fields.Integer('Số thứ tự trong danh sách', readonly=True,
+                                     help='Số thứ tự trong danh sách thu hồi')
     
     
     @api.depends('certificate_id', 'revoked_at')

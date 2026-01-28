@@ -17,11 +17,11 @@ class WizardKyKhachHang(models.TransientModel):
     ten_khach_hang = fields.Char(related='khach_hang_id.ten_khach_hang', string='Tên khách hàng')
     
     # Chữ ký
-    chu_ky = fields.Binary('Chữ ký', required=True,
+    chu_ky = fields.Binary('Chữ ký', required=False,
                            help='Vẽ chữ ký của bạn trên canvas')
     
     # OTP
-    otp_code = fields.Char('Mã OTP', required=True, size=6,
+    otp_code = fields.Char('Mã OTP', required=False, size=6,
                            help='Nhập mã OTP đã được gửi qua email')
     
     # Xác nhận

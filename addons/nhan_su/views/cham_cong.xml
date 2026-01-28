@@ -5,12 +5,14 @@
         <field name="name">cham_cong.tree</field>
         <field name="model">cham_cong</field>
         <field name="arch" type="xml">
-            <tree string="Chấm công">
+            <tree string="Cham cong">
                 <field name="nhan_vien_id"/>
                 <field name="ngay_cham_cong"/>
+                <field name="ca_lam_viec_id" optional="show"/>
                 <field name="gio_vao" widget="float_time"/>
                 <field name="gio_ra" widget="float_time"/>
                 <field name="so_gio_lam" widget="float_time"/>
+                <field name="so_gio_tang_ca" widget="float_time" optional="hide"/>
                 <field name="trang_thai" decoration-success="trang_thai == 'co_mat'" 
                        decoration-danger="trang_thai == 'vang_mat'"
                        decoration-warning="trang_thai in ['di_tre', 've_som']"
@@ -24,11 +26,11 @@
         <field name="name">cham_cong.form</field>
         <field name="model">cham_cong</field>
         <field name="arch" type="xml">
-            <form string="Chấm công">
+            <form string="Cham cong">
                 <sheet>
                     <div class="oe_title">
                         <h1>
-                            <field name="nhan_vien_id" placeholder="Chọn nhân viên..." 
+                            <field name="nhan_vien_id" placeholder="Chon nhan vien..." 
                                    required="1" options="{'no_create': True}"/>
                         </h1>
                         <h3 class="text-muted">
@@ -38,7 +40,9 @@
                     </div>
                     
                     <group>
-                        <group string="⏰ Giờ Làm Việc">
+                        <group string="Gio Lam Viec">
+                            <field name="ca_lam_viec_id" placeholder="Chon ca lam viec..."/>
+                            
                             <label for="gio_vao"/>
                             <div class="o_row">
                                 <field name="gio_vao" widget="float_time" class="oe_inline"/>
@@ -59,20 +63,15 @@
                                    readonly="1" class="text-success font-weight-bold"/>
                         </group>
                         
-                        <group string="📝 Ghi Chú">
-                            <field name="ghi_chu" nolabel="1" 
-                                   placeholder="Ghi chú về ngày làm việc..."/>
+                        <group string="Tang ca">
+                            <field name="so_gio_tang_ca" widget="float_time" readonly="1"/>
+                            <field name="he_so_tang_ca" readonly="1"/>
                         </group>
                     </group>
                     
-                    <div class="alert alert-info mt-3" role="alert" aria-live="polite">
-                        <h5 class="mb-2">📌 Lưu ý:</h5>
-                        <ul class="mb-0">
-                            <li>Giờ nghỉ trưa: <strong>12h00 - 13h30</strong> (1.5 giờ) tự động trừ</li>
-                            <li>Số giờ làm chuẩn: <strong>8 giờ/ngày</strong></li>
-                            <li>1 công = 8 giờ làm việc</li>
-                        </ul>
-                    </div>
+                    <group>
+                        <field name="ghi_chu" placeholder="Ghi chu ve ngay lam viec..."/>
+                    </group>
                 </sheet>
             </form>
         </field>

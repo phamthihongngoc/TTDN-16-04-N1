@@ -1,0 +1,350 @@
+/* ============================================
+   KHÁCH HÀNG MODULE - MODERN CSS STYLING
+   Odoo 15 Compatible
+   ============================================ */
+
+/* ======================
+   KANBAN CARDS - MODERN
+   ====================== */
+.kh_kanban_modern .kh_card_modern {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    min-height: 180px;
+}
+
+.kh_kanban_modern .kh_card_modern:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Customer Name */
+.kh_customer_name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+/* Email Line */
+.kh_email_line {
+    font-size: 12px;
+    color: #666;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Statistics Row */
+.kh_stats_row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.kh_stat_badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.kh_stat_orders {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.kh_stat_support {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.kh_stat_money {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+/* ======================
+   RIBBONS
+   ====================== */
+.kh_ribbon {
+    position: absolute;
+    top: 10px;
+    right: -35px;
+    width: 120px;
+    text-align: center;
+    padding: 4px 0;
+    font-size: 10px;
+    font-weight: bold;
+    transform: rotate(45deg);
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.kh_ribbon_vip {
+    background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+    color: #333;
+}
+
+.kh_ribbon_risk {
+    background: linear-gradient(135deg, #ff9a44 0%, #ff6600 100%);
+    color: white;
+}
+
+.kh_ribbon_lost {
+    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+    color: white;
+}
+
+/* ======================
+   FORM VIEW ENHANCEMENTS
+   ====================== */
+/* Smart Buttons */
+.o_form_view .oe_button_box .oe_stat_button {
+    border-radius: 8px;
+    margin: 4px;
+    transition: all 0.2s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.o_form_view .oe_button_box .oe_stat_button:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: scale(1.02);
+}
+
+.o_form_view .oe_button_box .oe_stat_button:hover .o_stat_info .o_stat_value,
+.o_form_view .oe_button_box .oe_stat_button:hover .o_stat_info .o_stat_text {
+    color: white;
+}
+
+/* Stat Values */
+.o_form_view .oe_button_box .o_stat_value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #714B67;
+}
+
+/* Group Titles with Icons */
+.o_group .o_group_col_6:first-child .o_inner_group::before {
+    font-family: 'Font Awesome 5 Free';
+    margin-right: 8px;
+}
+
+/* ======================
+   RFM SEGMENT BADGES
+   ====================== */
+.o_form_view .o_field_badge[data-value="vip"],
+.o_list_view .o_field_badge[data-value="vip"] {
+    background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%) !important;
+    color: #333 !important;
+    font-weight: 600;
+}
+
+.o_form_view .o_field_badge[data-value="loyal"],
+.o_list_view .o_field_badge[data-value="loyal"] {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    color: white !important;
+}
+
+.o_form_view .o_field_badge[data-value="at_risk"],
+.o_list_view .o_field_badge[data-value="at_risk"] {
+    background: linear-gradient(135deg, #ff9a44 0%, #ff6600 100%) !important;
+    color: white !important;
+}
+
+.o_form_view .o_field_badge[data-value="lost"],
+.o_list_view .o_field_badge[data-value="lost"] {
+    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%) !important;
+    color: white !important;
+}
+
+.o_form_view .o_field_badge[data-value="new"],
+.o_list_view .o_field_badge[data-value="new"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+}
+
+/* ======================
+   PROGRESS BARS
+   ====================== */
+.o_form_view .o_progressbar .o_progressbar_value {
+    border-radius: 10px;
+}
+
+.o_form_view .o_field_widget[name="churn_probability"] .o_progressbar_value {
+    background: linear-gradient(90deg, #11998e, #ff6600, #ff416c);
+}
+
+.o_form_view .o_field_widget[name="purchase_probability"] .o_progressbar_value {
+    background: linear-gradient(90deg, #667eea, #764ba2, #11998e);
+}
+
+/* ======================
+   TREE VIEW DECORATIONS
+   ====================== */
+.o_list_view .o_data_row.text-info td {
+    background-color: rgba(102, 126, 234, 0.1);
+}
+
+.o_list_view .o_data_row.text-muted td {
+    background-color: rgba(128, 128, 128, 0.1);
+}
+
+/* ======================
+   STATUSBAR STYLING
+   ====================== */
+.o_form_view .o_statusbar_status .o_arrow_button {
+    border-radius: 20px;
+    margin: 0 4px;
+    transition: all 0.2s ease;
+}
+
+.o_form_view .o_statusbar_status .o_arrow_button.btn-primary,
+.o_form_view .o_statusbar_status .o_arrow_button.o_arrow_button_current {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+/* ======================
+   HEADER BUTTONS
+   ====================== */
+.o_form_view header button.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    transition: all 0.2s ease;
+}
+
+.o_form_view header button.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.o_form_view header button.btn-secondary {
+    border-radius: 20px;
+    padding: 8px 20px;
+}
+
+/* ======================
+   NOTEBOOK TABS
+   ====================== */
+.o_form_view .o_notebook > ul.nav-tabs {
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.o_form_view .o_notebook > ul.nav-tabs .nav-link {
+    border: none;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.o_form_view .o_notebook > ul.nav-tabs .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.o_form_view .o_notebook > ul.nav-tabs .nav-link:hover:not(.active) {
+    background-color: rgba(102, 126, 234, 0.1);
+}
+
+/* ======================
+   WEB RIBBON CUSTOMIZATION
+   ====================== */
+.o_form_view .o_web_ribbon_container .o_web_ribbon {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 25px;
+}
+
+/* ======================
+   CHATTER STYLING
+   ====================== */
+.o_form_view .o_chatter {
+    background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+/* ======================
+   MOBILE RESPONSIVE
+   ====================== */
+@media (max-width: 768px) {
+    .kh_kanban_modern .kh_card_modern {
+        min-height: 150px;
+    }
+    
+    .kh_stats_row {
+        flex-direction: column;
+    }
+    
+    .kh_stat_badge {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .kh_ribbon {
+        font-size: 8px;
+        width: 100px;
+        right: -30px;
+    }
+}
+
+/* ======================
+   KANBAN COLUMN HEADERS
+   ====================== */
+.o_kanban_group_header {
+    border-radius: 8px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+}
+
+.o_kanban_group_header .o_column_title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* ======================
+   ACTIVITY WIDGET
+   ====================== */
+.o_kanban_record .o_kanban_activity_summary {
+    margin-left: 8px;
+}
+
+.o_mail_activity .o_activity_color_today {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.o_mail_activity .o_activity_color_overdue {
+    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+}
+
+/* ======================
+   ANIMATIONS
+   ====================== */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.kh_ribbon_vip {
+    animation: pulse 2s infinite;
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(45deg); }
+    25% { transform: rotate(47deg); }
+    75% { transform: rotate(43deg); }
+}
+
+.kh_ribbon_risk {
+    animation: shake 0.5s ease-in-out infinite;
+}

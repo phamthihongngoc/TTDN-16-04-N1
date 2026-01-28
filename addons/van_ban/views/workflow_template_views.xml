@@ -85,7 +85,7 @@
 
     <!-- Actions -->
     <record id="action_workflow_template" model="ir.actions.act_window">
-        <field name="name">Workflow Templates</field>
+        <field name="name">Mẫu quy trình</field>
         <field name="res_model">workflow.template</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
@@ -96,7 +96,7 @@
     </record>
 
     <!-- Menu Items -->
-    <menuitem id="menu_workflow_template" name="Workflow Templates"
+    <menuitem id="menu_workflow_template" name="Mẫu quy trình"
               parent="menu_van_ban_cau_hinh" action="action_workflow_template"
               groups="van_ban.group_quan_tri_van_ban" sequence="20"/>
 

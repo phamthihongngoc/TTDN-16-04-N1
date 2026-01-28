@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class WorkflowTemplate(models.Model):
@@ -127,8 +131,13 @@ class VanBan(models.Model):
         if not transition or transition not in self.available_transitions:
             raise UserError("Invalid transition")
 
-        # Update state
+        # Update state - PRESERVE existing field values
         old_state = self.trang_thai
+        # Log before transition
+        _logger.info(
+            "execute_transition: van_ban_id=%s transition=%s, nguoi_ky_id=%s before write",
+            self.id, transition.name, self.nguoi_ky_id.id if self.nguoi_ky_id else None
+        )
         self.write({'trang_thai': transition.to_state})
 
         # Execute action method if specified

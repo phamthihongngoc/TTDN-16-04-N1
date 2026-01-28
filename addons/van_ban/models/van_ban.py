@@ -10,6 +10,8 @@ import io
 import re
 import unicodedata
 
+from .ocr_utils import fix_spacing_artifacts
+
 _logger = logging.getLogger(__name__)
 
 try:
@@ -83,11 +85,22 @@ class VanBan(models.Model):
     nguoi_tao_id = fields.Many2one('nhan_vien', string='Người tạo',
                                     default=lambda self: self._get_nhan_vien_hien_tai(),
                                     tracking=True)
-    nguoi_duyet_id = fields.Many2one('nhan_vien', string='Người duyệt', tracking=True)
+    # Trưởng phòng Sales - người duyệt văn bản (bước 1)
+    truong_phong_duyet_id = fields.Many2one(
+        'nhan_vien', string='Trưởng phòng duyệt',
+        domain="['|', '|', ('chuc_vu', 'ilike', 'Trưởng phòng'), ('chuc_vu', 'ilike', 'Truong phong'), ('chuc_vu_id.name', 'ilike', 'Trưởng phòng')]",
+        default=lambda self: self._get_truong_phong_sales_default(),
+        tracking=True,
+        help='Trưởng phòng Sales sẽ duyệt văn bản')
+    nguoi_duyet_id = fields.Many2one('nhan_vien', string='Người duyệt (cũ)', tracking=True)  # Kept for compatibility
     nguoi_phe_duyet_id = fields.Many2one('nhan_vien', string='Người phê duyệt', tracking=True)
-    nguoi_ky_id = fields.Many2one('nhan_vien', string='Người ký nội bộ',
-                                   default=lambda self: self._get_nhan_vien_hien_tai(),
-                                   tracking=True)
+    # Giám đốc - người ký văn bản (bước 2)
+    nguoi_ky_id = fields.Many2one(
+        'nhan_vien', string='Giám đốc ký',
+        domain="['|', '|', '|', ('chuc_vu', 'ilike', 'Giám đốc'), ('chuc_vu', 'ilike', 'Giam doc'), ('chuc_vu', 'ilike', 'Director'), ('chuc_vu_id.name', 'ilike', 'Giám đốc')]",
+        default=lambda self: self._get_giam_doc_default(),
+        tracking=True,
+        help='Giám đốc sẽ duyệt và ký điện tử văn bản')
     
     # Computed fields for display
     ten_nguoi_tao = fields.Char('Tên người tạo', compute='_compute_sync_nhan_su', store=True)
@@ -124,6 +137,14 @@ class VanBan(models.Model):
         help='Họ tên người ký được trích xuất từ nội dung file PDF sau khi ký.'
     )
     nguoi_ky_trong_pdf_extracted_at = fields.Datetime('Trích xuất từ PDF lúc', readonly=True)
+
+    chuc_vu_nguoi_ky_trong_pdf = fields.Char(
+        'Chức vụ người ký (trong PDF đã ký)',
+        readonly=True,
+        tracking=True,
+        help='Chức vụ người ký được trích xuất từ nội dung file PDF sau khi ký (nếu có trong văn bản).'
+    )
+    chuc_vu_nguoi_ky_trong_pdf_extracted_at = fields.Datetime('Trích xuất chức vụ từ PDF lúc', readonly=True)
     
     da_khach_ky = fields.Boolean('Khách đã ký', readonly=True)
     ngay_khach_ky = fields.Datetime('Ngày khách ký', readonly=True)
@@ -291,10 +312,24 @@ class VanBan(models.Model):
             _logger.warning("Post-sign PDF extraction failed (apply party): %s", e)
 
         signer_in_pdf = (party_info.get('dai_dien_ben_a') or '').strip() if isinstance(party_info, dict) else False
+
+        signer_title_in_pdf = False
+        try:
+            if signer_in_pdf:
+                signer_title_in_pdf = self._ai_extract_signer_title_from_text(extracted_text, signer_in_pdf)
+        except Exception as e:
+            _logger.warning("Post-sign PDF extraction failed (title parse): %s", e)
+
         if signer_in_pdf:
             self.write({
                 'nguoi_ky_trong_pdf': signer_in_pdf,
                 'nguoi_ky_trong_pdf_extracted_at': fields.Datetime.now(),
+            })
+
+        if signer_title_in_pdf:
+            self.write({
+                'chuc_vu_nguoi_ky_trong_pdf': signer_title_in_pdf,
+                'chuc_vu_nguoi_ky_trong_pdf_extracted_at': fields.Datetime.now(),
             })
 
         # Log to history
@@ -305,6 +340,8 @@ class VanBan(models.Model):
                 ]
                 if signer_in_pdf:
                     lines.append(f'   - Người ký (trong PDF): {signer_in_pdf}')
+                if signer_title_in_pdf:
+                    lines.append(f'   - Chức vụ (trong PDF): {signer_title_in_pdf}')
                 ben_b = (party_info.get('ben_b') or '').strip() if isinstance(party_info, dict) else False
                 if ben_b:
                     lines.append(f'   - Khách hàng (BÊN B): {ben_b}')
@@ -313,6 +350,66 @@ class VanBan(models.Model):
             _logger.warning("Post-sign PDF extraction failed (history): %s", e)
 
         return signer_in_pdf or False
+
+    def _ai_extract_signer_title_from_text(self, extracted_text, signer_name):
+        """Extract signer title/position near signer name in the signature block.
+
+        Heuristic: find the last occurrence of signer_name near the end, then look upward
+        for a short line that looks like a job title (e.g., Giám đốc, Tổng giám đốc...).
+        """
+        if not extracted_text or not signer_name:
+            return False
+
+        raw_lines = [re.sub(r'\s+', ' ', (ln or '')).strip() for ln in extracted_text.splitlines()]
+        lines = [ln for ln in raw_lines if ln]
+        if not lines:
+            return False
+
+        def _norm(s):
+            if not s:
+                return ''
+            s = s.strip().lower()
+            s = s.replace('\u00a0', ' ').replace('\t', ' ').replace('\n', ' ').replace('\r', ' ')
+            s = unicodedata.normalize('NFKD', s)
+            s = ''.join(ch for ch in s if not unicodedata.combining(ch))
+            s = s.replace('đ', 'd')
+            s = re.sub(r"[^0-9a-zA-Z\s]", " ", s)
+            s = re.sub(r'\s+', ' ', s).strip()
+            return s
+
+        target = _norm(signer_name)
+        if not target:
+            return False
+
+        stop_re = re.compile(r'\b(ky|ký|ghi ro|ghi rõ|dong dau|đóng dấu|dai dien|đại diện|ben\s*[ab]|bên\s*[ab])\b', re.IGNORECASE)
+
+        # Search from the end for the signer line
+        for idx in range(len(lines) - 1, -1, -1):
+            ln = lines[idx]
+            if target and target in _norm(ln):
+                # Look upward for title-like line
+                for j in range(max(0, idx - 6), idx):
+                    cand = lines[idx - 1 - (j - max(0, idx - 6))]
+                    c = (cand or '').strip()
+                    if not c:
+                        continue
+                    if stop_re.search(c):
+                        continue
+                    if re.search(r'\d', c):
+                        continue
+                    if len(c) > 60:
+                        continue
+                    # Handle patterns like "Chức vụ: Giám đốc"
+                    m = re.search(r'(Chức vụ|Chuc vu)\s*[:：]\s*(.+)$', c, flags=re.IGNORECASE)
+                    if m:
+                        val = m.group(2).strip()
+                        return val or False
+                    # Skip parenthetical guidance
+                    if re.search(r'\(.*\)', c):
+                        continue
+                    return c
+                return False
+        return False
 
     def action_ai_autofill_from_pdf(self):
         """Manual re-run (useful after editing, or when onchange didn't run due to caching)."""
@@ -463,7 +560,90 @@ class VanBan(models.Model):
 
         # Rule-based: detect parties/signers from text before AI (avoid wrong customer)
         party_info = self._ai_extract_party_names_from_text(extracted_text)
+
+        # STRICT VALIDATION: if extracted parties/signers don't match existing data, stop immediately.
+        def _norm(val):
+            if not val:
+                return ''
+            s = (val or '').strip().lower()
+            s = s.replace('\u00a0', ' ').replace('\t', ' ').replace('\n', ' ').replace('\r', ' ')
+            s = s.replace('\u200b', '').replace('\u200c', '').replace('\u200d', '').replace('\ufeff', '')
+            s = unicodedata.normalize('NFKD', s)
+            s = ''.join(ch for ch in s if not unicodedata.combining(ch))
+            s = s.replace('đ', 'd')
+            s = re.sub(r"[^0-9a-zA-Z\s]", " ", s)
+            s = re.sub(r'\s+', ' ', s).strip()
+            return s
+
+        issues = []
+        ben_b_in_pdf = (party_info.get('ben_b') or '').strip() if isinstance(party_info, dict) else ''
+        signer_a_in_pdf = (party_info.get('dai_dien_ben_a') or '').strip() if isinstance(party_info, dict) else ''
+
+        matched_customer = False
+        if ben_b_in_pdf:
+            KhachHang = self.env['khach_hang'].sudo()
+            matched_customer = KhachHang.search([('ten_khach_hang', '=ilike', ben_b_in_pdf)], limit=1)
+            if not matched_customer:
+                matched_customer = KhachHang.search([('ten_khach_hang', 'ilike', ben_b_in_pdf)], limit=1)
+            if not matched_customer:
+                issues.append(_(u'Khách hàng trong PDF chưa có trong module Khách hàng: %s') % ben_b_in_pdf)
+
+        # If user already selected customer/order, enforce consistency with PDF
+        if matched_customer and self.khach_hang_id and self.khach_hang_id.id != matched_customer.id:
+            # name-based fallback (in case of duplicates / formatting)
+            if _norm(self.khach_hang_id.ten_khach_hang) != _norm(ben_b_in_pdf):
+                issues.append(_(u'Khách hàng liên quan không khớp với PDF. PDF: %s | Văn bản: %s') % (ben_b_in_pdf, self.khach_hang_id.ten_khach_hang or ''))
+
+        if self.don_hang_id and self.khach_hang_id and self.don_hang_id.khach_hang_id and self.don_hang_id.khach_hang_id.id != self.khach_hang_id.id:
+            issues.append(_(u'Đơn hàng liên quan không thuộc khách hàng đã chọn. Đơn hàng: %s | Khách hàng: %s') % (
+                (self.don_hang_id.ma_don_hang or self.don_hang_id.display_name),
+                (self.khach_hang_id.ten_khach_hang or self.khach_hang_id.display_name),
+            ))
+        elif self.don_hang_id and matched_customer and self.don_hang_id.khach_hang_id and self.don_hang_id.khach_hang_id.id != matched_customer.id:
+            issues.append(_(u'Đơn hàng liên quan không khớp với khách hàng trong PDF. PDF: %s | Đơn hàng thuộc: %s') % (
+                ben_b_in_pdf,
+                (self.don_hang_id.khach_hang_id.ten_khach_hang if self.don_hang_id.khach_hang_id else ''),
+            ))
+
+        if signer_a_in_pdf and self.nguoi_ky_id and _norm(self.nguoi_ky_id.ten_nv) != _norm(signer_a_in_pdf):
+            issues.append(_(u'Người ký nội bộ không khớp với tên người ký trong PDF (Bên A). PDF: %s | Văn bản: %s') % (
+                signer_a_in_pdf,
+                (self.nguoi_ky_id.ten_nv or ''),
+            ))
+
+        if issues:
+            self.ai_pdf_extract_state = 'error'
+            self.ai_pdf_extract_error = '\n'.join(issues)
+            title = _('Dữ liệu PDF không khớp')
+            msg = _('Không thể tiếp tục tự điền từ PDF vì dữ liệu không trùng khớp:\n\n%s') % ('\n'.join([f'- {x}' for x in issues]))
+            if is_onchange:
+                return {
+                    'warning': {
+                        'title': title,
+                        'message': msg,
+                    }
+                }
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': title,
+                    'message': msg,
+                    'type': 'danger',
+                    'sticky': True,
+                }
+            }
+
         self._ai_apply_party_info(party_info)
+
+        # Link to existing customer record when uniquely found.
+        # This enables downstream domain filtering (e.g., order selection) right after extraction.
+        if ben_b_in_pdf and not self.khach_hang_id:
+            try:
+                self._ai_apply_customer_name(ben_b_in_pdf)
+            except Exception:
+                # Never fail the PDF auto-fill flow due to customer linking
+                pass
 
         # Fill document type if still empty
         if not self.loai_van_ban_id:
@@ -571,7 +751,7 @@ class VanBan(models.Model):
         if not extracted_text:
             return False
 
-        text = extracted_text
+        text = fix_spacing_artifacts(extracted_text)
         raw_lines = [re.sub(r'\s+', ' ', (ln or '')).strip() for ln in text.splitlines()]
         lines = [ln for ln in raw_lines if ln]
 
@@ -717,7 +897,7 @@ class VanBan(models.Model):
         if not extracted_text:
             return {}
 
-        text = extracted_text
+        text = fix_spacing_artifacts(extracted_text)
         # Normalize spaces, keep line structure
         raw_lines = [re.sub(r'\s+', ' ', (ln or '')).strip() for ln in text.splitlines()]
         lines = [ln for ln in raw_lines if ln]
@@ -726,7 +906,11 @@ class VanBan(models.Model):
             """Làm sạch tên: bỏ prefix như '- Họ và tên:', 'Ông', 'Bà', etc. và loại bỏ dấu cách thừa giữa các ký tự."""
             if not val:
                 return ''
-            v = val.strip()
+            v = fix_spacing_artifacts(val).strip()
+            # Cắt phần dư sau các ký tự phân tách thường gặp
+            v = re.split(r'\s{2,}|\s+-\s+|\s+\|\s+|\s*;\s*|,', v)[0].strip()
+            # Cắt nếu có thông tin phụ phía sau
+            v = re.split(r'\b(sinh\s*năm|ngày\s*sinh|cmnd|cccd|mst|mã\s*số\s*thuế|địa\s*chỉ|điện\s*thoại|tel|fax|email)\b', v, flags=re.IGNORECASE)[0].strip()
             # Bỏ bullet đầu dòng
             v = re.sub(r'^[-•·]\s*', '', v)
             # Bỏ prefix "Họ và tên:", "Họ tên:", "Tên:"
@@ -777,12 +961,95 @@ class VanBan(models.Model):
                         name = m.group(2).strip()
                         if len(name) >= 4:
                             return _clean_name(name)
+                    # Tìm dòng có "Khách hàng:" nếu có
+                    m2 = re.search(r'(Khách hàng|Bên\s*B)\s*[:：]\s*(.+)$', ln, flags=re.IGNORECASE)
+                    if m2:
+                        name = m2.group(2).strip()
+                        if len(name) >= 4:
+                            return _clean_name(name)
+            return False
+
+        def _find_customer_anywhere():
+            """Fallback: tìm tên khách hàng theo mẫu 'Họ và tên' trước phần chữ ký."""
+            end_idx = len(lines)
+            for i, ln in enumerate(lines):
+                if re.search(r'ĐẠI\s*DIỆN\s*BÊN\s*A|ĐẠI\s*DIỆN\s*BÊN\s*B|\(Ký,\s*ghi\s*rõ|Ký\s*tên', ln, flags=re.IGNORECASE):
+                    end_idx = i
+                    break
+
+            for ln in lines[:end_idx]:
+                m = re.search(r'(Họ và tên|Họ tên)\s*[:：]\s*(.+)$', ln, flags=re.IGNORECASE)
+                if m:
+                    name = _clean_name(m.group(2).strip())
+                    if _is_valid_person_name(name):
+                        return name
+
+                m2 = re.search(r'(Khách hàng|Bên\s*B)\s*[:：]\s*(.+)$', ln, flags=re.IGNORECASE)
+                if m2:
+                    name = _clean_name(m2.group(2).strip())
+                    if _is_valid_person_name(name):
+                        return name
+
             return False
 
         def _find_signer_at_end():
             """Tìm tên người ký (ĐẠI DIỆN BÊN A) ở cuối văn bản."""
             import logging
             _logger = logging.getLogger(__name__)
+
+            def _try_split_two_names(line):
+                """Best-effort split for 2-column PDFs where two names get concatenated on one line.
+
+                Example: "Nguyễn Văn Bê Phạm Lực" -> ("Nguyễn Văn Bê", "Phạm Lực")
+                """
+                if not line:
+                    return (False, False)
+                cleaned = _clean_name(line)
+                words = cleaned.split()
+                if len(words) < 4:
+                    return (False, False)
+
+                def _strip_accents(s):
+                    import unicodedata
+                    return ''.join(
+                        ch for ch in unicodedata.normalize('NFD', s)
+                        if unicodedata.category(ch) != 'Mn'
+                    )
+
+                family_names = {
+                    'NGUYEN', 'TRAN', 'LE', 'PHAM', 'HOANG', 'HUYNH', 'PHAN', 'VU', 'VO', 'DANG', 'BUI',
+                    'DO', 'HO', 'NGO', 'DUONG', 'LY', 'DINH', 'TRUONG', 'MAI', 'TA', 'TANG', 'THAI',
+                    'TIEN', 'TONG', 'TO',
+                }
+
+                def _looks_like_family_name(word):
+                    if not word:
+                        return False
+                    w = _strip_accents(word).upper().strip()
+                    return w in family_names
+
+                best = (False, False)
+                best_score = None
+
+                # Ensure both sides have at least 2 words
+                for k in range(2, len(words) - 1):
+                    left = ' '.join(words[:k]).strip()
+                    right = ' '.join(words[k:]).strip()
+                    if not (_is_valid_person_name(left) and _is_valid_person_name(right)):
+                        continue
+                    lw = len(left.split())
+                    rw = len(right.split())
+                    # Prefer splits that keep both names reasonably long and balanced
+                    score = min(lw, rw) * 10 - abs(lw - rw)
+                    # Strong preference: the right-side name should start with a family name
+                    right_first = right.split()[0] if right else ''
+                    if _looks_like_family_name(right_first):
+                        score += 100
+                    if best_score is None or score > best_score:
+                        best_score = score
+                        best = (left, right)
+
+                return best
             
             # Lấy 40 dòng cuối của văn bản (phần chữ ký)
             end_lines = lines[-40:] if len(lines) > 40 else lines
@@ -828,6 +1095,15 @@ class VanBan(models.Model):
                         if signer_a or signer_b:
                             _logger.info(f"Found names on same line: A={signer_a}, B={signer_b}")
                             break
+
+                    # Fallback: sometimes PDF extraction collapses columns into a single-space line
+                    split_a, split_b = _try_split_two_names(cand)
+                    if split_a or split_b:
+                        signer_a = split_a or signer_a
+                        signer_b = split_b or signer_b
+                        _logger.info(f"Found names by heuristic split: A={signer_a}, B={signer_b}")
+                        break
+
                     # Nếu chỉ có 1 tên, kiểm tra xem có phải tên hợp lệ không
                     elif _is_valid_person_name(cand):
                         # Không biết là A hay B, bỏ qua
@@ -865,8 +1141,12 @@ class VanBan(models.Model):
             return signer_a, signer_b
 
         # Trích xuất thông tin
-        ben_b = _find_customer_in_ben_b_section()
+        ben_b = _find_customer_in_ben_b_section() or _find_customer_anywhere()
         signer_a, signer_b = _find_signer_at_end()
+
+        # Fallback: nếu không tìm được BÊN B rõ ràng, dùng người ký BÊN B
+        if not ben_b and signer_b and _is_valid_person_name(signer_b):
+            ben_b = _clean_name(signer_b)
 
         return {
             'ben_a': False,  # Không cần lấy tên công ty BÊN A
@@ -925,8 +1205,9 @@ class VanBan(models.Model):
                 except Exception:
                     page_text = ''
                 if page_text:
-                    text_parts.append(page_text)
+                    text_parts.append(fix_spacing_artifacts(page_text))
             extracted = "\n".join(text_parts).strip()
+            extracted = fix_spacing_artifacts(extracted)
             if extracted:
                 return extracted
         except Exception:
@@ -941,8 +1222,9 @@ class VanBan(models.Model):
                 except Exception:
                     page_text = ''
                 if page_text:
-                    text_parts.append(page_text)
+                    text_parts.append(fix_spacing_artifacts(page_text))
             extracted = "\n".join(text_parts).strip()
+            extracted = fix_spacing_artifacts(extracted)
             if extracted:
                 return extracted
         except Exception:
@@ -958,8 +1240,8 @@ class VanBan(models.Model):
                     except Exception:
                         page_text = ''
                     if page_text:
-                        text_parts.append(page_text)
-            return "\n".join(text_parts).strip()
+                        text_parts.append(fix_spacing_artifacts(page_text))
+            return fix_spacing_artifacts("\n".join(text_parts).strip())
         except Exception as e:
             raise UserError(_(
                 "Không thể trích xuất text từ PDF. Vui lòng kiểm tra thư viện PyPDF2/pdfplumber. Lỗi: %s"
@@ -1097,6 +1379,64 @@ class VanBan(models.Model):
             ('user_id', '=', self.env.uid)
         ], limit=1)
         return nhan_vien.id if nhan_vien else False
+    
+    def _get_truong_phong_sales_default(self):
+        """Lấy Trưởng phòng Sales để auto-fill cho người duyệt văn bản"""
+        # Tìm theo chức vụ Trưởng phòng và phòng ban Sales
+        truong_phong = self.env['nhan_vien'].search([
+            '|', '|', '|',
+            ('chuc_vu', 'ilike', 'Trưởng phòng'),
+            ('chuc_vu', 'ilike', 'Truong phong'),
+            ('chuc_vu_id.name', 'ilike', 'Trưởng phòng'),
+            ('chuc_vu_id.name', 'ilike', 'Truong phong'),
+            '|', '|',
+            ('phong_ban', 'ilike', 'Sales'),
+            ('phong_ban_id.name', 'ilike', 'Sales'),
+            ('phong_ban_id.name', 'ilike', 'Kinh doanh'),
+            ('trang_thai_lam_viec', '=', 'dang_lam')
+        ], limit=1)
+        if truong_phong:
+            return truong_phong.id
+        
+        # Fallback: Tìm bất kỳ Trưởng phòng nào
+        truong_phong = self.env['nhan_vien'].search([
+            '|', '|',
+            ('chuc_vu', 'ilike', 'Trưởng phòng'),
+            ('chuc_vu', 'ilike', 'Truong phong'),
+            ('chuc_vu_id.name', 'ilike', 'Trưởng phòng'),
+            ('trang_thai_lam_viec', '=', 'dang_lam')
+        ], limit=1)
+        return truong_phong.id if truong_phong else False
+    
+    def _get_giam_doc_default(self):
+        """Lấy Giám đốc để auto-fill cho người ký điện tử"""
+        # Tìm theo chức vụ Giám đốc và phòng ban Giám đốc
+        giam_doc = self.env['nhan_vien'].search([
+            '|', '|', '|', '|',
+            ('chuc_vu', 'ilike', 'Giám đốc'),
+            ('chuc_vu', 'ilike', 'Giam doc'),
+            ('chuc_vu', 'ilike', 'Director'),
+            ('chuc_vu_id.name', 'ilike', 'Giám đốc'),
+            ('chuc_vu_id.name', 'ilike', 'Director'),
+            '|', '|',
+            ('phong_ban', 'ilike', 'Giám đốc'),
+            ('phong_ban_id.name', 'ilike', 'Giám đốc'),
+            ('phong_ban_id.name', 'ilike', 'Ban giám đốc'),
+            ('trang_thai_lam_viec', '=', 'dang_lam')
+        ], limit=1)
+        if giam_doc:
+            return giam_doc.id
+        
+        # Fallback: Tìm bất kỳ Giám đốc nào
+        giam_doc = self.env['nhan_vien'].search([
+            '|', '|', '|',
+            ('chuc_vu', 'ilike', 'Giám đốc'),
+            ('chuc_vu', 'ilike', 'Giam doc'),
+            ('chuc_vu', 'ilike', 'Director'),
+            ('chuc_vu', 'ilike', 'CEO'),
+            ('trang_thai_lam_viec', '=', 'dang_lam')
+        ], limit=1)
+        return giam_doc.id if giam_doc else False
     
     @api.depends('ngay_het_han')
     def _compute_so_ngay_con_lai(self):
@@ -1367,6 +1707,15 @@ class VanBan(models.Model):
     
     def write(self, vals):
         """Ghi lịch sử thay đổi"""
+        # Log để debug nguoi_ky_id
+        if 'nguoi_ky_id' in vals or 'nguoi_duyet_id' in vals:
+            _logger.info(
+                "van_ban.write called with nguoi_ky_id=%s, nguoi_duyet_id=%s for ids=%s",
+                vals.get('nguoi_ky_id'),
+                vals.get('nguoi_duyet_id'),
+                self.ids
+            )
+        
         # Danh sách các trường quan trọng không được sửa khi bị khóa
         protected_fields = [
             'ten_van_ban', 'loai_van_ban_id', 'file_dinh_kem', 'ten_file',
@@ -1407,21 +1756,68 @@ class VanBan(models.Model):
         
         return result
     
+    # === SIGNER MATCH HELPERS ===
+
+    def _normalize_name_for_match(self, name):
+        if not name:
+            return ''
+        name = fix_spacing_artifacts(name).strip().lower()
+        name = name.replace('\u00a0', ' ').replace('\t', ' ').replace('\n', ' ').replace('\r', ' ')
+        name = name.replace('\u200b', '').replace('\u200c', '').replace('\u200d', '').replace('\ufeff', '')
+        name = unicodedata.normalize('NFKD', name)
+        name = ''.join([c for c in name if not unicodedata.combining(c)])
+        name = name.replace('đ', 'd')
+        name = re.sub(r"[^0-9a-zA-Z\s]", " ", name)
+        name = name.replace('_', ' ')
+        name = re.sub(r'\s+', ' ', name).strip()
+        return name
+
+    def _find_employee_by_pdf_name(self, signer_in_pdf):
+        self.ensure_one()
+        if not signer_in_pdf:
+            return False
+
+        norm = self._normalize_name_for_match(signer_in_pdf)
+        if not norm:
+            return False
+
+        candidates = self.env['nhan_vien'].sudo().search([
+            ('ten_nv', 'ilike', signer_in_pdf),
+        ], limit=50)
+
+        if not candidates:
+            tokens = [t for t in norm.split() if t]
+            domain = []
+            for t in tokens[:4]:
+                domain.append(('ten_nv', 'ilike', t))
+            if domain:
+                candidates = self.env['nhan_vien'].sudo().search(domain, limit=50)
+
+        for nv in candidates:
+            if self._normalize_name_for_match(nv.ten_nv) == norm:
+                return nv
+        return candidates[:1] if candidates else False
+
     # === WORKFLOW ACTIONS ===
     
     def action_gui_duyet(self):
-        """Gửi văn bản để duyệt - Enhanced with AI suggestions and notifications"""
+        """Gửi văn bản để duyệt - Gửi đến Trưởng phòng Sales"""
         for record in self:
             if not record.file_dinh_kem:
                 raise UserError('Vui lòng đính kèm file văn bản trước khi gửi duyệt!')
 
-            # AI Suggestion: Auto-assign approver if not set
-            if not record.nguoi_duyet_id and record.ai_suggested_approver:
-                record.write({'nguoi_duyet_id': record.ai_suggested_approver.id})
-                record._ghi_lich_su('ai_apply', f'AI tự động đề xuất người duyệt: {record.ai_suggested_approver.ten_nv}')
+            # Auto-assign Trưởng phòng Sales nếu chưa có
+            if not record.truong_phong_duyet_id:
+                truong_phong = record._get_truong_phong_sales_default()
+                if truong_phong:
+                    record.write({'truong_phong_duyet_id': truong_phong})
+                    record._ghi_lich_su('auto_assign', f'Tự động gán Trưởng phòng duyệt')
 
             record.write({'trang_thai': 'cho_duyet'})
-            record._ghi_lich_su('gui_duyet', 'Gửi văn bản để duyệt')
+            
+            # Ghi lịch sử
+            ten_truong_phong = record.truong_phong_duyet_id.ten_nv if record.truong_phong_duyet_id else 'Chưa xác định'
+            record._ghi_lich_su('gui_duyet', f'Gửi văn bản để duyệt đến Trưởng phòng: {ten_truong_phong}')
 
             # Enhanced notifications
             record._send_enhanced_notifications('approval_request')
@@ -1431,21 +1827,45 @@ class VanBan(models.Model):
                 record._schedule_auto_follow_up('approval', days=2)
     
     def action_duyet(self):
-        """Duyệt văn bản (Trưởng phòng) - Enhanced with notifications"""
+        """Trưởng phòng duyệt văn bản - Sau đó hiện nút Gửi ký"""
         for record in self:
-            record.write({
-                'trang_thai': 'da_duyet',
-                'nguoi_duyet_id': self._get_nhan_vien_hien_tai()
-            })
-            record._ghi_lich_su('duyet', 'Duyệt văn bản')
+            # Lưu lại nguoi_ky_id trước khi write để preserve
+            nguoi_ky_id_before = record.nguoi_ky_id.id if record.nguoi_ky_id else False
+            
+            # Gán người duyệt thực tế (Trưởng phòng hiện tại)
+            nguoi_duyet_thuc_te = self._get_nhan_vien_hien_tai()
+            vals = {'trang_thai': 'da_duyet'}
+            
+            # Cập nhật truong_phong_duyet_id nếu chưa có
+            if not record.truong_phong_duyet_id:
+                vals['truong_phong_duyet_id'] = nguoi_duyet_thuc_te
+            
+            # Log before write to debug
+            _logger.info(
+                "action_duyet: van_ban_id=%s before write - nguoi_ky_id=%s, truong_phong_duyet_id=%s",
+                record.id, record.nguoi_ky_id.id if record.nguoi_ky_id else None,
+                record.truong_phong_duyet_id.id if record.truong_phong_duyet_id else None
+            )
+            
+            record.write(vals)
+            
+            # Check and restore nguoi_ky_id if it was cleared
+            if nguoi_ky_id_before and not record.nguoi_ky_id:
+                _logger.warning(
+                    "action_duyet: nguoi_ky_id was cleared after write for van_ban_id=%s, restoring it",
+                    record.id
+                )
+                record.write({'nguoi_ky_id': nguoi_ky_id_before})
+            
+            # Ghi lịch sử với tên người duyệt thực tế
+            ten_nguoi_duyet = ''
+            if nguoi_duyet_thuc_te:
+                nv = self.env['nhan_vien'].sudo().browse(nguoi_duyet_thuc_te)
+                ten_nguoi_duyet = nv.ten_nv if nv.exists() else ''
+            record._ghi_lich_su('duyet', f'Trưởng phòng duyệt văn bản: {ten_nguoi_duyet or self.env.user.name}')
 
             # Enhanced notifications
             record._send_enhanced_notifications('approved')
-
-            # Auto-suggest next signer if not set
-            if not record.nguoi_ky_id and record.ai_suggested_signer:
-                record.write({'nguoi_ky_id': record.ai_suggested_signer.id})
-                record._ghi_lich_su('ai_apply', f'AI tự động đề xuất người ký: {record.ai_suggested_signer.ten_nv}')
 
             # Cancel follow-up activities
             record._cancel_pending_follow_ups()
@@ -1457,15 +1877,36 @@ class VanBan(models.Model):
             record._ghi_lich_su('tu_choi', 'Từ chối duyệt văn bản')
     
     def action_gui_ky(self):
-        """Gửi văn bản để ký - Enhanced with AI and notifications"""
+        """Trưởng phòng gửi văn bản đến Giám đốc để ký"""
         for record in self:
-            # AI Suggestion: Auto-assign signer if not set
-            if not record.nguoi_ky_id and record.ai_suggested_signer:
-                record.write({'nguoi_ky_id': record.ai_suggested_signer.id})
-                record._ghi_lich_su('ai_apply', f'AI tự động đề xuất người ký: {record.ai_suggested_signer.ten_nv}')
+            # Dùng sudo để bypass record rules khi đọc nguoi_ky_id
+            record_sudo = record.sudo()
+            
+            # Auto-assign Giám đốc nếu chưa có
+            if not record_sudo.nguoi_ky_id:
+                giam_doc = record._get_giam_doc_default()
+                if giam_doc:
+                    record_sudo.write({'nguoi_ky_id': giam_doc})
+                    record._ghi_lich_su('auto_assign', 'Tự động gán Giám đốc để ký')
+            
+            # Kiểm tra phải có Giám đốc ký
+            if not record_sudo.nguoi_ky_id:
+                _logger.warning(
+                    "action_gui_ky blocked: van_ban_id=%s ma_van_ban=%s user_id=%s (no nguoi_ky_id)",
+                    record.id,
+                    record.ma_van_ban,
+                    self.env.user.id,
+                )
+                raise UserError(
+                    'Vui lòng chọn "Giám đốc ký" trước khi gửi ký.\n\n'
+                    f'(Văn bản: {record.ma_van_ban} - ID {record.id})'
+                )
 
             record.write({'trang_thai': 'cho_ky'})
-            record._ghi_lich_su('gui_ky', 'Gửi văn bản để ký')
+            
+            # Ghi lịch sử
+            ten_giam_doc = record_sudo.nguoi_ky_id.ten_nv if record_sudo.nguoi_ky_id else 'Chưa xác định'
+            record._ghi_lich_su('gui_ky', f'Gửi văn bản đến Giám đốc để ký: {ten_giam_doc}')
 
             # Enhanced notifications
             record._send_enhanced_notifications('signature_request')
@@ -1473,7 +1914,47 @@ class VanBan(models.Model):
             # Schedule urgent follow-up for high-risk documents
             if record.ai_risk_level in ['high', 'critical']:
                 record._schedule_auto_follow_up('signature', days=1)
-    
+
+    # ==========================================
+    # SMART BUTTON ACTIONS
+    # ==========================================
+
+    def action_view_file_goc(self):
+        """Xem/Tải file gốc"""
+        self.ensure_one()
+        if not self.file_dinh_kem:
+            raise UserError('Không có file đính kèm!')
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content?model=van_ban&id={self.id}&field=file_dinh_kem&filename={self.ten_file or "file.pdf"}&download=true',
+            'target': 'new',
+        }
+
+    def action_view_file_da_ky(self):
+        """Xem/Tải file đã ký"""
+        self.ensure_one()
+        if not self.file_da_ky:
+            raise UserError('Chưa có file đã ký!')
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content?model=van_ban&id={self.id}&field=file_da_ky&filename={self.ten_file_da_ky or "signed.pdf"}&download=true',
+            'target': 'new',
+        }
+
+    def action_view_signature_log(self):
+        """Xem lịch sử ký"""
+        self.ensure_one()
+        return {
+            'name': _('Lịch sử ký - %s') % self.ma_van_ban,
+            'type': 'ir.actions.act_window',
+            'res_model': 'van_ban.signature.log',
+            'view_mode': 'tree,form',
+            'domain': [('van_ban_id', '=', self.id)],
+            'context': {'default_van_ban_id': self.id},
+        }
+
     def action_ky_noi_bo(self):
         """Mở wizard ký điện tử - VẼ CHỮ KÝ"""
         self.ensure_one()
@@ -1592,6 +2073,12 @@ class VanBan(models.Model):
             # Gửi email thông báo cho khách hàng (nếu có)
             if record.khach_hang_id and record.khach_hang_id.email:
                 record._gui_email_van_ban_da_gui()
+
+            # Gửi email thông báo + file đã ký cho Giám đốc (nếu có)
+            record._gui_email_van_ban_da_gui_cho_giam_doc()
+
+            # Thông báo nội bộ
+            record._send_enhanced_notifications('sent')
         
         # Thông báo thành công và reload form
         self.env.cr.commit()  # Commit để đảm bảo dữ liệu được lưu
@@ -1613,6 +2100,52 @@ class VanBan(models.Model):
                 },
             }
         }
+
+    def _gui_email_van_ban_da_gui_cho_giam_doc(self):
+        """Gửi email văn bản đã ký cho Giám đốc"""
+        self.ensure_one()
+
+        giam_doc_email = None
+        giam_doc_name = None
+
+        if self.nguoi_ky_id:
+            giam_doc_name = self.nguoi_ky_id.ten_nv or self.nguoi_ky_id.name
+            giam_doc_email = self.nguoi_ky_id.email or (self.nguoi_ky_id.user_id.email if self.nguoi_ky_id.user_id else None)
+
+        if not giam_doc_email:
+            return
+
+        mail_values = {
+            'subject': f'[{self.env.company.name}] Văn bản đã ký: {self.ten_van_ban}',
+            'body_html': f'''
+                <p>Kính gửi {giam_doc_name or "Giám đốc"},</p>
+                <p>Văn bản <strong>{self.ten_van_ban}</strong> đã được ký đầy đủ và gửi đi.</p>
+                <p><strong>Thông tin văn bản:</strong></p>
+                <ul>
+                    <li>Mã văn bản: {self.ma_van_ban}</li>
+                    <li>Loại văn bản: {self.loai_van_ban_id.ten_loai}</li>
+                    <li>Ngày gửi: {self.ngay_gui}</li>
+                    <li>Khách hàng: {self.khach_hang_id.ten_khach_hang if self.khach_hang_id else ""}</li>
+                </ul>
+                <p>File văn bản đã ký được đính kèm trong email này.</p>
+                <br/>
+                <p>Trân trọng,</p>
+                <p>{self.env.company.name}</p>
+            ''',
+            'email_to': giam_doc_email,
+            'email_from': self.env.company.email or 'noreply@company.com',
+        }
+
+        if self.file_da_ky and self.ten_file_da_ky:
+            mail_values['attachment_ids'] = [(
+                0, 0, {
+                    'name': self.ten_file_da_ky,
+                    'datas': self.file_da_ky,
+                    'mimetype': 'application/pdf',
+                }
+            )]
+
+        self.env['mail.mail'].create(mail_values).send()
     
     def action_gui_yeu_cau_ky_khach(self):
         """Tạo yêu cầu ký cho khách hàng"""
@@ -1642,6 +2175,15 @@ class VanBan(models.Model):
         yeu_cau.action_gui_email_yeu_cau_ky()
         
         self._ghi_lich_su('gui_yeu_cau_ky', f'Gửi yêu cầu ký cho khách hàng: {self.khach_hang_id.ten_khach_hang}')
+
+        # Thông báo trên hồ sơ khách hàng (module khách hàng)
+        if self.khach_hang_id:
+            self.khach_hang_id.message_post(
+                body=(
+                    f'📄 Có yêu cầu ký mới cho văn bản <strong>{self.ten_van_ban}</strong>. '
+                    'Vui lòng ký để hoàn tất.'
+                )
+            )
         
         return {
             'type': 'ir.actions.client',
@@ -2065,7 +2607,7 @@ class VanBan(models.Model):
                 'tag': 'display_notification',
                 'params': {
                     'title': 'AI Analysis Complete',
-                    'message': 'Đã hoàn thành phân tích AI. Kiểm tra tab AI Assistant để xem kết quả.',
+                    'message': 'Đã hoàn thành phân tích AI. Kiểm tra tab Trợ lý AI để xem kết quả.',
                     'type': 'success',
                 }
             }

@@ -19,7 +19,7 @@
                         
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_left_pane">
-                                <i class="fa fa-envelope fa-2x text-primary"/>
+                                <i class="fa fa-envelope fa-2x text-primary" title="Outgoing Mail Servers"/>
                             </div>
                             <div class="o_setting_right_pane">
                                 <span class="o_form_label">Outgoing Mail Servers</span>
@@ -33,7 +33,7 @@
                         
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_left_pane">
-                                <i class="fa fa-inbox fa-2x text-success"/>
+                                <i class="fa fa-inbox fa-2x text-success" title="Email Templates"/>
                             </div>
                             <div class="o_setting_right_pane">
                                 <span class="o_form_label">Email Templates</span>
@@ -54,7 +54,7 @@
                         
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_left_pane">
-                                <i class="fa fa-users fa-2x text-info"/>
+                                <i class="fa fa-users fa-2x text-info" title="Users"/>
                             </div>
                             <div class="o_setting_right_pane">
                                 <span class="o_form_label">Users</span>
@@ -68,7 +68,7 @@
                         
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_left_pane">
-                                <i class="fa fa-building fa-2x text-warning"/>
+                                <i class="fa fa-building fa-2x text-warning" title="Companies"/>
                             </div>
                             <div class="o_setting_right_pane">
                                 <span class="o_form_label">Companies</span>
@@ -89,7 +89,7 @@
                         
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_left_pane">
-                                <i class="fa fa-clock-o fa-2x text-danger"/>
+                                <i class="fa fa-clock-o fa-2x text-danger" title="Scheduled Actions"/>
                             </div>
                             <div class="o_setting_right_pane">
                                 <span class="o_form_label">Scheduled Actions (Cron)</span>
@@ -103,7 +103,7 @@
                         
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_left_pane">
-                                <i class="fa fa-database fa-2x text-secondary"/>
+                                <i class="fa fa-database fa-2x text-secondary" title="System Parameters"/>
                             </div>
                             <div class="o_setting_right_pane">
                                 <span class="o_form_label">System Parameters</span>

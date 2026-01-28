@@ -35,6 +35,8 @@
         'views/khach_hang_views.xml',
         'views/ho_tro_khach_hang_views.xml',
         'views/don_hang_views.xml',
+        'views/phieu_xuat_kho_views.xml',
+        'views/hoa_don_views.xml',
         'views/san_pham_views.xml',
         'views/email_khach_hang_views.xml',
         'views/dashboard_views.xml',
@@ -48,6 +50,7 @@
     'assets': {
         'web.assets_backend': [
             'khach_hang/static/src/css/dashboard.css',
+            'khach_hang/static/src/css/khach_hang_modern.css',
         ],
     },
     'demo': [],

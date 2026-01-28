@@ -3,7 +3,7 @@
     
     <!-- Root Menu -->
     <menuitem id="menu_van_ban_root"
-              name="Quản lý văn bản"
+              name="Văn bản"
               web_icon="van_ban,static/description/icon.png"
               sequence="35"/>
 
@@ -31,6 +31,25 @@
               action="action_van_ban_sap_het_han"
               parent="menu_van_ban_main"
               sequence="3"/>
+
+    <menuitem id="menu_van_ban_toi_can_ky"
+              name="Chờ ký"
+              action="action_van_ban_toi_can_ky"
+              parent="menu_van_ban_main"
+              sequence="4"
+              groups="van_ban.group_giam_doc_ky"/>
+
+    <menuitem id="menu_van_ban_rui_ro_cao"
+              name="Rủi ro cao"
+              action="action_van_ban_rui_ro_cao"
+              parent="menu_van_ban_main"
+              sequence="5"/>
+
+    <menuitem id="menu_van_ban_pipeline"
+              name="Pipeline"
+              action="action_van_ban_pipeline"
+              parent="menu_van_ban_main"
+              sequence="6"/>
 
     <!-- Menu: Văn bản đến -->
     <menuitem id="menu_van_ban_den_main"
@@ -76,24 +95,24 @@
               sequence="3"
               groups="van_ban.group_giam_doc_ky"/>
 
-    <!-- Menu: Yêu cầu ký -->
-    <menuitem id="menu_yeu_cau_ky"
-              name="Yêu cầu ký"
-              action="action_yeu_cau_ky"
-              parent="menu_van_ban_root"
-              sequence="40"/>
+    <!-- AI Chat (trực tiếp) -->
+    <record id="action_ai_chat_van_ban" model="ir.actions.client">
+        <field name="name">Trợ lý AI - Văn bản</field>
+        <field name="tag">ai_chat_widget</field>
+        <field name="context">{'default_module': 'van_ban'}</field>
+    </record>
 
-    <!-- Menu: Công cụ (AI + OCR) -->
-    <menuitem id="menu_van_ban_tools"
-              name="Công cụ"
+    <menuitem id="menu_ai_chat_van_ban"
+              name="🤖 Trợ lý AI"
               parent="menu_van_ban_root"
-              sequence="50"/>
+              action="action_ai_chat_van_ban"
+              sequence="45"/>
 
-    <!-- Menu: OCR -->
+    <!-- Menu: OCR (tách riêng) -->
     <menuitem id="menu_van_ban_ocr"
               name="OCR"
-              parent="menu_van_ban_tools"
-              sequence="20"/>
+              parent="menu_van_ban_root"
+              sequence="55"/>
 
     <menuitem id="menu_van_ban_ocr_main"
               name="Bóc tách OCR"
@@ -150,18 +169,5 @@
               action="action_loai_van_ban"
               parent="menu_van_ban_cau_hinh"
               sequence="1"/>
-
-    <!-- AI Chat -->
-    <record id="action_ai_chat_van_ban" model="ir.actions.client">
-        <field name="name">AI Assistant - Văn bản</field>
-        <field name="tag">ai_chat_widget</field>
-        <field name="context">{'default_module': 'van_ban'}</field>
-    </record>
-
-    <menuitem id="menu_ai_chat_van_ban"
-              name="🤖 AI Assistant"
-              parent="menu_van_ban_tools"
-              action="action_ai_chat_van_ban"
-              sequence="10"/>
 
 </odoo>

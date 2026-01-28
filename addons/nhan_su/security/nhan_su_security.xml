@@ -13,6 +13,7 @@
         <record id="group_nhan_vien_kinh_doanh" model="res.groups">
             <field name="name">Nhân viên kinh doanh</field>
             <field name="category_id" ref="module_category_nhan_su"/>
+            <field name="implied_ids" eval="[(4, ref('van_ban.group_nhan_vien_soan_thao')), (4, ref('khach_hang.group_khach_hang_user'))]"/>
             <field name="comment">Soạn thảo văn bản, quản lý khách hàng được phân công</field>
         </record>
 
@@ -20,7 +21,7 @@
         <record id="group_truong_phong" model="res.groups">
             <field name="name">Trưởng phòng</field>
             <field name="category_id" ref="module_category_nhan_su"/>
-            <field name="implied_ids" eval="[(4, ref('group_nhan_vien_kinh_doanh'))]"/>
+            <field name="implied_ids" eval="[(4, ref('group_nhan_vien_kinh_doanh')), (4, ref('van_ban.group_truong_phong_duyet')), (4, ref('khach_hang.group_khach_hang_manager'))]"/>
             <field name="comment">Duyệt văn bản, phân công nhân viên, xem tất cả khách hàng</field>
         </record>
 
@@ -28,7 +29,7 @@
         <record id="group_giam_doc" model="res.groups">
             <field name="name">Giám đốc</field>
             <field name="category_id" ref="module_category_nhan_su"/>
-            <field name="implied_ids" eval="[(4, ref('group_truong_phong'))]"/>
+            <field name="implied_ids" eval="[(4, ref('group_truong_phong')), (4, ref('van_ban.group_giam_doc_ky')), (4, ref('khach_hang.group_khach_hang_manager'))]"/>
             <field name="comment">Phê duyệt cuối cùng, toàn quyền quản lý hệ thống</field>
         </record>
 
@@ -45,7 +46,7 @@
         <record id="nhan_vien_rule_nhan_vien_kinh_doanh" model="ir.rule">
             <field name="name">Nhân viên: Chỉ xem nhân viên đang làm việc</field>
             <field name="model_id" ref="model_nhan_vien"/>
-            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('group_nhan_vien_kinh_doanh'))]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>

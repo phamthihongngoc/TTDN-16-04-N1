@@ -294,11 +294,11 @@ class AIMixin(models.AbstractModel):
         )
     
     def action_ai_assistant(self):
-        """Open AI Assistant wizard for this record."""
+        """Open Trợ lý AI wizard for this record."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'AI Assistant',
+            'name': 'Trợ lý AI',
             'res_model': 'ai.assistant.wizard',
             'view_mode': 'form',
             'target': 'new',

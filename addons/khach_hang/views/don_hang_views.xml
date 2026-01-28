@@ -24,6 +24,23 @@
                             <field name="ma_don_hang" readonly="1"/>
                         </h1>
                     </div>
+
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_phieu_xuat_kho"
+                                attrs="{'invisible': [('phieu_xuat_kho_id', '=', False)]}">
+                            <div class="o_stat_info">
+                                <field name="phieu_xuat_kho_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Phiếu xuất kho</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_hoa_don"
+                                attrs="{'invisible': [('hoa_don_id', '=', False)]}">
+                            <div class="o_stat_info">
+                                <field name="hoa_don_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Hóa đơn</span>
+                            </div>
+                        </button>
+                    </div>
                     
                     <group>
                         <group string="Thông tin đơn hàng">
@@ -34,6 +51,18 @@
                         <group string="Tổng cộng">
                             <field name="tong_tien" widget="monetary"/>
                             <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Thanh toán">
+                            <field name="phuong_thuc_thanh_toan"/>
+                            <field name="trang_thai_thanh_toan" widget="badge"/>
+                            <field name="payment_url" readonly="1"/>
+                        </group>
+                        <group string="Chứng từ">
+                            <field name="hoa_don_id" readonly="1"/>
+                            <field name="phieu_xuat_kho_id" readonly="1"/>
                         </group>
                     </group>
                     

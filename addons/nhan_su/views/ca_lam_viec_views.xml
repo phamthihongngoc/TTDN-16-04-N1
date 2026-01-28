@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Form View -->
+    <record id="view_ca_lam_viec_form" model="ir.ui.view">
+        <field name="name">ca_lam_viec.form</field>
+        <field name="model">ca_lam_viec</field>
+        <field name="arch" type="xml">
+            <form string="Ca làm việc">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Tên ca làm việc"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Thông tin cơ bản">
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Thời gian làm việc">
+                            <field name="gio_bat_dau" widget="float_time"/>
+                            <field name="gio_ket_thuc" widget="float_time"/>
+                            <field name="so_gio_lam_chuan" widget="float_time"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Nghỉ trưa">
+                            <field name="nghi_trua"/>
+                            <field name="gio_nghi_trua_bat_dau" widget="float_time" 
+                                   attrs="{'invisible': [('nghi_trua', '=', False)]}"/>
+                            <field name="gio_nghi_trua_ket_thuc" widget="float_time"
+                                   attrs="{'invisible': [('nghi_trua', '=', False)]}"/>
+                        </group>
+                        <group string="Quy định">
+                            <field name="cho_phep_tre_phut"/>
+                            <field name="cho_phep_som_phut"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Hệ số tăng ca">
+                        <group>
+                            <field name="he_so_tang_ca"/>
+                            <field name="he_so_tang_ca_dem"/>
+                        </group>
+                        <group>
+                            <field name="he_so_nghi_le"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <field name="ghi_chu" placeholder="Ghi chú thêm..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Tree View -->
+    <record id="view_ca_lam_viec_tree" model="ir.ui.view">
+        <field name="name">ca_lam_viec.tree</field>
+        <field name="model">ca_lam_viec</field>
+        <field name="arch" type="xml">
+            <tree string="Ca làm việc">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="gio_bat_dau" widget="float_time"/>
+                <field name="gio_ket_thuc" widget="float_time"/>
+                <field name="so_gio_lam_chuan" widget="float_time"/>
+                <field name="he_so_tang_ca"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Search View -->
+    <record id="view_ca_lam_viec_search" model="ir.ui.view">
+        <field name="name">ca_lam_viec.search</field>
+        <field name="model">ca_lam_viec</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm ca làm việc">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Hoạt động" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Có nghỉ trưa" name="nghi_trua" domain="[('nghi_trua', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Action -->
+    <record id="action_ca_lam_viec" model="ir.actions.act_window">
+        <field name="name">Ca làm việc</field>
+        <field name="res_model">ca_lam_viec</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo ca làm việc mới
+            </p>
+            <p>
+                Định nghĩa các ca làm việc với giờ vào/ra, nghỉ trưa và hệ số tăng ca.
+            </p>
+        </field>
+    </record>
+    
+</odoo>

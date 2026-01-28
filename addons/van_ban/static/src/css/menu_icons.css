@@ -1,0 +1,9 @@
+/* Icon cho menu OCR */
+.o_menu_sections > li > a[data-menu-xmlid="van_ban.menu_van_ban_ocr"]::before,
+a.dropdown-item[data-menu-xmlid="van_ban.menu_van_ban_ocr"]::before {
+    content: "\f1ea";  /* FontAwesome file-alt icon */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 6px;
+    font-size: 14px;
+}

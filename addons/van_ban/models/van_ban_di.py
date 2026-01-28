@@ -17,7 +17,7 @@ try:
 except ImportError as e:
     _logger.warning("Missing OCR libraries: %s", e)
 
-from .ocr_utils import ocr_image_bytes
+from .ocr_utils import ocr_image_bytes, fix_spacing_artifacts
 
 
 class VanBanDi(models.Model):
@@ -315,12 +315,14 @@ class VanBanDi(models.Model):
                     for page in pdf.pages:
                         page_text = page.extract_text() or ''
                         if page_text:
-                            text += page_text + "\n"
-                    return text.strip()
+                            text += fix_spacing_artifacts(page_text) + "\n"
+                    return fix_spacing_artifacts(text.strip())
 
             elif is_image:
                 # Xử lý ảnh với OCR
-                return ocr_image_bytes(Image, ImageOps, ImageFilter, pytesseract, file_data, lang='vie+eng')
+                return fix_spacing_artifacts(
+                    ocr_image_bytes(Image, ImageOps, ImageFilter, pytesseract, file_data, lang='vie+eng')
+                )
             
             else:
                 return False

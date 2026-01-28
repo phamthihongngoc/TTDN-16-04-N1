@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- ==================== LOẠI PHỤ CẤP ==================== -->
+    
+    <record id="view_loai_phu_cap_form" model="ir.ui.view">
+        <field name="name">loai_phu_cap.form</field>
+        <field name="model">loai_phu_cap</field>
+        <field name="arch" type="xml">
+            <form string="Loai phu cap">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="loai_tinh"/>
+                            <field name="so_tien"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="tinh_vao_bhxh"/>
+                            <field name="tinh_vao_thue"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="ghi_chu"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_loai_phu_cap_tree" model="ir.ui.view">
+        <field name="name">loai_phu_cap.tree</field>
+        <field name="model">loai_phu_cap</field>
+        <field name="arch" type="xml">
+            <tree string="Loai phu cap">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="loai_tinh"/>
+                <field name="so_tien"/>
+                <field name="tinh_vao_bhxh"/>
+                <field name="tinh_vao_thue"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="action_loai_phu_cap" model="ir.actions.act_window">
+        <field name="name">Loai phu cap</field>
+        <field name="res_model">loai_phu_cap</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    <!-- ==================== PHỤ CẤP NHÂN VIÊN ==================== -->
+    
+    <record id="view_phu_cap_nhan_vien_form" model="ir.ui.view">
+        <field name="name">phu_cap_nhan_vien.form</field>
+        <field name="model">phu_cap_nhan_vien</field>
+        <field name="arch" type="xml">
+            <form string="Phu cap nhan vien">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="nhan_vien_id"/>
+                            <field name="loai_phu_cap_id"/>
+                            <field name="so_tien"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="ngay_bat_dau"/>
+                            <field name="ngay_ket_thuc"/>
+                            <field name="con_hieu_luc"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="ghi_chu"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_phu_cap_nhan_vien_tree" model="ir.ui.view">
+        <field name="name">phu_cap_nhan_vien.tree</field>
+        <field name="model">phu_cap_nhan_vien</field>
+        <field name="arch" type="xml">
+            <tree string="Phu cap nhan vien"
+                  decoration-muted="con_hieu_luc == False">
+                <field name="nhan_vien_id"/>
+                <field name="loai_phu_cap_id"/>
+                <field name="so_tien"/>
+                <field name="ngay_bat_dau"/>
+                <field name="ngay_ket_thuc"/>
+                <field name="con_hieu_luc"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_phu_cap_nhan_vien_search" model="ir.ui.view">
+        <field name="name">phu_cap_nhan_vien.search</field>
+        <field name="model">phu_cap_nhan_vien</field>
+        <field name="arch" type="xml">
+            <search string="Tim kiem phu cap">
+                <field name="nhan_vien_id"/>
+                <field name="loai_phu_cap_id"/>
+                <filter string="Con hieu luc" name="con_hieu_luc" domain="[('con_hieu_luc', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Nhan vien" name="group_nhan_vien" context="{'group_by': 'nhan_vien_id'}"/>
+                    <filter string="Loai phu cap" name="group_loai" context="{'group_by': 'loai_phu_cap_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <record id="action_phu_cap_nhan_vien" model="ir.actions.act_window">
+        <field name="name">Phu cap nhan vien</field>
+        <field name="res_model">phu_cap_nhan_vien</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_con_hieu_luc': 1}</field>
+    </record>
+    
+    <!-- ==================== CẤU HÌNH BHXH ==================== -->
+    
+    <record id="view_cau_hinh_bhxh_form" model="ir.ui.view">
+        <field name="name">cau_hinh_bhxh.form</field>
+        <field name="model">cau_hinh_bhxh</field>
+        <field name="arch" type="xml">
+            <form string="Cau hinh BHXH">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="ten"/>
+                            <field name="ngay_ap_dung"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="luong_co_so"/>
+                            <field name="luong_toi_da_bhxh"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Ty le dong bao hiem">
+                            <group>
+                                <group string="Nguoi lao dong dong">
+                                    <field name="ty_le_bhxh_nld"/>
+                                    <field name="ty_le_bhyt_nld"/>
+                                    <field name="ty_le_bhtn_nld"/>
+                                    <field name="tong_ty_le_nld"/>
+                                </group>
+                                <group string="Doanh nghiep dong">
+                                    <field name="ty_le_bhxh_dn"/>
+                                    <field name="ty_le_bhyt_dn"/>
+                                    <field name="ty_le_bhtn_dn"/>
+                                    <field name="tong_ty_le_dn"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Giam tru thue TNCN">
+                            <group>
+                                <group>
+                                    <field name="giam_tru_ban_than"/>
+                                    <field name="giam_tru_nguoi_phu_thuoc"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                    
+                    <group>
+                        <field name="ghi_chu"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_cau_hinh_bhxh_tree" model="ir.ui.view">
+        <field name="name">cau_hinh_bhxh.tree</field>
+        <field name="model">cau_hinh_bhxh</field>
+        <field name="arch" type="xml">
+            <tree string="Cau hinh BHXH">
+                <field name="ten"/>
+                <field name="ngay_ap_dung"/>
+                <field name="luong_co_so"/>
+                <field name="tong_ty_le_nld"/>
+                <field name="tong_ty_le_dn"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="action_cau_hinh_bhxh" model="ir.actions.act_window">
+        <field name="name">Cau hinh BHXH</field>
+        <field name="res_model">cau_hinh_bhxh</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    <!-- ==================== BẢNG THUẾ TNCN ==================== -->
+    
+    <record id="view_bang_thue_tncn_form" model="ir.ui.view">
+        <field name="name">bang_thue_tncn.form</field>
+        <field name="model">bang_thue_tncn</field>
+        <field name="arch" type="xml">
+            <form string="Bac thue TNCN">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="thu_nhap_tu"/>
+                            <field name="thu_nhap_den"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="ty_le_thue"/>
+                            <field name="so_tien_tru"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_bang_thue_tncn_tree" model="ir.ui.view">
+        <field name="name">bang_thue_tncn.tree</field>
+        <field name="model">bang_thue_tncn</field>
+        <field name="arch" type="xml">
+            <tree string="Bang thue TNCN">
+                <field name="thu_nhap_tu"/>
+                <field name="thu_nhap_den"/>
+                <field name="ty_le_thue"/>
+                <field name="so_tien_tru"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="action_bang_thue_tncn" model="ir.actions.act_window">
+        <field name="name">Bang thue TNCN</field>
+        <field name="res_model">bang_thue_tncn</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+</odoo>

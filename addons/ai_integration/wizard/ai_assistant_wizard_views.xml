@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- AI Assistant Wizard Form View -->
+    <!-- Trợ lý AI Wizard Form View -->
     <record id="view_ai_assistant_wizard_form" model="ir.ui.view">
         <field name="name">ai.assistant.wizard.form</field>
         <field name="model">ai.assistant.wizard</field>
         <field name="arch" type="xml">
-            <form string="AI Assistant">
+            <form string="Trợ lý AI">
                 <sheet>
                     <div class="oe_title">
                         <h1>
@@ -65,9 +65,9 @@
         </field>
     </record>
     
-    <!-- AI Assistant Action (for menu) -->
+    <!-- Trợ lý AI Action (for menu) -->
     <record id="action_ai_assistant" model="ir.actions.act_window">
-        <field name="name">AI Assistant</field>
+        <field name="name">Trợ lý AI</field>
         <field name="res_model">ai.assistant.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>

@@ -27,14 +27,14 @@ class AIContextVanBan(models.AbstractModel):
     def _get_document_context(self, doc_id):
         """Lấy context văn bản chung"""
         try:
-            doc = self.env['van_ban'].browse(doc_id)
+            doc = self.env['van_ban'].sudo().browse(doc_id)
             if not doc.exists():
                 return None
             
             context = f"""VĂN BẢN: {doc.display_name}
-- Số ký hiệu: {doc.so_ky_hieu if hasattr(doc, 'so_ky_hieu') else 'N/A'}
+- Mã: {doc.ma_van_ban if hasattr(doc, 'ma_van_ban') else 'N/A'}
 - Loại: {doc.loai_van_ban_id.display_name if hasattr(doc, 'loai_van_ban_id') and doc.loai_van_ban_id else 'N/A'}
-- Ngày ban hành: {doc.ngay_ban_hanh.strftime('%d/%m/%Y') if hasattr(doc, 'ngay_ban_hanh') and doc.ngay_ban_hanh else 'N/A'}
+- Ngày tạo: {doc.ngay_tao.strftime('%d/%m/%Y') if hasattr(doc, 'ngay_tao') and doc.ngay_tao else 'N/A'}
 - Trạng thái: {dict(doc._fields['trang_thai'].selection).get(doc.trang_thai, 'N/A') if hasattr(doc, 'trang_thai') else 'N/A'}
 """
             
@@ -66,7 +66,7 @@ NỘI DUNG:
     def _get_incoming_doc_context(self, doc_id):
         """Lấy context văn bản đến"""
         try:
-            doc = self.env['van_ban_den'].browse(doc_id)
+            doc = self.env['van_ban_den'].sudo().browse(doc_id)
             if not doc.exists():
                 return None
             
@@ -119,7 +119,7 @@ NỘI DUNG:
     def _get_outgoing_doc_context(self, doc_id):
         """Lấy context văn bản đi"""
         try:
-            doc = self.env['van_ban_di'].browse(doc_id)
+            doc = self.env['van_ban_di'].sudo().browse(doc_id)
             if not doc.exists():
                 return None
             
@@ -204,7 +204,7 @@ NỘI DUNG:
                     if filters.get('trang_thai'):
                         domain.append(('trang_thai', '=', filters['trang_thai']))
                 
-                docs = self.env['van_ban_den'].search(domain, limit=limit)
+                docs = self.env['van_ban_den'].sudo().search(domain, limit=limit)
                 for doc in docs:
                     results.append({
                         'id': doc.id,
@@ -225,7 +225,7 @@ NỘI DUNG:
                     if filters.get('trang_thai'):
                         domain.append(('trang_thai', '=', filters['trang_thai']))
                 
-                docs = self.env['van_ban_di'].search(domain, limit=limit)
+                docs = self.env['van_ban_di'].sudo().search(domain, limit=limit)
                 for doc in docs:
                     results.append({
                         'id': doc.id,

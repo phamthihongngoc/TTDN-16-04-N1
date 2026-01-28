@@ -19,7 +19,7 @@
               sequence="20"/>
     
     <menuitem id="menu_ai_assistant"
-              name="AI Assistant"
+              name="Trợ lý AI"
               parent="menu_ai_integration_root"
               action="action_ai_assistant"
               sequence="30"/>

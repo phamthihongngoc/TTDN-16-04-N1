@@ -21,6 +21,7 @@ class LichSuVanBan(models.Model):
         ('duyet', 'Duyệt'),
         ('tu_choi', 'Từ chối duyệt'),
         ('gui_ky', 'Gửi ký'),
+        ('auto_assign', 'Tự động gán'),
         ('ky', 'Ký nội bộ'),
         ('gui_yeu_cau_ky', 'Gửi yêu cầu ký khách'),
         ('khach_ky', 'Khách hàng ký'),

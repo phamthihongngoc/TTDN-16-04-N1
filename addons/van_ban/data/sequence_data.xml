@@ -12,6 +12,17 @@
             <field name="number_increment">1</field>
         </record>
 
+        <!-- Sequence cho số hiệu văn bản (tự sinh) -->
+        <record id="seq_van_ban_so_hieu" model="ir.sequence">
+            <field name="name">Số hiệu văn bản</field>
+            <field name="code">van_ban.so_hieu</field>
+            <field name="prefix"></field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="use_date_range">True</field>
+        </record>
+
         <!-- Sequence cho số văn bản đến -->
         <record id="seq_van_ban_den" model="ir.sequence">
             <field name="name">Số văn bản đến</field>

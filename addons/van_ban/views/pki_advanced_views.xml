@@ -6,7 +6,7 @@
         <field name="name">pki.certificate.revocation.tree</field>
         <field name="model">pki.certificate.revocation</field>
         <field name="arch" type="xml">
-            <tree string="Certificate Revocation List">
+            <tree string="Danh sách chứng thư số bị thu hồi">
                 <field name="crl_entry_number"/>
                 <field name="certificate_name"/>
                 <field name="reason_code"/>
@@ -22,10 +22,10 @@
         <field name="name">pki.certificate.revocation.form</field>
         <field name="model">pki.certificate.revocation</field>
         <field name="arch" type="xml">
-            <form string="CRL Entry">
+            <form string="Mục thu hồi chứng thư số">
                 <header>
                     <button name="action_remove_from_crl" 
-                            string="Reactivate Certificate"
+                            string="Kích hoạt lại chứng thư số"
                             type="object"
                             class="btn-success"
                             attrs="{'invisible': ['|', ('state', '=', 'removed'), ('reason_code', '!=', 'certificate_hold')]}"/>
@@ -34,7 +34,7 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_export_crl" 
-                                string="Export CRL"
+                                string="Xuất danh sách thu hồi"
                                 type="object"
                                 class="oe_stat_button"
                                 icon="fa-download"/>
@@ -61,7 +61,7 @@
                         <field name="reason_description" nolabel="1"/>
                     </group>
                     
-                    <group string="Reactivation Info" attrs="{'invisible': [('state', '!=', 'removed')]}">
+                    <group string="Thông tin kích hoạt lại" attrs="{'invisible': [('state', '!=', 'removed')]}">
                         <field name="removed_at"/>
                         <field name="removed_by"/>
                         <field name="removed_reason"/>
@@ -77,7 +77,7 @@
     
     <!-- CRL Action -->
     <record id="action_pki_certificate_revocation" model="ir.actions.act_window">
-        <field name="name">Certificate Revocation List (CRL)</field>
+        <field name="name">Danh sách chứng thư số bị thu hồi</field>
         <field name="res_model">pki.certificate.revocation</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{}</field>
@@ -93,7 +93,7 @@
         <field name="name">pki.certificate.rotation.tree</field>
         <field name="model">pki.certificate.rotation</field>
         <field name="arch" type="xml">
-            <tree string="Certificate Rotations">
+            <tree string="Xoay vòng chứng thư số">
                 <field name="name"/>
                 <field name="old_certificate_id"/>
                 <field name="new_certificate_id"/>
@@ -109,15 +109,15 @@
         <field name="name">pki.certificate.rotation.form</field>
         <field name="model">pki.certificate.rotation</field>
         <field name="arch" type="xml">
-            <form string="Certificate Rotation">
+            <form string="Xoay vòng chứng thư số">
                 <header>
                     <button name="action_execute_rotation"
-                            string="Execute Rotation"
+                            string="Thực hiện xoay vòng"
                             type="object"
                             class="btn-primary"
                             attrs="{'invisible': [('state', 'not in', ['pending', 'failed'])]}"/>
                     <button name="action_cancel"
-                            string="Cancel"
+                            string="Hủy"
                             type="object"
                             attrs="{'invisible': [('state', 'not in', ['pending', 'failed'])]}"/>
                     <field name="state" widget="statusbar"/>
@@ -141,11 +141,11 @@
                         </group>
                     </group>
                     
-                    <group string="Rotation Reason">
+                    <group string="Lý do xoay vòng">
                         <field name="rotation_reason" nolabel="1"/>
                     </group>
                     
-                    <group string="Error Message" attrs="{'invisible': [('error_message', '=', False)]}">
+                    <group string="Thông báo lỗi" attrs="{'invisible': [('error_message', '=', False)]}">
                         <field name="error_message" nolabel="1" class="text-danger"/>
                     </group>
                 </sheet>
@@ -159,7 +159,7 @@
     
     <!-- Rotation Action -->
     <record id="action_pki_certificate_rotation" model="ir.actions.act_window">
-        <field name="name">Certificate Rotations</field>
+        <field name="name">Xoay vòng chứng thư số</field>
         <field name="res_model">pki.certificate.rotation</field>
         <field name="view_mode">tree,form</field>
     </record>
@@ -230,15 +230,15 @@
     
     <!-- Menu Items -->
     <menuitem id="menu_pki_certificate_revocation"
-              name="Revocation List (CRL)"
-              parent="menu_van_ban_root"
+              name="Danh sách thu hồi"
+              parent="menu_pki_certificate"
               action="action_pki_certificate_revocation"
-              sequence="130"/>
+              sequence="2"/>
     
     <menuitem id="menu_pki_certificate_rotation"
-              name="Certificate Rotations"
-              parent="menu_van_ban_root"
+              name="Xoay vòng chứng thư số"
+              parent="menu_pki_certificate"
               action="action_pki_certificate_rotation"
-              sequence="140"/>
+              sequence="3"/>
     
 </odoo>

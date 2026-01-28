@@ -7,6 +7,14 @@ access_don_hang_user,don_hang.user,model_don_hang,group_khach_hang_user,1,1,1,0
 access_don_hang_manager,don_hang.manager,model_don_hang,group_khach_hang_manager,1,1,1,1
 access_don_hang_line_user,don_hang_line.user,model_don_hang_line,group_khach_hang_user,1,1,1,1
 access_don_hang_line_manager,don_hang_line.manager,model_don_hang_line,group_khach_hang_manager,1,1,1,1
+access_phieu_xuat_kho_user,phieu_xuat_kho.user,model_phieu_xuat_kho,group_khach_hang_user,1,1,1,0
+access_phieu_xuat_kho_manager,phieu_xuat_kho.manager,model_phieu_xuat_kho,group_khach_hang_manager,1,1,1,1
+access_phieu_xuat_kho_line_user,phieu_xuat_kho_line.user,model_phieu_xuat_kho_line,group_khach_hang_user,1,1,1,1
+access_phieu_xuat_kho_line_manager,phieu_xuat_kho_line.manager,model_phieu_xuat_kho_line,group_khach_hang_manager,1,1,1,1
+access_hoa_don_user,hoa_don.user,model_hoa_don,group_khach_hang_user,1,1,1,0
+access_hoa_don_manager,hoa_don.manager,model_hoa_don,group_khach_hang_manager,1,1,1,1
+access_hoa_don_line_user,hoa_don_line.user,model_hoa_don_line,group_khach_hang_user,1,1,1,1
+access_hoa_don_line_manager,hoa_don_line.manager,model_hoa_don_line,group_khach_hang_manager,1,1,1,1
 access_san_pham_user,san_pham.user,model_san_pham,group_khach_hang_user,1,0,0,0
 access_san_pham_manager,san_pham.manager,model_san_pham,group_khach_hang_manager,1,1,1,1
 access_email_user,email.user,model_email_khach_hang,group_khach_hang_user,1,1,1,0

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Sequence cho Don nghi phep -->
+        <record id="seq_don_nghi_phep" model="ir.sequence">
+            <field name="name">Don nghi phep Sequence</field>
+            <field name="code">don_nghi_phep</field>
+            <field name="prefix">NP/%(year)s/</field>
+            <field name="padding">4</field>
+        </record>
+        
+        <!-- Ca lam viec mac dinh -->
+        <record id="ca_hanh_chinh" model="ca_lam_viec">
+            <field name="name">Ca hanh chinh</field>
+            <field name="code">HC</field>
+            <field name="sequence">1</field>
+            <field name="gio_bat_dau">8.0</field>
+            <field name="gio_ket_thuc">17.0</field>
+            <field name="nghi_trua">True</field>
+            <field name="gio_nghi_trua_bat_dau">12.0</field>
+            <field name="gio_nghi_trua_ket_thuc">13.0</field>
+            <field name="cho_phep_tre_phut">15</field>
+            <field name="he_so_tang_ca">1.5</field>
+            <field name="he_so_tang_ca_dem">2.0</field>
+            <field name="he_so_nghi_le">3.0</field>
+        </record>
+        
+        <record id="ca_sang" model="ca_lam_viec">
+            <field name="name">Ca sang</field>
+            <field name="code">S</field>
+            <field name="sequence">2</field>
+            <field name="gio_bat_dau">6.0</field>
+            <field name="gio_ket_thuc">14.0</field>
+            <field name="nghi_trua">True</field>
+            <field name="gio_nghi_trua_bat_dau">11.0</field>
+            <field name="gio_nghi_trua_ket_thuc">11.5</field>
+            <field name="he_so_tang_ca">1.5</field>
+        </record>
+        
+        <record id="ca_chieu" model="ca_lam_viec">
+            <field name="name">Ca chieu</field>
+            <field name="code">C</field>
+            <field name="sequence">3</field>
+            <field name="gio_bat_dau">14.0</field>
+            <field name="gio_ket_thuc">22.0</field>
+            <field name="nghi_trua">True</field>
+            <field name="gio_nghi_trua_bat_dau">18.0</field>
+            <field name="gio_nghi_trua_ket_thuc">18.5</field>
+            <field name="he_so_tang_ca">1.5</field>
+            <field name="he_so_tang_ca_dem">2.0</field>
+        </record>
+        
+        <!-- Loai nghi phep -->
+        <record id="loai_phep_nam" model="loai_nghi_phep">
+            <field name="name">Phep nam</field>
+            <field name="code">PN</field>
+            <field name="sequence">1</field>
+            <field name="co_luong">True</field>
+            <field name="so_ngay_mac_dinh">12</field>
+            <field name="cho_phep_cong_don">True</field>
+        </record>
+        
+        <record id="loai_nghi_om" model="loai_nghi_phep">
+            <field name="name">Nghi om</field>
+            <field name="code">NO</field>
+            <field name="sequence">2</field>
+            <field name="co_luong">True</field>
+            <field name="so_ngay_mac_dinh">30</field>
+            <field name="ghi_chu">Nghi om co giay xac nhan cua bac si</field>
+        </record>
+        
+        <record id="loai_nghi_khong_luong" model="loai_nghi_phep">
+            <field name="name">Nghi khong luong</field>
+            <field name="code">NKL</field>
+            <field name="sequence">3</field>
+            <field name="co_luong">False</field>
+            <field name="so_ngay_mac_dinh">0</field>
+        </record>
+        
+        <record id="loai_nghi_cuoi" model="loai_nghi_phep">
+            <field name="name">Nghi cuoi</field>
+            <field name="code">NC</field>
+            <field name="sequence">4</field>
+            <field name="co_luong">True</field>
+            <field name="so_ngay_mac_dinh">3</field>
+        </record>
+        
+        <record id="loai_nghi_tang" model="loai_nghi_phep">
+            <field name="name">Nghi tang</field>
+            <field name="code">NT</field>
+            <field name="sequence">5</field>
+            <field name="co_luong">True</field>
+            <field name="so_ngay_mac_dinh">3</field>
+        </record>
+        
+        <record id="loai_nghi_thai_san" model="loai_nghi_phep">
+            <field name="name">Nghi thai san</field>
+            <field name="code">TS</field>
+            <field name="sequence">6</field>
+            <field name="co_luong">True</field>
+            <field name="so_ngay_mac_dinh">180</field>
+            <field name="ghi_chu">6 thang cho nu, 5-14 ngay cho nam</field>
+        </record>
+        
+        <!-- Loai phu cap -->
+        <record id="phu_cap_an_trua" model="loai_phu_cap">
+            <field name="name">Phu cap an trua</field>
+            <field name="code">AT</field>
+            <field name="sequence">1</field>
+            <field name="loai_tinh">co_dinh</field>
+            <field name="so_tien">730000</field>
+            <field name="tinh_vao_bhxh">False</field>
+            <field name="tinh_vao_thue">False</field>
+        </record>
+        
+        <record id="phu_cap_xang_xe" model="loai_phu_cap">
+            <field name="name">Phu cap xang xe</field>
+            <field name="code">XX</field>
+            <field name="sequence">2</field>
+            <field name="loai_tinh">co_dinh</field>
+            <field name="so_tien">500000</field>
+            <field name="tinh_vao_bhxh">False</field>
+            <field name="tinh_vao_thue">False</field>
+        </record>
+        
+        <record id="phu_cap_dien_thoai" model="loai_phu_cap">
+            <field name="name">Phu cap dien thoai</field>
+            <field name="code">DT</field>
+            <field name="sequence">3</field>
+            <field name="loai_tinh">co_dinh</field>
+            <field name="so_tien">300000</field>
+            <field name="tinh_vao_bhxh">False</field>
+            <field name="tinh_vao_thue">False</field>
+        </record>
+        
+        <record id="phu_cap_trach_nhiem" model="loai_phu_cap">
+            <field name="name">Phu cap trach nhiem</field>
+            <field name="code">TN</field>
+            <field name="sequence">4</field>
+            <field name="loai_tinh">co_dinh</field>
+            <field name="so_tien">1000000</field>
+            <field name="tinh_vao_bhxh">True</field>
+            <field name="tinh_vao_thue">True</field>
+        </record>
+        
+        <record id="phu_cap_chuyen_can" model="loai_phu_cap">
+            <field name="name">Phu cap chuyen can</field>
+            <field name="code">CC</field>
+            <field name="sequence">5</field>
+            <field name="loai_tinh">co_dinh</field>
+            <field name="so_tien">500000</field>
+            <field name="tinh_vao_bhxh">False</field>
+            <field name="tinh_vao_thue">True</field>
+        </record>
+        
+        <!-- Cau hinh BHXH 2024 -->
+        <record id="cau_hinh_bhxh_2024" model="cau_hinh_bhxh">
+            <field name="ten">Cau hinh BHXH 2024</field>
+            <field name="ngay_ap_dung">2024-01-01</field>
+            <field name="active">True</field>
+            <field name="ty_le_bhxh_nld">8.0</field>
+            <field name="ty_le_bhyt_nld">1.5</field>
+            <field name="ty_le_bhtn_nld">1.0</field>
+            <field name="ty_le_bhxh_dn">17.5</field>
+            <field name="ty_le_bhyt_dn">3.0</field>
+            <field name="ty_le_bhtn_dn">1.0</field>
+            <field name="luong_co_so">1800000</field>
+            <field name="giam_tru_ban_than">11000000</field>
+            <field name="giam_tru_nguoi_phu_thuoc">4400000</field>
+        </record>
+        
+        <!-- Bang thue TNCN luy tien -->
+        <record id="thue_bac_1" model="bang_thue_tncn">
+            <field name="thu_nhap_tu">0</field>
+            <field name="thu_nhap_den">5000000</field>
+            <field name="ty_le_thue">5</field>
+            <field name="so_tien_tru">0</field>
+        </record>
+        
+        <record id="thue_bac_2" model="bang_thue_tncn">
+            <field name="thu_nhap_tu">5000001</field>
+            <field name="thu_nhap_den">10000000</field>
+            <field name="ty_le_thue">10</field>
+            <field name="so_tien_tru">250000</field>
+        </record>
+        
+        <record id="thue_bac_3" model="bang_thue_tncn">
+            <field name="thu_nhap_tu">10000001</field>
+            <field name="thu_nhap_den">18000000</field>
+            <field name="ty_le_thue">15</field>
+            <field name="so_tien_tru">750000</field>
+        </record>
+        
+        <record id="thue_bac_4" model="bang_thue_tncn">
+            <field name="thu_nhap_tu">18000001</field>
+            <field name="thu_nhap_den">32000000</field>
+            <field name="ty_le_thue">20</field>
+            <field name="so_tien_tru">1650000</field>
+        </record>
+        
+        <record id="thue_bac_5" model="bang_thue_tncn">
+            <field name="thu_nhap_tu">32000001</field>
+            <field name="thu_nhap_den">52000000</field>
+            <field name="ty_le_thue">25</field>
+            <field name="so_tien_tru">3250000</field>
+        </record>
+        
+        <record id="thue_bac_6" model="bang_thue_tncn">
+            <field name="thu_nhap_tu">52000001</field>
+            <field name="thu_nhap_den">80000000</field>
+            <field name="ty_le_thue">30</field>
+            <field name="so_tien_tru">5850000</field>
+        </record>
+        
+        <record id="thue_bac_7" model="bang_thue_tncn">
+            <field name="thu_nhap_tu">80000001</field>
+            <field name="thu_nhap_den" eval="False"/>
+            <field name="ty_le_thue">35</field>
+            <field name="so_tien_tru">9850000</field>
+        </record>
+        
+    </data>
+</odoo>

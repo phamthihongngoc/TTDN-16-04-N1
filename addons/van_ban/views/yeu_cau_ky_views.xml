@@ -11,6 +11,10 @@
                     <button name="action_gui_email_yeu_cau_ky" string="Gửi email" type="object"
                             class="oe_highlight"
                             attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}"/>
+
+                    <button name="action_open_wizard_ky_khach" string="Ký điện tử" type="object"
+                        class="btn-primary"
+                        attrs="{'invisible': [('trang_thai', '!=', 'cho_ky')]}"/>
                     
                     <button name="action_gui_lai" string="Gửi lại" type="object"
                             attrs="{'invisible': [('trang_thai', 'not in', ['cho_ky', 'het_han'])]}"/>

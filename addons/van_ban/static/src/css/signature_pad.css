@@ -90,3 +90,214 @@
         border: 1px solid #000;
     }
 }
+
+/* ==========================================
+   VAN BAN MODULE - ENHANCED UI STYLES
+   ========================================== */
+
+/* Kanban Card Enhancements */
+.o_kanban_view .o_kanban_record .oe_kanban_card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+    border: 1px solid #e9ecef;
+}
+
+.o_kanban_view .o_kanban_record .oe_kanban_card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+/* Kanban Ribbons */
+.ribbon {
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    z-index: 1;
+    overflow: hidden;
+    width: 75px;
+    height: 75px;
+    text-align: right;
+}
+
+.ribbon span {
+    font-size: 10px;
+    font-weight: bold;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 20px;
+    transform: rotate(45deg);
+    width: 100px;
+    display: block;
+    position: absolute;
+    top: 19px;
+    right: -21px;
+    padding: 0;
+}
+
+.ribbon-top-left {
+    top: -5px;
+    left: -5px;
+    right: auto;
+}
+
+.ribbon-top-left span {
+    transform: rotate(-45deg);
+    left: -21px;
+    right: auto;
+}
+
+/* Badge colors */
+.badge-pill {
+    padding: 4px 10px;
+    font-weight: 500;
+}
+
+/* Kanban Card Header */
+.o_kanban_card_header {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 8px 8px 0 0;
+}
+
+.o_kanban_card_header_title .o_primary {
+    font-size: 14px;
+    font-weight: 600;
+    color: #212529;
+}
+
+.o_kanban_card_header_title .o_secondary {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 2px;
+}
+
+/* Kanban Card Content */
+.o_kanban_card_content {
+    padding: 12px;
+}
+
+.o_kanban_record_body > div {
+    margin-bottom: 6px;
+}
+
+.o_kanban_record_body i {
+    width: 16px;
+    text-align: center;
+    margin-right: 4px;
+}
+
+/* Kanban Card Footer */
+.o_kanban_card_footer {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-top: 1px solid #f0f0f0;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Smart Button Enhancements */
+.oe_button_box .oe_stat_button {
+    border-radius: 6px;
+    margin: 2px;
+    transition: all 0.2s ease;
+}
+
+.oe_button_box .oe_stat_button:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.oe_button_box .oe_stat_button:hover .o_stat_text,
+.oe_button_box .oe_stat_button:hover .o_stat_value {
+    color: white !important;
+}
+
+/* Form Ribbon Enhancements */
+.web_ribbon {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Status Bar Enhancements */
+.o_statusbar_status {
+    padding: 8px 0;
+}
+
+.o_statusbar_status button {
+    border-radius: 20px;
+    padding: 4px 16px;
+    font-weight: 500;
+}
+
+/* Alert boxes in form */
+.alert-info {
+    border-left: 4px solid #17a2b8;
+    border-radius: 4px;
+}
+
+/* Tree View Enhancements */
+.o_list_view .o_data_row.text-success {
+    background-color: rgba(40, 167, 69, 0.05);
+}
+
+.o_list_view .o_data_row.text-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+.o_list_view .o_data_row.text-danger {
+    background-color: rgba(220, 53, 69, 0.05);
+}
+
+/* Search Panel */
+.o_search_panel_section_header {
+    font-weight: 600;
+    color: #495057;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+/* Dashboard Cards */
+.o_dashboard_card {
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+    transition: all 0.3s ease;
+}
+
+.o_dashboard_card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+/* Signature Display */
+.o_field_image img {
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+/* Activity Widget */
+.o_Activity .o_activity_color_today {
+    background-color: #ffc107;
+}
+
+.o_Activity .o_activity_color_overdue {
+    background-color: #dc3545;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .o_kanban_card_header_title .o_primary {
+        font-size: 13px;
+    }
+    
+    .o_kanban_card_content {
+        padding: 8px;
+    }
+    
+    .oe_button_box .oe_stat_button {
+        min-width: 80px;
+    }
+}

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_phieu_xuat_kho_form" model="ir.ui.view">
+        <field name="name">phieu_xuat_kho.form</field>
+        <field name="model">phieu_xuat_kho</field>
+        <field name="arch" type="xml">
+            <form string="Phiếu xuất kho">
+                <header>
+                    <button name="action_xuat_kho" string="Xuất kho" type="object"
+                            class="oe_highlight" attrs="{'invisible': [('trang_thai', '=', 'da_xuat')]}"/>
+                    <field name="trang_thai" widget="statusbar" statusbar_visible="moi,da_xuat"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="ma_phieu" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Thông tin phiếu xuất">
+                            <field name="don_hang_id"/>
+                            <field name="khach_hang_id" readonly="1"/>
+                            <field name="ngay_xuat"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Chi tiết xuất kho">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="san_pham_id"/>
+                                    <field name="so_luong"/>
+                                    <field name="ghi_chu"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_phieu_xuat_kho_tree" model="ir.ui.view">
+        <field name="name">phieu_xuat_kho.tree</field>
+        <field name="model">phieu_xuat_kho</field>
+        <field name="arch" type="xml">
+            <tree string="Phiếu xuất kho">
+                <field name="ma_phieu"/>
+                <field name="don_hang_id"/>
+                <field name="khach_hang_id"/>
+                <field name="ngay_xuat"/>
+                <field name="trang_thai" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_phieu_xuat_kho_search" model="ir.ui.view">
+        <field name="name">phieu_xuat_kho.search</field>
+        <field name="model">phieu_xuat_kho</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="ma_phieu"/>
+                <field name="don_hang_id"/>
+                <field name="khach_hang_id"/>
+                <filter string="Mới" name="moi" domain="[('trang_thai', '=', 'moi')]"/>
+                <filter string="Đã xuất kho" name="da_xuat" domain="[('trang_thai', '=', 'da_xuat')]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Khách hàng" name="group_khach_hang" context="{'group_by': 'khach_hang_id'}"/>
+                    <filter string="Trạng thái" name="group_trang_thai" context="{'group_by': 'trang_thai'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_phieu_xuat_kho" model="ir.actions.act_window">
+        <field name="name">Phiếu xuất kho</field>
+        <field name="res_model">phieu_xuat_kho</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_phieu_xuat_kho_search"/>
+    </record>
+
+</odoo>

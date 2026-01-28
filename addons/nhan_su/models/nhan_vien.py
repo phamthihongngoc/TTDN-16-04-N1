@@ -106,6 +106,10 @@ class NhanVien(models.Model):
     so_van_ban_ky = fields.Integer("Số văn bản đã ký", compute='_compute_thong_ke_lien_ket', store=True)
     so_khach_hang_phu_trach = fields.Integer("Số khách hàng phụ trách", compute='_compute_thong_ke_lien_ket', store=True)
     
+    # Văn bản chờ xử lý (Trưởng phòng - cần duyệt, Giám đốc - cần ký)
+    so_van_ban_can_duyet = fields.Integer("Văn bản cần duyệt", compute='_compute_van_ban_cho_xu_ly')
+    so_van_ban_can_ky = fields.Integer("Văn bản cần ký", compute='_compute_van_ban_cho_xu_ly')
+    
     _sql_constraints = [
         ('ma_nv_unique', 'unique(ma_dinh_danh)', 'Mã nhân viên đã tồn tại!')
     ]
@@ -257,6 +261,55 @@ class NhanVien(models.Model):
                     record.so_khach_hang_phu_trach = khach_hang_model.search_count([
                         ('nhan_vien_phu_trach_id', '=', record.id)
                     ])
+    
+    def _compute_van_ban_cho_xu_ly(self):
+        """Đếm số văn bản đang chờ duyệt/ký của nhân viên này"""
+        for record in self:
+            record.so_van_ban_can_duyet = 0
+            record.so_van_ban_can_ky = 0
+            
+            if 'van_ban' not in self.env:
+                continue
+                
+            van_ban_model = self.env['van_ban'].sudo()
+            
+            # Văn bản cần duyệt (trạng thái cho_duyet và nhân viên là người duyệt)
+            if 'truong_phong_duyet_id' in van_ban_model._fields:
+                record.so_van_ban_can_duyet = van_ban_model.search_count([
+                    ('truong_phong_duyet_id', '=', record.id),
+                    ('trang_thai', '=', 'cho_duyet')
+                ])
+            
+            # Văn bản cần ký (trạng thái cho_ky và nhân viên là người ký)
+            if 'nguoi_ky_id' in van_ban_model._fields:
+                record.so_van_ban_can_ky = van_ban_model.search_count([
+                    ('nguoi_ky_id', '=', record.id),
+                    ('trang_thai', '=', 'cho_ky')
+                ])
+    
+    def action_view_van_ban_can_duyet(self):
+        """Xem danh sách văn bản đang chờ duyệt"""
+        self.ensure_one()
+        return {
+            'name': 'Văn bản cần duyệt',
+            'type': 'ir.actions.act_window',
+            'res_model': 'van_ban',
+            'view_mode': 'tree,form',
+            'domain': [('truong_phong_duyet_id', '=', self.id), ('trang_thai', '=', 'cho_duyet')],
+            'context': {'default_truong_phong_duyet_id': self.id},
+        }
+    
+    def action_view_van_ban_can_ky(self):
+        """Xem danh sách văn bản đang chờ ký"""
+        self.ensure_one()
+        return {
+            'name': 'Văn bản cần ký',
+            'type': 'ir.actions.act_window',
+            'res_model': 'van_ban',
+            'view_mode': 'tree,form',
+            'domain': [('nguoi_ky_id', '=', self.id), ('trang_thai', '=', 'cho_ky')],
+            'context': {'default_nguoi_ky_id': self.id},
+        }
                 
     
     @api.depends('ty_le_cham_cong')
@@ -444,6 +497,18 @@ class NhanVien(models.Model):
             'res_model': 'van_ban',
             'view_mode': 'tree,form',
             'domain': domain,
+        }
+
+    def action_view_van_ban_ky(self):
+        self.ensure_one()
+        if 'van_ban' not in self.env:
+            return False
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Văn bản đã ký',
+            'res_model': 'van_ban',
+            'view_mode': 'tree,form',
+            'domain': [('nguoi_ky_id', '=', self.id)],
         }
     
     # === SYSTEM INTEGRATION CONSTRAINTS ===

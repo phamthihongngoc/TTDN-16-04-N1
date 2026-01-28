@@ -16,7 +16,7 @@ class AIContextNhanSu(models.AbstractModel):
         """Lấy context nghiệp vụ cho chatbot"""
         if model == 'nhan_vien':
             return self._get_employee_context(res_id)
-        elif model == 'phong_ban':
+        elif model in ['phong_ban', 'nhan_su.phong_ban']:
             return self._get_department_context(res_id)
         elif model == 'cham_cong':
             return self._get_attendance_context(res_id)
@@ -33,14 +33,23 @@ class AIContextNhanSu(models.AbstractModel):
             if not emp.exists():
                 return None
             
+            ma_nv = emp.ma_dinh_danh if hasattr(emp, 'ma_dinh_danh') else emp.ma_nhan_vien if hasattr(emp, 'ma_nhan_vien') else 'N/A'
+            phone = emp.so_dien_thoai if hasattr(emp, 'so_dien_thoai') else emp.dien_thoai if hasattr(emp, 'dien_thoai') else 'N/A'
+            if hasattr(emp, 'trang_thai_lam_viec'):
+                status = dict(emp._fields['trang_thai_lam_viec'].selection).get(emp.trang_thai_lam_viec, 'N/A')
+            elif hasattr(emp, 'trang_thai'):
+                status = dict(emp._fields['trang_thai'].selection).get(emp.trang_thai, 'N/A')
+            else:
+                status = 'N/A'
+
             context = f"""NHÂN VIÊN: {emp.display_name}
-- Mã NV: {emp.ma_nhan_vien if hasattr(emp, 'ma_nhan_vien') else 'N/A'}
+- Mã NV: {ma_nv}
 - Email: {emp.email if hasattr(emp, 'email') else 'N/A'}
-- Điện thoại: {emp.dien_thoai if hasattr(emp, 'dien_thoai') else 'N/A'}
+- Điện thoại: {phone}
 - Phòng ban: {emp.phong_ban_id.display_name if hasattr(emp, 'phong_ban_id') and emp.phong_ban_id else 'N/A'}
 - Chức vụ: {emp.chuc_vu_id.display_name if hasattr(emp, 'chuc_vu_id') and emp.chuc_vu_id else 'N/A'}
 - Ngày vào làm: {emp.ngay_vao_lam.strftime('%d/%m/%Y') if hasattr(emp, 'ngay_vao_lam') and emp.ngay_vao_lam else 'N/A'}
-- Trạng thái: {dict(emp._fields['trang_thai'].selection).get(emp.trang_thai, 'N/A') if hasattr(emp, 'trang_thai') else 'N/A'}
+- Trạng thái: {status}
 """
             
             # Thông tin hợp đồng
@@ -85,7 +94,7 @@ GHI CHÚ: {emp.ghi_chu[:200]}{'...' if len(emp.ghi_chu) > 200 else ''}
     def _get_department_context(self, dept_id):
         """Lấy context phòng ban"""
         try:
-            dept = self.env['phong_ban'].browse(dept_id)
+            dept = self.env['nhan_su.phong_ban'].sudo().browse(dept_id)
             if not dept.exists():
                 return None
             
@@ -95,22 +104,25 @@ GHI CHÚ: {emp.ghi_chu[:200]}{'...' if len(emp.ghi_chu) > 200 else ''}
 """
             
             # Số nhân viên
-            if hasattr(dept, 'nhan_vien_ids'):
-                employees = dept.nhan_vien_ids
-                active_emps = employees.filtered(lambda e: e.trang_thai == 'dang_lam' if hasattr(e, 'trang_thai') else True)
-                context += f"""
+            employees = self.env['nhan_vien'].sudo().search([('phong_ban_id', '=', dept.id)])
+            active_emps = employees.filtered(
+                lambda e: e.trang_thai_lam_viec == 'dang_lam'
+                if hasattr(e, 'trang_thai_lam_viec') else e.trang_thai == 'dang_lam'
+                if hasattr(e, 'trang_thai') else True
+            )
+            context += f"""
 NHÂN SỰ:
 - Tổng số: {len(employees)} người
 - Đang làm: {len(active_emps)} người
 """
-                # Liệt kê nhân viên
-                if active_emps[:5]:
-                    context += "- Danh sách:\n"
-                    for emp in active_emps[:5]:
-                        pos = emp.chuc_vu_id.display_name if hasattr(emp, 'chuc_vu_id') and emp.chuc_vu_id else ''
-                        context += f"  • {emp.display_name} - {pos}\n"
-                    if len(active_emps) > 5:
-                        context += f"  ... và {len(active_emps) - 5} người khác\n"
+            # Liệt kê nhân viên
+            if active_emps[:5]:
+                context += "- Danh sách:\n"
+                for emp in active_emps[:5]:
+                    pos = emp.chuc_vu_id.display_name if hasattr(emp, 'chuc_vu_id') and emp.chuc_vu_id else ''
+                    context += f"  • {emp.display_name} - {pos}\n"
+                if len(active_emps) > 5:
+                    context += f"  ... và {len(active_emps) - 5} người khác\n"
             
             return context
             
@@ -192,14 +204,18 @@ NHÂN SỰ:
     def get_all_employees_summary(self, limit=50):
         """Lấy tổng quan tất cả nhân viên"""
         try:
-            employees = self.env['nhan_vien'].search([], limit=limit, order='create_date desc')
+            employees = self.env['nhan_vien'].sudo().search([], limit=limit, order='create_date desc')
             
             if not employees:
                 return "Không có nhân viên nào trong hệ thống."
             
-            # Thống kê
+            # Thống kê - check trang_thai_lam_viec first, then trang_thai
             total = len(employees)
-            active = len(employees.filtered(lambda e: e.trang_thai == 'dang_lam' if hasattr(e, 'trang_thai') else True))
+            active = len(employees.filtered(
+                lambda e: e.trang_thai_lam_viec == 'dang_lam' if hasattr(e, 'trang_thai_lam_viec') else (
+                    e.trang_thai == 'dang_lam' if hasattr(e, 'trang_thai') else True
+                )
+            ))
             
             summary = f"""TỔNG QUAN NHÂN SỰ:
 - Tổng số nhân viên: {total}
@@ -212,7 +228,12 @@ DANH SÁCH NHÂN VIÊN:
             for emp in employees[:20]:
                 dept = emp.phong_ban_id.display_name if hasattr(emp, 'phong_ban_id') and emp.phong_ban_id else 'N/A'
                 pos = emp.chuc_vu_id.display_name if hasattr(emp, 'chuc_vu_id') and emp.chuc_vu_id else 'N/A'
-                status = dict(emp._fields['trang_thai'].selection).get(emp.trang_thai, '') if hasattr(emp, 'trang_thai') else ''
+                if hasattr(emp, 'trang_thai_lam_viec'):
+                    status = dict(emp._fields['trang_thai_lam_viec'].selection).get(emp.trang_thai_lam_viec, '')
+                elif hasattr(emp, 'trang_thai'):
+                    status = dict(emp._fields['trang_thai'].selection).get(emp.trang_thai, '')
+                else:
+                    status = ''
                 summary += f"• {emp.display_name} - {dept} - {pos} ({status})\n"
             
             if total > 20:
@@ -228,7 +249,7 @@ DANH SÁCH NHÂN VIÊN:
     def get_all_departments_summary(self):
         """Lấy tổng quan tất cả phòng ban"""
         try:
-            departments = self.env['phong_ban'].search([])
+            departments = self.env['nhan_su.phong_ban'].sudo().search([])
             
             if not departments:
                 return "Không có phòng ban nào trong hệ thống."
@@ -239,7 +260,8 @@ DANH SÁCH NHÂN VIÊN:
             
             for dept in departments:
                 manager = dept.truong_phong_id.display_name if hasattr(dept, 'truong_phong_id') and dept.truong_phong_id else 'Chưa có'
-                emp_count = len(dept.nhan_vien_ids) if hasattr(dept, 'nhan_vien_ids') else 0
+                employees = self.env['nhan_vien'].sudo().search([('phong_ban_id', '=', dept.id)])
+                emp_count = len(employees)
                 summary += f"• {dept.display_name}\n"
                 summary += f"  - Trưởng phòng: {manager}\n"
                 summary += f"  - Số nhân viên: {emp_count}\n\n"
@@ -308,14 +330,31 @@ DANH SÁCH NHÂN VIÊN:
     def search_employees(self, keyword):
         """Tìm kiếm nhân viên theo từ khóa"""
         try:
-            domain = ['|', '|', '|',
-                ('name', 'ilike', keyword),
-                ('ma_nhan_vien', 'ilike', keyword),
-                ('email', 'ilike', keyword),
-                ('dien_thoai', 'ilike', keyword),
-            ]
+            employee_model = self.env['nhan_vien']
+            fields_map = employee_model._fields
+            or_parts = []
+            if 'ten_nv' in fields_map:
+                or_parts.append(('ten_nv', 'ilike', keyword))
+            if 'name' in fields_map:
+                or_parts.append(('name', 'ilike', keyword))
+            if 'ma_dinh_danh' in fields_map:
+                or_parts.append(('ma_dinh_danh', 'ilike', keyword))
+            if 'ma_nhan_vien' in fields_map:
+                or_parts.append(('ma_nhan_vien', 'ilike', keyword))
+            if 'email' in fields_map:
+                or_parts.append(('email', 'ilike', keyword))
+            if 'so_dien_thoai' in fields_map:
+                or_parts.append(('so_dien_thoai', 'ilike', keyword))
+            if 'dien_thoai' in fields_map:
+                or_parts.append(('dien_thoai', 'ilike', keyword))
+
+            if not or_parts:
+                return "Không thể tìm kiếm vì thiếu trường dữ liệu phù hợp."
+
+            domain = ['|'] * (len(or_parts) - 1)
+            domain += or_parts
             
-            employees = self.env['nhan_vien'].search(domain, limit=20)
+            employees = self.env['nhan_vien'].sudo().search(domain, limit=20)
             
             if not employees:
                 return f"Không tìm thấy nhân viên với từ khóa: {keyword}"
@@ -325,10 +364,11 @@ DANH SÁCH NHÂN VIÊN:
             for emp in employees:
                 dept = emp.phong_ban_id.display_name if hasattr(emp, 'phong_ban_id') and emp.phong_ban_id else 'N/A'
                 email = emp.email if hasattr(emp, 'email') else 'N/A'
-                phone = emp.dien_thoai if hasattr(emp, 'dien_thoai') else 'N/A'
+                phone = emp.so_dien_thoai if hasattr(emp, 'so_dien_thoai') else emp.dien_thoai if hasattr(emp, 'dien_thoai') else 'N/A'
+                ma_nv = emp.ma_dinh_danh if hasattr(emp, 'ma_dinh_danh') else emp.ma_nhan_vien if hasattr(emp, 'ma_nhan_vien') else 'N/A'
                 
                 result += f"• **{emp.display_name}**\n"
-                result += f"  - Mã NV: {emp.ma_nhan_vien if hasattr(emp, 'ma_nhan_vien') else 'N/A'}\n"
+                result += f"  - Mã NV: {ma_nv}\n"
                 result += f"  - Phòng ban: {dept}\n"
                 result += f"  - Email: {email}\n"
                 result += f"  - ĐT: {phone}\n\n"

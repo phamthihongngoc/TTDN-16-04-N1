@@ -69,7 +69,7 @@ class AIChatToolVanBan(models.AbstractModel):
             return {'error': 'Thiếu thông tin văn bản'}
         
         try:
-            doc = self.env[model].browse(res_id)
+            doc = self.env[model].sudo().browse(res_id)
             if not doc.exists():
                 return {'error': 'Không tìm thấy văn bản'}
             
@@ -138,7 +138,7 @@ Yêu cầu:
             return {'error': 'Thiếu thông tin văn bản'}
         
         try:
-            doc = self.env[model].browse(res_id)
+            doc = self.env[model].sudo().browse(res_id)
             if not doc.exists():
                 return {'error': 'Không tìm thấy văn bản'}
             

@@ -12,3 +12,8 @@ from . import res_company
 from . import res_config_settings
 from . import nhan_vien_ai
 
+# Tính năng mới: Ca làm việc, Nghỉ phép, Phụ cấp, BHXH
+from . import ca_lam_viec
+from . import don_nghi_phep
+from . import phu_cap
+

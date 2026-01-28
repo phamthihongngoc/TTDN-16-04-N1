@@ -41,7 +41,7 @@ try:
 except Exception:
     requests = None
 
-from .ocr_utils import ocr_image_bytes
+from .ocr_utils import ocr_image_bytes, fix_spacing_artifacts
 
 
 class VanBanOCR(models.Model):
@@ -49,7 +49,7 @@ class VanBanOCR(models.Model):
     _description = 'OCR - Trích xuất nội dung từ file'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char('Tên OCR', required=True, default=lambda self: _('OCR'), tracking=True)
+    name = fields.Char('Tên OCR', required=True, tracking=True)
     file_dinh_kem = fields.Binary('File', attachment=True, tracking=True)
     ten_file = fields.Char('Tên file', tracking=True)
 
@@ -320,7 +320,7 @@ class VanBanOCR(models.Model):
                         if ocr_texts:
                             parts.extend(ocr_texts)
 
-                self.noi_dung_trich_xuat = ('\n'.join(parts)).strip() or False
+                self.noi_dung_trich_xuat = fix_spacing_artifacts(('\n'.join(parts)).strip()) or False
 
             elif loai == 'image':
                 provider = self._get_ocr_provider()
@@ -330,7 +330,7 @@ class VanBanOCR(models.Model):
                     # OCR via external API
                     lang_used = self._get_ocrspace_settings().get('language') or 'vie'
                     text = self._ocr_via_ocrspace(file_data)
-                    self.noi_dung_trich_xuat = (text or '').strip() or False
+                    self.noi_dung_trich_xuat = fix_spacing_artifacts((text or '').strip()) or False
                 else:
                     # Local OCR (Tesseract)
                     self._ensure_ocr_dependencies()
@@ -347,7 +347,7 @@ class VanBanOCR(models.Model):
                         lang=lang_used,
                         config=tesseract_config,
                     )
-                    self.noi_dung_trich_xuat = (text or '').strip() or False
+                    self.noi_dung_trich_xuat = fix_spacing_artifacts((text or '').strip()) or False
 
             else:
                 raise UserError(_('Chỉ hỗ trợ .docx, .png, .jpg/.jpeg.'))

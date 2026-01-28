@@ -30,10 +30,33 @@
                                 <field name="luong_thang_nay" widget="statinfo" string="Lương (tháng)"/>
                             </button>
                             <button type="object" name="action_view_khach_hang" class="oe_stat_button" icon="fa-users">
-                                <field name="so_khach_hang_phu_trach" widget="statinfo" string="Khách hàng"/>
+                                <field name="so_khach_hang_phu_trach" widget="statinfo" string="Phụ trách"/>
                             </button>
                             <button type="object" name="action_view_van_ban" class="oe_stat_button" icon="fa-file-text-o">
-                                <field name="so_van_ban_tao" widget="statinfo" string="Văn bản"/>
+                                <field name="so_van_ban_tao" widget="statinfo" string="Đã tạo"/>
+                            </button>
+                            <button type="object" name="action_view_van_ban_ky" class="oe_stat_button" icon="fa-pencil">
+                                <field name="so_van_ban_ky" widget="statinfo" string="Đã ký"/>
+                            </button>
+                            <!-- Văn bản cần duyệt (dành cho Trưởng phòng) -->
+                            <button type="object" name="action_view_van_ban_can_duyet" class="oe_stat_button" icon="fa-check-circle"
+                                    attrs="{'invisible': [('so_van_ban_can_duyet', '=', 0)]}">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value text-warning">
+                                        <field name="so_van_ban_can_duyet"/>
+                                    </span>
+                                    <span class="o_stat_text">Cần duyệt</span>
+                                </div>
+                            </button>
+                            <!-- Văn bản cần ký (dành cho Giám đốc) -->
+                            <button type="object" name="action_view_van_ban_can_ky" class="oe_stat_button" icon="fa-pencil-square-o"
+                                    attrs="{'invisible': [('so_van_ban_can_ky', '=', 0)]}">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value text-danger">
+                                        <field name="so_van_ban_can_ky"/>
+                                    </span>
+                                    <span class="o_stat_text">Cần ký</span>
+                                </div>
                             </button>
                             <button type="object" name="action_view_ho_so" class="oe_stat_button" icon="fa-folder-open">
                                 <div class="o_field_widget o_stat_info">
@@ -225,20 +248,41 @@
             <field name="arch" type="xml">
                 <search string="Tìm kiếm nhân viên">
                     <field name="ma_dinh_danh"/>
-                    <field name="ten_nv"/>
+                    <field name="ten_nv" filter_domain="['|', ('ten_nv', 'ilike', self), ('ma_dinh_danh', 'ilike', self)]"/>
                     <field name="chuc_vu_id"/>
                     <field name="phong_ban_id"/>
                     <field name="so_dien_thoai"/>
                     <field name="email"/>
                     <field name="vai_tro_ids"/>
+                    <field name="manager_id"/>
                     
-                    <filter string="Đang làm việc" name="dang_lam" 
-                            domain="[('trang_thai_lam_viec', '=', 'dang_lam')]"/>
-                    <filter string="Nghỉ việc" name="nghi_viec" 
-                            domain="[('trang_thai_lam_viec', '=', 'nghi_viec')]"/>
                     <separator/>
-                    <filter string="Lương cao (&gt; 10tr)" name="luong_cao" 
+                    <filter string="✅ Đang làm việc" name="dang_lam" 
+                            domain="[('trang_thai_lam_viec', '=', 'dang_lam')]"/>
+                    <filter string="⏸️ Tạm nghỉ" name="tam_nghi" 
+                            domain="[('trang_thai_lam_viec', '=', 'tam_nghi')]"/>
+                    <filter string="❌ Nghỉ việc" name="nghi_viec" 
+                            domain="[('trang_thai_lam_viec', '=', 'nghi_viec')]"/>
+                    
+                    <separator/>
+                    <filter string="💰 Lương cao (&gt; 10tr)" name="luong_cao" 
                             domain="[('luong_co_ban', '&gt;', 10000000)]"/>
+                    <filter string="💰 Lương trung bình (5-10tr)" name="luong_trung_binh" 
+                            domain="[('luong_co_ban', '&gt;=', 5000000), ('luong_co_ban', '&lt;=', 10000000)]"/>
+                    
+                    <separator/>
+                    <filter string="👨‍💼 Có tài khoản" name="co_tai_khoan" 
+                            domain="[('user_id', '!=', False)]"/>
+                    <filter string="👤 Chưa có tài khoản" name="chua_co_tai_khoan" 
+                            domain="[('user_id', '=', False)]"/>
+                    
+                    <separator/>
+                    <filter string="📋 Hồ sơ đầy đủ" name="ho_so_day_du" 
+                            domain="[('trang_thai_ho_so', '=', 'day_du')]"/>
+                    <filter string="📋 Hồ sơ thiếu" name="ho_so_thieu" 
+                            domain="[('trang_thai_ho_so', '=', 'thieu')]"/>
+                    <filter string="📋 Hồ sơ sắp hết hạn" name="ho_so_sap_het_han" 
+                            domain="[('trang_thai_ho_so', '=', 'sap_het_han')]"/>
                     
                     <group expand="0" string="Nhóm theo">
                         <filter string="Trạng thái" name="group_trang_thai" 
@@ -247,39 +291,106 @@
                                 context="{'group_by':'phong_ban_id'}"/>
                         <filter string="Chức vụ" name="group_chuc_vu" 
                                 context="{'group_by':'chuc_vu_id'}"/>
+                        <filter string="Quản lý" name="group_manager" 
+                                context="{'group_by':'manager_id'}"/>
+                        <filter string="Tháng vào làm" name="group_month" 
+                                context="{'group_by':'ngay_vao_lam:month'}"/>
                     </group>
                 </search>
             </field>
         </record>
 
+        <!-- Kanban View - Enhanced Modern -->
         <record id="view_nhan_vien_kanban" model="ir.ui.view">
             <field name="name">nhan_vien.kanban</field>
             <field name="model">nhan_vien</field>
             <field name="arch" type="xml">
-                <kanban class="o_kanban_small_column" default_group_by="phong_ban_id">
+                <kanban class="o_kanban_small_column nv_kanban_modern" default_group_by="phong_ban_id"
+                        quick_create="false">
+                    <field name="id"/>
                     <field name="image_1920"/>
                     <field name="ten_nv"/>
                     <field name="ma_dinh_danh"/>
                     <field name="chuc_vu_id"/>
                     <field name="phong_ban_id"/>
                     <field name="trang_thai_lam_viec"/>
+                    <field name="email"/>
+                    <field name="so_dien_thoai"/>
+                    <field name="so_van_ban_tao"/>
+                    <field name="so_khach_hang_phu_trach"/>
+                    <field name="ty_le_cham_cong"/>
+                    <field name="trang_thai_ho_so"/>
+                    <progressbar field="trang_thai_lam_viec" colors='{"dang_lam": "success", "tam_nghi": "warning", "nghi_viec": "danger"}'/>
                     <templates>
                         <t t-name="kanban-box">
-                            <div class="oe_kanban_global_click o_kanban_card">
-                                <div class="o_kanban_image">
-                                    <img t-if="record.image_1920 and record.image_1920.raw_value" t-att-src="kanban_image('nhan_vien', 'image_1920', record.id)" class="o_kanban_avatar" alt="Avatar"/>
-                                    <div t-if="! (record.image_1920 and record.image_1920.raw_value)" class="o_kanban_avatar o_kanban_avatar_empty"/>
+                            <div class="oe_kanban_global_click o_kanban_card nv_card_modern">
+                                <!-- Status Ribbon -->
+                                <div t-if="record.trang_thai_lam_viec.raw_value == 'dang_lam'" class="nv_ribbon nv_ribbon_active">✅ Đang làm</div>
+                                <div t-if="record.trang_thai_lam_viec.raw_value == 'tam_nghi'" class="nv_ribbon nv_ribbon_pause">⏸️ Tạm nghỉ</div>
+                                <div t-if="record.trang_thai_lam_viec.raw_value == 'nghi_viec'" class="nv_ribbon nv_ribbon_inactive">❌ Nghỉ việc</div>
+                                
+                                <!-- Dropdown Menu -->
+                                <div class="o_dropdown_kanban dropdown">
+                                    <a class="dropdown-toggle o-no-caret btn" data-toggle="dropdown" href="#" role="button">
+                                        <span class="fa fa-ellipsis-v"/>
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <a t-if="widget.editable" role="menuitem" type="edit" class="dropdown-item">✏️ Sửa</a>
+                                        <div class="dropdown-divider"/>
+                                        <a role="menuitem" type="object" name="action_view_cham_cong" class="dropdown-item">📅 Xem chấm công</a>
+                                        <a role="menuitem" type="object" name="action_view_bang_luong" class="dropdown-item">💰 Xem bảng lương</a>
+                                        <a role="menuitem" type="object" name="action_view_van_ban" class="dropdown-item">📄 Xem văn bản</a>
+                                        <a role="menuitem" type="object" name="action_view_khach_hang" class="dropdown-item">👥 Xem khách hàng</a>
+                                    </div>
                                 </div>
+                                
+                                <!-- Avatar & Info -->
+                                <div class="o_kanban_image">
+                                    <img t-if="record.image_1920.raw_value" 
+                                         t-att-src="kanban_image('nhan_vien', 'image_1920', record.id.raw_value)" 
+                                         class="o_kanban_avatar nv_avatar" alt="Avatar"/>
+                                    <div t-if="!record.image_1920.raw_value" 
+                                         class="o_kanban_avatar o_kanban_avatar_empty nv_avatar_empty">
+                                        <i class="fa fa-user-circle-o fa-3x text-muted"/>
+                                    </div>
+                                </div>
+                                
                                 <div class="oe_kanban_details">
-                                    <strong><field name="ten_nv"/></strong>
-                                    <div class="text-muted"><field name="ma_dinh_danh"/></div>
-                                    <div><field name="chuc_vu_id"/></div>
-                                    <div class="text-muted"><field name="phong_ban_id"/></div>
-                                    <div class="mt8">
-                                        <field name="trang_thai_lam_viec" widget="badge"
-                                               decoration-success="trang_thai_lam_viec=='dang_lam'"
-                                               decoration-warning="trang_thai_lam_viec=='tam_nghi'"
-                                               decoration-danger="trang_thai_lam_viec=='nghi_viec'"/>
+                                    <strong class="nv_name"><field name="ten_nv"/></strong>
+                                    <div class="nv_code text-muted">
+                                        <i class="fa fa-id-badge mr-1"/> <field name="ma_dinh_danh"/>
+                                    </div>
+                                    <div class="nv_position">
+                                        <i class="fa fa-briefcase mr-1"/> <field name="chuc_vu_id"/>
+                                    </div>
+                                    <div class="nv_department text-muted">
+                                        <i class="fa fa-building mr-1"/> <field name="phong_ban_id"/>
+                                    </div>
+                                    
+                                    <!-- Statistics -->
+                                    <div class="nv_stats_row mt-2">
+                                        <span class="nv_stat_badge nv_stat_docs" title="Văn bản đã tạo">
+                                            📄 <field name="so_van_ban_tao"/>
+                                        </span>
+                                        <span class="nv_stat_badge nv_stat_customers" title="Khách hàng phụ trách">
+                                            👥 <field name="so_khach_hang_phu_trach"/>
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Attendance Progress -->
+                                    <div class="nv_attendance mt-2">
+                                        <small class="text-muted">Chấm công: </small>
+                                        <span t-attf-class="badge #{record.ty_le_cham_cong.raw_value >= 95 ? 'badge-success' : (record.ty_le_cham_cong.raw_value >= 80 ? 'badge-warning' : 'badge-danger')}">
+                                            <field name="ty_le_cham_cong"/>%
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Document Status -->
+                                    <div class="nv_doc_status mt-1">
+                                        <field name="trang_thai_ho_so" widget="badge" 
+                                               decoration-success="trang_thai_ho_so == 'day_du'"
+                                               decoration-warning="trang_thai_ho_so == 'sap_het_han'"
+                                               decoration-danger="trang_thai_ho_so in ['thieu', 'het_han']"/>
                                     </div>
                                 </div>
                             </div>

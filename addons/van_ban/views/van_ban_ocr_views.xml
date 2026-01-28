@@ -5,11 +5,12 @@
         <field name="name">van_ban_ocr.tree</field>
         <field name="model">van_ban_ocr</field>
         <field name="arch" type="xml">
-            <tree string="OCR" default_order="id desc">
+            <tree string="OCR" default_order="id desc" decoration-success="noi_dung_trich_xuat != False" decoration-muted="noi_dung_trich_xuat == False">
                 <field name="name"/>
                 <field name="ten_file"/>
                 <field name="loai_file"/>
                 <field name="create_date"/>
+                <field name="noi_dung_trich_xuat" invisible="1"/>
             </tree>
         </field>
     </record>
@@ -20,35 +21,49 @@
         <field name="arch" type="xml">
             <form string="OCR">
                 <header>
-                    <button name="action_trich_xuat" string="Trích xuất" type="object" class="oe_highlight"
+                    <button name="action_trich_xuat" string="Trích xuất văn bản" type="object" 
+                            class="btn-primary" 
+                            style="border-radius: 20px; padding: 10px 24px; font-weight: 600; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);"
                             attrs="{'invisible': [('file_dinh_kem', '=', False)]}"/>
-                    <button name="action_clear_file" string="Xóa file hiện tại" type="object"
+                    <button name="action_clear_file" string="Xóa file" type="object" 
+                            class="btn-secondary"
+                            style="border-radius: 20px; padding: 10px 24px; font-weight: 500; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none; color: white;"
                             attrs="{'invisible': [('file_dinh_kem', '=', False)]}"/>
                 </header>
 
-                <sheet>
-                    <div class="oe_title">
-                        <label for="name"/>
-                        <h1><field name="name"/></h1>
+                <sheet style="background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); padding: 20px;">
+                    <!-- Tên OCR - Thu nhỏ -->
+                    <div class="oe_title" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(102, 126, 234, 0.25); max-width: 50%;">
+                        <label for="name" string="TÊN OCR" style="color: rgba(255,255,255,0.9); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px;"/>
+                        <h1 style="margin: 0;">
+                            <field name="name" placeholder="Nhập tên OCR..." style="color: white; font-size: 16px; font-weight: 600; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.4); width: 100%;"/>
+                        </h1>
                     </div>
 
-                    <group>
-                        <group string="Upload">
-                            <field name="file_dinh_kem" filename="ten_file"/>
-                            <field name="ten_file"/>
-                            <field name="loai_file" readonly="1"/>
+                    <!-- Layout 2 cột -->
+                    <group col="2" style="gap: 20px;">
+                        <!-- Cột trái: Thông tin file -->
+                        <group string="Tải lên tệp tin" style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-left: 4px solid #667eea;">
+                            <field name="file_dinh_kem" filename="ten_file" style="padding: 12px; background: #f8f9ff; border-radius: 8px; border: 2px dashed #667eea;"/>
+                            <field name="ten_file" string="Tên file" style="color: #4a5568; font-weight: 500;"/>
+                            <field name="loai_file" string="Loại file" readonly="1" style="color: #718096; background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); padding: 6px 12px; border-radius: 20px; display: inline-block;"/>
+                        </group>
+                        
+                        <!-- Cột phải: Kết quả trích xuất -->
+                        <group string="Kết quả trích xuất" style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-left: 4px solid #f093fb;">
+                            <field name="noi_dung_trich_xuat" nolabel="1"
+                                   placeholder="Nội dung trích xuất sẽ hiển thị ở đây sau khi bạn nhấn 'Trích xuất văn bản'..."
+                                   style="min-height: 200px; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; font-size: 14px; line-height: 1.7; color: #2d3748;"/>
                         </group>
                     </group>
 
-                    <notebook>
-                        <page string="Kết quả">
-                            <group>
-                                <field name="noi_dung_trich_xuat" placeholder="Nội dung trích xuất sẽ hiển thị ở đây"/>
-                            </group>
-                        </page>
-                        <page string="Lịch sử">
+                    <!-- Tabs phụ -->
+                    <notebook style="margin-top: 24px;">
+                        <page string="Lịch sử" style="background: white; border-radius: 12px; padding: 16px;">
                             <field name="history_ids" context="{'default_ocr_id': active_id}" nolabel="1">
-                                <tree string="Lịch sử trích xuất" default_order="create_date desc">
+                                <tree string="Lịch sử trích xuất" default_order="create_date desc" 
+                                      decoration-info="1"
+                                      style="border-radius: 8px; overflow: hidden;">
                                     <field name="create_date"/>
                                     <field name="user_id"/>
                                     <field name="ten_file"/>
@@ -57,9 +72,9 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Lỗi" attrs="{'invisible': [('loi_xu_ly', '=', False)]}">
+                        <page string="Lỗi" attrs="{'invisible': [('loi_xu_ly', '=', False)]}" style="background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); border-radius: 12px; padding: 16px;">
                             <group>
-                                <field name="loi_xu_ly" readonly="1"/>
+                                <field name="loi_xu_ly" readonly="1" style="color: #c53030; font-family: 'Consolas', monospace; background: #fff5f5; padding: 12px; border-radius: 8px; border: 1px solid #feb2b2;"/>
                             </group>
                         </page>
                     </notebook>

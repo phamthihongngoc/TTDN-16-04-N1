@@ -45,10 +45,14 @@ class AIChatOrchestrator(models.AbstractModel):
             
             # Update session context if provided
             if context.get('active_model'):
-                session.write({
+                module = context.get('module') or session._infer_module_from_model(context.get('active_model'))
+                values = {
                     'active_model': context.get('active_model'),
                     'active_res_id': context.get('active_res_id'),
-                })
+                }
+                if module:
+                    values['module'] = module
+                session.write(values)
             
             # Create user message
             self.env['ai.chat.message'].create_user_message(
@@ -76,7 +80,7 @@ class AIChatOrchestrator(models.AbstractModel):
                 response = ai_service.chat_completion_with_tools(
                     messages=messages,
                     tools=tools_schema if tools_schema else None,
-                    temperature=0.7,
+                    temperature=0.2,
                 )
             except Exception as e:
                 _logger.exception("Error calling AI service")
@@ -202,8 +206,12 @@ NGUYÊN TẮC:
 - Trả lời bằng tiếng Việt, ngắn gọn, chuyên nghiệp
 - Sử dụng tools khi cần truy vấn hoặc thao tác dữ liệu
 - KHÔNG bịa dữ liệu - chỉ trả lời dựa trên thông tin từ tools
+- Với câu hỏi cần số liệu, danh sách, trạng thái, thống kê: BẮT BUỘC gọi tool để truy vấn dữ liệu trước khi trả lời
 - Với các thao tác ghi dữ liệu (tạo, sửa, gửi), phải xác nhận với user trước
 - Khi không chắc chắn, hãy hỏi lại để làm rõ
+
+PHẠM VI DỮ LIỆU:
+- Có thể truy vấn dữ liệu của cả 3 module: Khách hàng, Văn bản, Nhân sự
 
 CÁCH SỬ DỤNG TOOLS:
 - Dùng tool để tìm kiếm, đọc dữ liệu trước khi trả lời
@@ -231,20 +239,20 @@ CÁCH SỬ DỤNG TOOLS:
             base_prompt += """
 
 CONTEXT: Quản lý Khách hàng
-Bạn CHỈ có thể truy vấn dữ liệu KHÁCH HÀNG:
+Bạn có thể truy vấn dữ liệu KHÁCH HÀNG:
 - Tìm kiếm, tóm tắt thông tin khách hàng
 - Xem lịch sử đơn hàng, hỗ trợ
 - Soạn email chăm sóc/nhắc việc
 - Tạo phiếu hỗ trợ (cần xác nhận)
 - Đề xuất bước tiếp theo với khách hàng
 
-LƯU Ý: Không trả lời câu hỏi về văn bản hay nhân sự.
+LƯU Ý: Khi cần dữ liệu cụ thể, hãy gọi tool trước khi trả lời.
 """
         elif module == 'van_ban':
             base_prompt += """
 
 CONTEXT: Quản lý Văn bản
-Bạn CHỈ có thể truy vấn dữ liệu VĂN BẢN:
+Bạn có thể truy vấn dữ liệu VĂN BẢN:
 - Tóm tắt nội dung văn bản
 - Trích xuất thông tin (người, cơ quan, deadline...)
 - Phân loại văn bản
@@ -252,13 +260,13 @@ Bạn CHỈ có thể truy vấn dữ liệu VĂN BẢN:
 - Đề xuất luồng xử lý/ký duyệt
 - Tạo checklist việc cần làm
 
-LƯU Ý: Không trả lời câu hỏi về khách hàng hay nhân sự.
+LƯU Ý: Khi cần dữ liệu cụ thể, hãy gọi tool trước khi trả lời.
 """
         elif module == 'nhan_su':
             base_prompt += """
 
 CONTEXT: Quản lý Nhân sự
-Bạn CHỈ có thể truy vấn dữ liệu NHÂN SỰ:
+Bạn có thể truy vấn dữ liệu NHÂN SỰ:
 - Tra cứu thông tin nhân viên (họ tên, phòng ban, chức vụ, liên hệ)
 - Xem cơ cấu phòng ban, số lượng nhân viên
 - Kiểm tra chấm công, nghỉ phép
@@ -267,7 +275,7 @@ Bạn CHỈ có thể truy vấn dữ liệu NHÂN SỰ:
 - Tìm kiếm nhân viên theo tên, mã NV, email, SĐT
 - Báo cáo chấm công theo tháng
 
-LƯU Ý: Không trả lời câu hỏi về khách hàng hay văn bản.
+LƯU Ý: Khi cần dữ liệu cụ thể, hãy gọi tool trước khi trả lời.
 """
         
         return base_prompt
@@ -317,23 +325,11 @@ LƯU Ý: Không trả lời câu hỏi về khách hàng hay văn bản.
 
     def _get_tools_for_session(self, session, context):
         """Lấy tools phù hợp với session context"""
-        # Use session.module first, fallback to active_model detection
-        module = session.module
-        
-        if not module:
-            active_model = session.active_model or context.get('active_model', '') or ''
-            if active_model and ('khach_hang' in active_model or 'don_hang' in active_model or 'ho_tro' in active_model):
-                module = 'khach_hang'
-            elif active_model and 'van_ban' in active_model:
-                module = 'van_ban'
-            elif active_model and ('nhan_vien' in active_model or 'phong_ban' in active_model or 'cham_cong' in active_model or 'bang_luong' in active_model):
-                module = 'nhan_su'
-        
         active_model = session.active_model or context.get('active_model', '') or ''
         
         try:
             return self.env['ai.chat.tool'].get_tools_for_context(
-                module=module,
+                module=None,
                 active_model=active_model
             )
         except Exception as e:
