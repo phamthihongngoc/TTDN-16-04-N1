@@ -136,11 +136,16 @@ class AIChatTool(models.Model):
         
         # Check permission
         if self.required_group_id:
-            if not self.env.user.has_group(self.required_group_id.get_full_xml_id()[self.required_group_id.id]):
-                return {
-                    'success': False,
-                    'error': f'Bạn không có quyền sử dụng tool: {self.display_name}'
-                }
+            try:
+                xml_ids = self.required_group_id.get_full_xml_id()
+                group_xml_id = xml_ids.get(self.required_group_id.id, '')
+                if group_xml_id and not self.env.user.has_group(group_xml_id):
+                    return {
+                        'success': False,
+                        'error': f'Bạn không có quyền sử dụng tool: {self.display_name}'
+                    }
+            except Exception as e:
+                _logger.warning(f"Error checking permission for tool {self.name}: {e}")
         
         # Find and call method
         if not self.model_name or not self.method_name:
@@ -150,6 +155,13 @@ class AIChatTool(models.Model):
             }
         
         try:
+            # Check if model exists
+            if self.model_name not in self.env:
+                return {
+                    'success': False,
+                    'error': f'Model {self.model_name} không tồn tại'
+                }
+            
             model = self.env[self.model_name]
             method = getattr(model, self.method_name, None)
             
@@ -161,6 +173,14 @@ class AIChatTool(models.Model):
             
             # Call method with session context
             result = method(arguments, session=session)
+            
+            # Check if result contains error
+            if isinstance(result, dict) and result.get('error'):
+                return {
+                    'success': False,
+                    'error': result['error'],
+                    'data': result,
+                }
             
             return {
                 'success': True,
@@ -188,14 +208,16 @@ class AIChatTool(models.Model):
         """Lấy danh sách tools phù hợp với context"""
         domain = [('active', '=', True)]
         
+        # Nếu có module cụ thể, lấy tools của module đó + general
+        # Nếu không, lấy TẤT CẢ tools active
         if module:
             domain.append(('module', 'in', [module, 'general']))
+        # Không filter theo module nếu module=None -> lấy tất cả tools
         
         tools = self.search(domain)
         
-        # Filter by applicable_models
-        if active_model:
-            tools = tools.filtered(lambda t: t.is_applicable_for_model(active_model))
+        # KHÔNG filter theo applicable_models nữa để cho phép truy vấn cross-module
+        # AI sẽ tự quyết định tool nào phù hợp
         
         # Filter by user permission (with error handling)
         def check_permission(t):

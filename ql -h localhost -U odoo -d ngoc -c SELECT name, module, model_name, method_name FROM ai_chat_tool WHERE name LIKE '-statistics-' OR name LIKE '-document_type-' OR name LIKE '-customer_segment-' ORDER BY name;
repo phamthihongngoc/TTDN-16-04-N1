@@ -1,0 +1,7 @@
+ get_customer_statistics   | khach_hang | ai.chat.tool.khach_hang | tool_get_customer_statistics
+ get_department_statistics | nhan_su    | ai.chat.tool.nhan_su    | tool_get_department_statistics
+ get_document_statistics   | van_ban    | ai.chat.tool.van_ban    | tool_get_document_statistics
+ get_hr_statistics         | nhan_su    | ai.chat.tool.nhan_su    | tool_get_hr_statistics
+ list_customer_segments    | khach_hang | ai.chat.tool.khach_hang | tool_list_customer_segments
+ list_document_types       | van_ban    | ai.chat.tool.van_ban    | tool_list_document_types
+

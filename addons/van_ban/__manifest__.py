@@ -56,6 +56,7 @@
         'web.assets_backend': [
             'van_ban/static/src/css/signature_pad.css',
             'van_ban/static/src/css/menu_icons.css',
+            'van_ban/static/src/css/ai_extract.css',
         ],
     },
     'external_dependencies': {

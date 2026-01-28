@@ -65,6 +65,11 @@ class VanBanOCR(models.Model):
 
     noi_dung_trich_xuat = fields.Text('Nội dung trích xuất', tracking=True)
     loi_xu_ly = fields.Text('Lỗi xử lý', readonly=True)
+    
+    # AI Summary
+    ai_summary = fields.Text('Tóm tắt AI', readonly=True, tracking=True,
+                             help='Tóm tắt nội dung văn bản bởi AI')
+    ai_summary_at = fields.Datetime('Tóm tắt lúc', readonly=True)
 
     def _get_ocr_provider(self):
         return self.env['ir.config_parameter'].sudo().get_param('van_ban.ocr_provider') or 'local'
@@ -239,10 +244,24 @@ class VanBanOCR(models.Model):
             ))
 
     def action_trich_xuat(self):
-        for record in self:
-            if not record.file_dinh_kem:
-                raise UserError(_('Vui lòng upload file trước khi trích xuất.'))
-            record._run_extract()
+        """Trích xuất văn bản từ file, tự động lưu không cần ấn Save."""
+        self.ensure_one()
+        if not self.file_dinh_kem:
+            raise UserError(_('Vui lòng upload file trước khi trích xuất.'))
+        self._run_extract()
+        
+        # Return notification with reload to refresh view
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Trích xuất hoàn thành'),
+                'message': _('Đã trích xuất văn bản thành công.'),
+                'type': 'success',
+                'sticky': False,
+                'next': {'type': 'ir.actions.client', 'tag': 'reload'},
+            }
+        }
 
     def _run_extract(self):
         self.ensure_one()
@@ -372,6 +391,51 @@ class VanBanOCR(models.Model):
             'noi_dung_trich_xuat': self.noi_dung_trich_xuat,
             'loi_xu_ly': self.loi_xu_ly,
         })
+
+    def action_ai_summarize(self):
+        """Tóm tắt nội dung trích xuất bằng AI."""
+        self.ensure_one()
+        
+        if not self.noi_dung_trich_xuat:
+            raise UserError(_('Chưa có nội dung trích xuất. Vui lòng trích xuất văn bản trước.'))
+        
+        ai_service = self.env['ai.service']
+        if not ai_service.is_available():
+            raise UserError(_('AI Service chưa được cấu hình. Vui lòng vào Settings > AI Integration.'))
+        
+        text = self.noi_dung_trich_xuat
+        
+        if len(text) < 50:
+            raise UserError(_('Nội dung quá ngắn để tóm tắt.'))
+        
+        try:
+            summary = ai_service.summarize_text(
+                text=text,
+                max_words=300,
+                focus='các điểm chính, thông tin quan trọng, bên liên quan và nội dung cốt lõi của văn bản',
+                model_name=self._name,
+                record_id=self.id
+            )
+            
+            self.write({
+                'ai_summary': summary,
+                'ai_summary_at': fields.Datetime.now(),
+            })
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Tóm tắt hoàn thành'),
+                    'message': _('AI đã tóm tắt văn bản thành công.'),
+                    'type': 'success',
+                    'sticky': False,
+                    'next': {'type': 'ir.actions.client', 'tag': 'reload'},
+                }
+            }
+        except Exception as e:
+            _logger.error('AI Summary failed: %s', str(e), exc_info=True)
+            raise UserError(_('Lỗi khi tóm tắt: %s') % str(e))
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -124,6 +124,9 @@ class VanBan(models.Model):
         ('error', 'Lỗi'),
     ], string='AI PDF Extract State', default='none', readonly=True)
     ai_pdf_extract_error = fields.Text('AI PDF Extract Error', readonly=True)
+    ai_pdf_summary = fields.Text('Tóm tắt AI từ PDF', readonly=True, 
+                                  help='Tóm tắt nội dung văn bản PDF bởi AI')
+    ai_pdf_summary_at = fields.Datetime('Tóm tắt PDF lúc', readonly=True)
     
     # === KÝ ĐIỆN TỬ ===
     da_ky_noi_bo = fields.Boolean('Đã ký nội bộ', readonly=True)
@@ -412,21 +415,86 @@ class VanBan(models.Model):
         return False
 
     def action_ai_autofill_from_pdf(self):
-        """Manual re-run (useful after editing, or when onchange didn't run due to caching)."""
-        for record in self:
-            warning = record._ai_autofill_from_uploaded_pdf(force=True, is_onchange=False)
-            if warning:
-                return warning
+        """Manual re-run (useful after editing, or when onchange didn't run due to caching).
+        Auto-saves changes to database without requiring manual Save click."""
+        self.ensure_one()
+        
+        # If record is new (not saved yet), save first
+        if not self.id or isinstance(self.id, models.NewId):
+            # Can't process unsaved record
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Thông báo'),
+                    'message': _('Vui lòng lưu văn bản trước khi trích xuất PDF.'),
+                    'type': 'warning',
+                    'sticky': False,
+                }
+            }
+        
+        # Run extraction with force=True
+        warning = self._ai_autofill_from_uploaded_pdf(force=True, is_onchange=False)
+        if warning:
+            return warning
+        
+        # Return success notification and reload the view
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'title': _('AI Auto-fill'),
-                'message': _('Đã thử tự điền thông tin từ PDF.'),
+                'message': _('Đã trích xuất và tự điền thông tin từ PDF thành công.'),
                 'type': 'success',
                 'sticky': False,
+                'next': {'type': 'ir.actions.client', 'tag': 'reload'},
             }
         }
+
+    def action_ai_summarize_pdf(self):
+        """Tóm tắt nội dung PDF đã trích xuất bằng AI."""
+        self.ensure_one()
+        
+        if not self.ai_pdf_text:
+            raise UserError(_('Chưa có nội dung PDF đã trích xuất. Vui lòng trích xuất PDF trước.'))
+        
+        ai_service = self.env['ai.service']
+        if not ai_service.is_available():
+            raise UserError(_('AI Service chưa được cấu hình. Vui lòng vào Settings > AI Integration.'))
+        
+        text = self.ai_pdf_text
+        
+        if len(text) < 50:
+            raise UserError(_('Nội dung PDF quá ngắn để tóm tắt.'))
+        
+        try:
+            summary = ai_service.summarize_text(
+                text=text,
+                max_words=300,
+                focus='các điểm chính, thông tin quan trọng, bên liên quan, điều khoản và nội dung cốt lõi của văn bản',
+                model_name=self._name,
+                record_id=self.id
+            )
+            
+            self.write({
+                'ai_pdf_summary': summary,
+                'ai_pdf_summary_at': fields.Datetime.now(),
+            })
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Tóm tắt hoàn thành'),
+                    'message': _('AI đã tóm tắt văn bản PDF thành công.'),
+                    'type': 'success',
+                    'sticky': False,
+                    'next': {'type': 'ir.actions.client', 'tag': 'reload'},
+                }
+            }
+        except Exception as e:
+            _logger.error('AI PDF Summary failed: %s', str(e), exc_info=True)
+            raise UserError(_('Lỗi khi tóm tắt PDF: %s') % str(e))
 
     def _ai_autofill_from_uploaded_pdf(self, force=False, is_onchange=False):
         """Shared implementation for onchange and manual button.
@@ -728,6 +796,7 @@ class VanBan(models.Model):
                     if len(re.findall(r'\d', nxt)) <= 6:
                         cand = f"{cand} {nxt}".strip()
                 cand = re.sub(r'\s+', ' ', cand).strip()
+                cand = fix_spacing_artifacts(cand)
                 # Avoid absurdly long lines
                 if 6 <= len(cand) <= 180:
                     return cand
@@ -742,7 +811,8 @@ class VanBan(models.Model):
             letters = len(re.findall(r'[A-Za-zÀ-ỹ]', ln))
             if letters < 6:
                 continue
-            return re.sub(r'\s+', ' ', ln).strip()
+            ln = re.sub(r'\s+', ' ', ln).strip()
+            return fix_spacing_artifacts(ln)
 
         return False
 
@@ -917,9 +987,6 @@ class VanBan(models.Model):
             v = re.sub(r'^(Họ và tên|Họ tên|Tên)\s*[:：]\s*', '', v, flags=re.IGNORECASE)
             # Bỏ prefix "Ông", "Bà"
             v = re.sub(r'^(Ông|Bà|Anh|Chị)\s*[:：]?\s*', '', v, flags=re.IGNORECASE)
-            # Nếu tên bị dính liền (không có dấu cách giữa các từ), tách ra theo chữ hoa
-            if v and not ' ' in v and len(v) > 4:
-                v = re.sub(r'(?<=[a-zàáảãạăắằẳẵặâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ])(?=[A-ZÀÁẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬĐÈÉẺẼẸÊẾỀỂỄỆÌÍỈĨỊÒÓỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÙÚỦŨỤƯỨỪỬỮỰỲÝỶỸỴ])', ' ', v)
             # Chỉ giữ 1 dấu cách giữa các từ
             v = re.sub(r'\s+', ' ', v)
             return v.strip()
@@ -2070,12 +2137,16 @@ class VanBan(models.Model):
             
             record._ghi_lich_su('gui', 'Gửi văn bản - Văn bản đã được khóa')
             
-            # Gửi email thông báo cho khách hàng (nếu có)
+            # Gửi văn bản đến nhiều người:
+            # 1. Gửi email cho Admin (lưu trữ)
+            record._gui_email_van_ban_cho_admin()
+            
+            # 2. Gửi email thông báo + file đã ký cho Giám đốc/Người ký
+            record._gui_email_van_ban_da_gui_cho_giam_doc()
+            
+            # 3. Gửi email thông báo cho khách hàng (nếu có)
             if record.khach_hang_id and record.khach_hang_id.email:
                 record._gui_email_van_ban_da_gui()
-
-            # Gửi email thông báo + file đã ký cho Giám đốc (nếu có)
-            record._gui_email_van_ban_da_gui_cho_giam_doc()
 
             # Thông báo nội bộ
             record._send_enhanced_notifications('sent')
@@ -2100,6 +2171,78 @@ class VanBan(models.Model):
                 },
             }
         }
+
+    def _gui_email_van_ban_cho_admin(self):
+        """Gửi email văn bản đã ký cho Admin/Quản trị văn bản để lưu trữ"""
+        self.ensure_one()
+        
+        # Lấy danh sách email admin từ nhóm quản trị văn bản
+        admin_emails = []
+        admin_group = self.env.ref('van_ban.group_quan_tri_van_ban', raise_if_not_found=False)
+        
+        if admin_group:
+            for user in admin_group.users:
+                if user and user.active and user.email:
+                    admin_emails.append(user.email)
+        
+        # Nếu không có admin trong nhóm, lấy system admin
+        if not admin_emails:
+            system_admin = self.env.ref('base.user_admin', raise_if_not_found=False)
+            if system_admin and system_admin.email:
+                admin_emails.append(system_admin.email)
+        
+        if not admin_emails:
+            return
+        
+        # Thông tin chi tiết về chữ ký
+        signature_info = []
+        if self.da_ky_noi_bo and self.nguoi_ky_id:
+            signature_info.append(f'Người ký nội bộ: {self.nguoi_ky_id.ten_nv or self.nguoi_ky_id.name} - Ngày ký: {self.ngay_ky_noi_bo}')
+        if self.da_khach_ky and self.khach_hang_id:
+            signature_info.append(f'Khách hàng ký: {self.khach_hang_id.ten_khach_hang} - Ngày ký: {self.ngay_khach_ky}')
+        
+        signature_html = '<br/>'.join(signature_info) if signature_info else 'Không có thông tin chữ ký'
+        
+        mail_values = {
+            'subject': f'[LƯU TRỮ] Văn bản đã ký hoàn tất: {self.ten_van_ban}',
+            'body_html': f'''
+                <h3>📁 Văn bản cần lưu trữ</h3>
+                <p>Văn bản <strong>{self.ten_van_ban}</strong> đã được ký hoàn tất và gửi đi.</p>
+                
+                <h4>Thông tin văn bản:</h4>
+                <table style="border-collapse: collapse; width: 100%;">
+                    <tr><td style="padding: 5px; border: 1px solid #ddd;"><strong>Mã văn bản:</strong></td><td style="padding: 5px; border: 1px solid #ddd;">{self.ma_van_ban}</td></tr>
+                    <tr><td style="padding: 5px; border: 1px solid #ddd;"><strong>Tên văn bản:</strong></td><td style="padding: 5px; border: 1px solid #ddd;">{self.ten_van_ban}</td></tr>
+                    <tr><td style="padding: 5px; border: 1px solid #ddd;"><strong>Loại văn bản:</strong></td><td style="padding: 5px; border: 1px solid #ddd;">{self.loai_van_ban_id.ten_loai if self.loai_van_ban_id else ''}</td></tr>
+                    <tr><td style="padding: 5px; border: 1px solid #ddd;"><strong>Ngày gửi:</strong></td><td style="padding: 5px; border: 1px solid #ddd;">{self.ngay_gui}</td></tr>
+                    <tr><td style="padding: 5px; border: 1px solid #ddd;"><strong>Khách hàng:</strong></td><td style="padding: 5px; border: 1px solid #ddd;">{self.khach_hang_id.ten_khach_hang if self.khach_hang_id else 'Không có'}</td></tr>
+                    <tr><td style="padding: 5px; border: 1px solid #ddd;"><strong>Giá trị hợp đồng:</strong></td><td style="padding: 5px; border: 1px solid #ddd;">{'{:,.0f}'.format(self.gia_tri_hop_dong) if self.gia_tri_hop_dong else 'Không có'} VND</td></tr>
+                </table>
+                
+                <h4>Thông tin chữ ký:</h4>
+                <p>{signature_html}</p>
+                
+                <p style="color: #28a745;"><strong>✓ Văn bản đã được khóa và lưu trữ.</strong></p>
+                <p>File văn bản đã ký được đính kèm trong email này.</p>
+                <br/>
+                <p>Trân trọng,</p>
+                <p>Hệ thống Quản lý Văn bản - {self.env.company.name}</p>
+            ''',
+            'email_to': ','.join(admin_emails),
+            'email_from': self.env.company.email or 'noreply@company.com',
+        }
+        
+        # Đính kèm file đã ký
+        if self.file_da_ky and self.ten_file_da_ky:
+            mail_values['attachment_ids'] = [(
+                0, 0, {
+                    'name': self.ten_file_da_ky,
+                    'datas': self.file_da_ky,
+                    'mimetype': 'application/pdf',
+                }
+            )]
+        
+        self.env['mail.mail'].create(mail_values).send()
 
     def _gui_email_van_ban_da_gui_cho_giam_doc(self):
         """Gửi email văn bản đã ký cho Giám đốc"""

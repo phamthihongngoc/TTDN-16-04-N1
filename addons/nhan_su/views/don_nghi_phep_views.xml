@@ -62,14 +62,23 @@
                     <button name="action_gui_duyet" type="object" string="Gửi duyệt"
                             class="btn-primary"
                             attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}"/>
+                    <!-- Assigned approver actions -->
                     <button name="action_duyet" type="object" string="Duyệt"
-                            class="btn-success"
-                            attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}"
-                            groups="nhan_su.group_quan_tri_nhan_su"/>
-                    <button name="action_tu_choi" type="object" string="Tu choi"
-                            class="btn-danger"
-                            attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}"
-                            groups="nhan_su.group_quan_tri_nhan_su"/>
+                        class="btn-success"
+                            attrs="{'invisible': ['|', ('trang_thai', '!=', 'cho_duyet'), ('is_current_approver', '=', False)]}"/>
+                    <button name="action_tu_choi" type="object" string="Từ chối"
+                        class="btn-danger"
+                            attrs="{'invisible': ['|', ('trang_thai', '!=', 'cho_duyet'), ('is_current_approver', '=', False)]}"/>
+
+                    <!-- HR override actions -->
+                    <button name="action_duyet" type="object" string="Duyệt (HR)"
+                        class="btn-success"
+                        attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}"
+                        groups="nhan_su.group_quan_tri_nhan_su"/>
+                    <button name="action_tu_choi" type="object" string="Từ chối (HR)"
+                        class="btn-danger"
+                        attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}"
+                        groups="nhan_su.group_quan_tri_nhan_su"/>
                     <button name="action_huy" type="object" string="Huy"
                             attrs="{'invisible': [('trang_thai', 'in', ['huy', 'tu_choi'])]}"/>
                     <button name="action_nhap_lai" type="object" string="Nhap lai"
@@ -78,6 +87,7 @@
                            statusbar_visible="nhap,cho_duyet,da_duyet"/>
                 </header>
                 <sheet>
+                    <field name="is_current_approver" invisible="1"/>
                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" type="object" name="action_gui_duyet"
                                 attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}">
@@ -96,6 +106,7 @@
                         <group string="Thong tin nhan vien">
                             <field name="nhan_vien_id"/>
                             <field name="phong_ban_id"/>
+                            <field name="nguoi_duyet_id" attrs="{'readonly': [('trang_thai', '!=', 'nhap')]}" options="{'no_create': True}"/>
                             <field name="loai_nghi_phep_id"/>
                             <field name="co_luong"/>
                         </group>
@@ -115,11 +126,11 @@
                     
                     <group attrs="{'invisible': [('trang_thai', 'not in', ['da_duyet', 'tu_choi'])]}">
                         <group string="Thong tin duyet">
-                            <field name="nguoi_duyet_id"/>
+                            <field name="nguoi_duyet_id" readonly="1"/>
                             <field name="ngay_duyet"/>
                         </group>
                         <group attrs="{'invisible': [('trang_thai', '!=', 'tu_choi')]}">
-                            <field name="ly_do_tu_choi"/>
+                            <field name="ly_do_tu_choi" readonly="1"/>
                         </group>
                     </group>
                     
@@ -222,7 +233,7 @@
         <field name="name">Cho duyet</field>
         <field name="res_model">don_nghi_phep</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('trang_thai', '=', 'cho_duyet')]</field>
+        <field name="domain">[('trang_thai', '=', 'cho_duyet'), ('nguoi_duyet_id', '=', uid)]</field>
     </record>
     
     <!-- ==================== WIZARD TỪ CHỐI ==================== -->

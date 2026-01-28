@@ -110,6 +110,16 @@ class NhanVien(models.Model):
     so_van_ban_can_duyet = fields.Integer("Văn bản cần duyệt", compute='_compute_van_ban_cho_xu_ly')
     so_van_ban_can_ky = fields.Integer("Văn bản cần ký", compute='_compute_van_ban_cho_xu_ly')
     
+    # Đơn nghỉ phép chờ duyệt (dành cho Trưởng phòng)
+    so_don_nghi_phep_can_duyet = fields.Integer("Đơn nghỉ phép cần duyệt", compute='_compute_don_nghi_phep_can_duyet')
+    
+    # Thông tin nghỉ phép hiện tại của nhân viên
+    dang_nghi_phep = fields.Boolean("Đang nghỉ phép", compute='_compute_thong_tin_nghi_phep', store=True)
+    so_ngay_nghi_phep = fields.Float("Số ngày nghỉ phép", compute='_compute_thong_tin_nghi_phep', store=True)
+    ly_do_nghi_phep = fields.Text("Lý do nghỉ phép", compute='_compute_thong_tin_nghi_phep', store=True)
+    ngay_ket_thuc_nghi = fields.Date("Ngày kết thúc nghỉ", compute='_compute_thong_tin_nghi_phep', store=True)
+    don_nghi_phep_hien_tai_id = fields.Many2one('don_nghi_phep', string="Đơn nghỉ phép hiện tại", compute='_compute_thong_tin_nghi_phep', store=True)
+    
     _sql_constraints = [
         ('ma_nv_unique', 'unique(ma_dinh_danh)', 'Mã nhân viên đã tồn tại!')
     ]
@@ -310,7 +320,64 @@ class NhanVien(models.Model):
             'domain': [('nguoi_ky_id', '=', self.id), ('trang_thai', '=', 'cho_ky')],
             'context': {'default_nguoi_ky_id': self.id},
         }
-                
+    
+    def _compute_don_nghi_phep_can_duyet(self):
+        """Đếm số đơn nghỉ phép đang chờ duyệt dành cho Trưởng phòng"""
+        for record in self:
+            record.so_don_nghi_phep_can_duyet = 0
+            
+            if not record.user_id:
+                continue
+            
+            # Tìm các đơn nghỉ phép có nguoi_duyet_id = user_id của nhân viên này
+            don_nghi_phep_model = self.env['don_nghi_phep'].sudo()
+            record.so_don_nghi_phep_can_duyet = don_nghi_phep_model.search_count([
+                ('nguoi_duyet_id', '=', record.user_id.id),
+                ('trang_thai', '=', 'cho_duyet')
+            ])
+    
+    @api.depends('trang_thai_lam_viec')
+    def _compute_thong_tin_nghi_phep(self):
+        """Tính thông tin nghỉ phép hiện tại của nhân viên (nếu đang nghỉ)"""
+        today = fields.Date.today()
+        for record in self:
+            record.dang_nghi_phep = False
+            record.so_ngay_nghi_phep = 0
+            record.ly_do_nghi_phep = False
+            record.ngay_ket_thuc_nghi = False
+            record.don_nghi_phep_hien_tai_id = False
+            
+            # Tìm đơn nghỉ phép đã duyệt có ngày hiện tại nằm trong khoảng nghỉ
+            don_nghi_phep = self.env['don_nghi_phep'].sudo().search([
+                ('nhan_vien_id', '=', record.id),
+                ('trang_thai', '=', 'da_duyet'),
+                ('ngay_bat_dau', '<=', today),
+                ('ngay_ket_thuc', '>=', today),
+            ], limit=1, order='ngay_bat_dau desc')
+            
+            if don_nghi_phep:
+                record.dang_nghi_phep = True
+                record.so_ngay_nghi_phep = don_nghi_phep.so_ngay_nghi
+                record.ly_do_nghi_phep = don_nghi_phep.ly_do
+                record.ngay_ket_thuc_nghi = don_nghi_phep.ngay_ket_thuc
+                record.don_nghi_phep_hien_tai_id = don_nghi_phep.id
+    
+    def action_view_don_nghi_phep_can_duyet(self):
+        """Xem danh sách đơn nghỉ phép đang chờ duyệt"""
+        self.ensure_one()
+        return {
+            'name': 'Đơn nghỉ phép cần duyệt',
+            'type': 'ir.actions.act_window',
+            'res_model': 'don_nghi_phep',
+            'view_mode': 'tree,form',
+            'domain': [('nguoi_duyet_id', '=', self.user_id.id), ('trang_thai', '=', 'cho_duyet')],
+            'context': {},
+        }
+
+    def action_refresh_nghi_phep(self):
+        """Cập nhật lại thông tin nghỉ phép"""
+        self._compute_thong_tin_nghi_phep()
+        return True
     
     @api.depends('ty_le_cham_cong')
     def _compute_kpi(self):

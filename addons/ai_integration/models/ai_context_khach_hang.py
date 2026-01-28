@@ -337,3 +337,104 @@ GIẢI PHÁP:
             
         except Exception as e:
             return {'error': str(e)}
+
+    @api.model
+    def get_customer_statistics(self, stat_type='all'):
+        """
+        Lấy thống kê tổng quan về khách hàng trong hệ thống.
+        
+        Args:
+            stat_type: 'phan_loai', 'trang_thai', 'rfm', 'overview', 'all'
+        
+        Returns:
+            Dict chứa thống kê theo yêu cầu
+        """
+        try:
+            KhachHang = self.env['khach_hang'].sudo()
+            result = {
+                'success': True,
+            }
+            
+            # Thống kê tổng quan
+            if stat_type in ['overview', 'all']:
+                total_customers = KhachHang.search_count([])
+                
+                # Đếm đơn hàng
+                total_orders = self.env['don_hang'].sudo().search_count([])
+                
+                # Tính tổng doanh thu
+                orders = self.env['don_hang'].sudo().search([])
+                total_revenue = sum(orders.mapped('tong_tien')) if orders else 0
+                
+                # Đếm hỗ trợ
+                total_support = self.env['ho_tro_khach_hang'].sudo().search_count([])
+                open_support = self.env['ho_tro_khach_hang'].sudo().search_count([
+                    ('trang_thai', 'not in', ['done', 'hoan_thanh', 'cancel', 'huy'])
+                ])
+                
+                result['tong_quan'] = {
+                    'tong_khach_hang': total_customers,
+                    'tong_don_hang': total_orders,
+                    'tong_doanh_thu': total_revenue,
+                    'tong_ho_tro': total_support,
+                    'ho_tro_dang_mo': open_support,
+                }
+            
+            # Thống kê theo phân loại
+            if stat_type in ['phan_loai', 'all']:
+                phan_loai_stats = []
+                if 'phan_loai' in KhachHang._fields:
+                    selections = KhachHang._fields['phan_loai'].selection
+                    for code, name in selections:
+                        count = KhachHang.search_count([('phan_loai', '=', code)])
+                        phan_loai_stats.append({
+                            'ma': code,
+                            'ten': name,
+                            'so_luong': count,
+                        })
+                result['thong_ke_phan_loai'] = phan_loai_stats
+            
+            # Thống kê theo trạng thái
+            if stat_type in ['trang_thai', 'all']:
+                trang_thai_stats = []
+                if 'trang_thai' in KhachHang._fields:
+                    selections = KhachHang._fields['trang_thai'].selection
+                    for code, name in selections:
+                        count = KhachHang.search_count([('trang_thai', '=', code)])
+                        trang_thai_stats.append({
+                            'ma': code,
+                            'ten': name,
+                            'so_luong': count,
+                        })
+                result['thong_ke_trang_thai'] = trang_thai_stats
+            
+            # Thống kê theo RFM
+            if stat_type in ['rfm', 'all']:
+                rfm_stats = []
+                if 'rfm_segment' in KhachHang._fields:
+                    selections = KhachHang._fields['rfm_segment'].selection
+                    for code, name in selections:
+                        count = KhachHang.search_count([('rfm_segment', '=', code)])
+                        rfm_stats.append({
+                            'ma': code,
+                            'ten': name,
+                            'so_luong': count,
+                        })
+                result['thong_ke_rfm'] = rfm_stats
+            
+            # Tạo message tóm tắt
+            messages = []
+            if 'tong_quan' in result:
+                tq = result['tong_quan']
+                messages.append(f"Tổng số khách hàng: {tq['tong_khach_hang']}")
+                messages.append(f"Tổng đơn hàng: {tq['tong_don_hang']}")
+                messages.append(f"Tổng doanh thu: {tq['tong_doanh_thu']:,.0f} VND")
+                messages.append(f"Phiếu hỗ trợ đang mở: {tq['ho_tro_dang_mo']}/{tq['tong_ho_tro']}")
+            
+            result['message'] = '\n'.join(messages)
+            
+            return result
+            
+        except Exception as e:
+            _logger.warning(f"Error getting customer statistics: {e}")
+            return {'error': str(e)}

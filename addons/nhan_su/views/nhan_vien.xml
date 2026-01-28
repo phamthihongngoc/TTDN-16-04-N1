@@ -48,6 +48,16 @@
                                     <span class="o_stat_text">Cần duyệt</span>
                                 </div>
                             </button>
+                            <!-- Đơn nghỉ phép cần duyệt (dành cho Trưởng phòng) -->
+                            <button type="object" name="action_view_don_nghi_phep_can_duyet" class="oe_stat_button" icon="fa-calendar-check-o"
+                                    attrs="{'invisible': [('so_don_nghi_phep_can_duyet', '=', 0)]}">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value text-success">
+                                        <field name="so_don_nghi_phep_can_duyet"/>
+                                    </span>
+                                    <span class="o_stat_text">Cần duyệt</span>
+                                </div>
+                            </button>
                             <!-- Văn bản cần ký (dành cho Giám đốc) -->
                             <button type="object" name="action_view_van_ban_can_ky" class="oe_stat_button" icon="fa-pencil-square-o"
                                     attrs="{'invisible': [('so_van_ban_can_ky', '=', 0)]}">
@@ -71,6 +81,15 @@
                                        decoration-danger="trang_thai_ho_so in ['thieu', 'het_han']"/>
                             </button>
                         </div>
+                        <!-- Thông báo đang nghỉ phép -->
+                        <div class="alert alert-info" role="alert" attrs="{'invisible': [('dang_nghi_phep', '=', False)]}">
+                            <strong><i class="fa fa-calendar-times-o"/> Đang nghỉ phép:</strong>
+                            <field name="so_ngay_nghi_phep" class="oe_inline"/> ngày 
+                            (đến ngày <field name="ngay_ket_thuc_nghi" class="oe_inline"/>)
+                            <br/><strong>Lý do:</strong> <field name="ly_do_nghi_phep" class="oe_inline"/>
+                        </div>
+                        <field name="dang_nghi_phep" invisible="1"/>
+                        <field name="don_nghi_phep_hien_tai_id" invisible="1"/>
                         <!-- Header với tiêu đề đẹp -->
                         <div class="oe_title">
                             <label for="ma_dinh_danh" class="oe_edit_only" string="Mã NV"/>

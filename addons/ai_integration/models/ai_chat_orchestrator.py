@@ -210,10 +210,26 @@ NGUYÊN TẮC:
 - Với các thao tác ghi dữ liệu (tạo, sửa, gửi), phải xác nhận với user trước
 - Khi không chắc chắn, hãy hỏi lại để làm rõ
 
-PHẠM VI DỮ LIỆU:
-- Có thể truy vấn dữ liệu của cả 3 module: Khách hàng, Văn bản, Nhân sự
+PHẠM VI DỮ LIỆU - BẠN CÓ THỂ TRUY VẤN TẤT CẢ CÁC MODULE:
+
+1. MODULE VĂN BẢN:
+   - list_document_types: Liệt kê các loại văn bản (dùng khi hỏi "có bao nhiêu loại văn bản", "những loại văn bản nào")
+   - get_document_statistics: Thống kê văn bản (tổng số, theo trạng thái, theo loại)
+   - search_document: Tìm kiếm văn bản
+   - get_pending_documents: Văn bản chờ xử lý
+
+2. MODULE KHÁCH HÀNG:
+   - get_customer_statistics: Thống kê khách hàng (tổng số, doanh thu, đơn hàng)
+   - list_customer_segments: Phân loại khách hàng
+   - search_customer: Tìm kiếm khách hàng
+   - get_customer_orders: Đơn hàng của khách
+
+3. MODULE NHÂN SỰ:
+   - search_employee: Tìm kiếm nhân viên
+   - get_employee_statistics: Thống kê nhân sự
 
 CÁCH SỬ DỤNG TOOLS:
+- Khi user hỏi về số lượng, loại, tổng: LUÔN gọi tool tương ứng
 - Dùng tool để tìm kiếm, đọc dữ liệu trước khi trả lời
 - Giải thích kết quả tool cho user một cách dễ hiểu
 - Nếu tool trả về lỗi, thông báo cho user và gợi ý cách khác
@@ -238,44 +254,25 @@ CÁCH SỬ DỤNG TOOLS:
         if module == 'khach_hang':
             base_prompt += """
 
-CONTEXT: Quản lý Khách hàng
-Bạn có thể truy vấn dữ liệu KHÁCH HÀNG:
-- Tìm kiếm, tóm tắt thông tin khách hàng
-- Xem lịch sử đơn hàng, hỗ trợ
-- Soạn email chăm sóc/nhắc việc
-- Tạo phiếu hỗ trợ (cần xác nhận)
-- Đề xuất bước tiếp theo với khách hàng
-
-LƯU Ý: Khi cần dữ liệu cụ thể, hãy gọi tool trước khi trả lời.
+CONTEXT HIỆN TẠI: Quản lý Khách hàng
+Ưu tiên trả lời về KHÁCH HÀNG nhưng vẫn có thể truy vấn dữ liệu từ Văn bản và Nhân sự.
 """
         elif module == 'van_ban':
             base_prompt += """
 
-CONTEXT: Quản lý Văn bản
-Bạn có thể truy vấn dữ liệu VĂN BẢN:
-- Tóm tắt nội dung văn bản
-- Trích xuất thông tin (người, cơ quan, deadline...)
-- Phân loại văn bản
-- Soạn văn bản đi từ văn bản đến (cần xác nhận)
-- Đề xuất luồng xử lý/ký duyệt
-- Tạo checklist việc cần làm
-
-LƯU Ý: Khi cần dữ liệu cụ thể, hãy gọi tool trước khi trả lời.
+CONTEXT HIỆN TẠI: Quản lý Văn bản
+Ưu tiên trả lời về VĂN BẢN nhưng vẫn có thể truy vấn dữ liệu từ Khách hàng và Nhân sự.
 """
         elif module == 'nhan_su':
             base_prompt += """
 
-CONTEXT: Quản lý Nhân sự
-Bạn có thể truy vấn dữ liệu NHÂN SỰ:
-- Tra cứu thông tin nhân viên (họ tên, phòng ban, chức vụ, liên hệ)
-- Xem cơ cấu phòng ban, số lượng nhân viên
-- Kiểm tra chấm công, nghỉ phép
-- Xem thông tin bảng lương (nếu được phép)
-- Thống kê nhân sự theo phòng ban, loại hợp đồng
-- Tìm kiếm nhân viên theo tên, mã NV, email, SĐT
-- Báo cáo chấm công theo tháng
+CONTEXT HIỆN TẠI: Quản lý Nhân sự
+Ưu tiên trả lời về NHÂN SỰ nhưng vẫn có thể truy vấn dữ liệu từ Văn bản và Khách hàng.
+"""
+        else:
+            base_prompt += """
 
-LƯU Ý: Khi cần dữ liệu cụ thể, hãy gọi tool trước khi trả lời.
+Bạn có thể truy vấn dữ liệu từ tất cả các module: Văn bản, Khách hàng, Nhân sự.
 """
         
         return base_prompt

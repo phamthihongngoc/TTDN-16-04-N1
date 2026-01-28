@@ -298,6 +298,83 @@ Chỉ trả về JSON.
         return result
 
     @api.model
+    def tool_get_document_statistics(self, arguments, session=None):
+        """
+        Lấy thống kê tổng quan về văn bản trong hệ thống.
+        Sử dụng tool này khi người dùng hỏi về:
+        - Có bao nhiêu loại văn bản
+        - Thống kê văn bản theo loại, trạng thái
+        - Số lượng văn bản đến/đi
+        - Tổng quan về văn bản
+        
+        Arguments:
+            stat_type: Loại thống kê ('loai_van_ban', 'trang_thai', 'overview', 'all')
+        """
+        stat_type = arguments.get('stat_type', 'all')
+        
+        provider = self.env['ai.context.van_ban']
+        result = provider.get_document_statistics(stat_type)
+        
+        return result
+
+    @api.model
+    def tool_list_document_types(self, arguments, session=None):
+        """
+        Liệt kê tất cả các loại văn bản trong hệ thống.
+        Sử dụng tool này khi người dùng hỏi:
+        - Có những loại văn bản nào
+        - Danh sách loại văn bản
+        - Các loại văn bản được hỗ trợ
+        
+        Arguments:
+            include_count: Có đếm số văn bản mỗi loại không (default True)
+        """
+        include_count = arguments.get('include_count', True)
+        
+        try:
+            LoaiVanBan = self.env['loai_van_ban'].sudo()
+            loai_van_bans = LoaiVanBan.search([('active', '=', True)], order='thu_tu, ten_loai')
+            
+            result = []
+            for loai in loai_van_bans:
+                item = {
+                    'id': loai.id,
+                    'ten_loai': loai.ten_loai,
+                    'ma_loai': loai.ma_loai,
+                    'mo_ta': loai.mo_ta or '',
+                }
+                
+                if include_count:
+                    # Đếm văn bản chính
+                    count_van_ban = self.env['van_ban'].sudo().search_count([
+                        ('loai_van_ban_id', '=', loai.id)
+                    ])
+                    # Đếm văn bản đến
+                    count_den = self.env['van_ban_den'].sudo().search_count([
+                        ('loai_van_ban_id', '=', loai.id)
+                    ])
+                    # Đếm văn bản đi
+                    count_di = self.env['van_ban_di'].sudo().search_count([
+                        ('loai_van_ban_id', '=', loai.id)
+                    ])
+                    item['so_van_ban'] = count_van_ban
+                    item['so_van_ban_den'] = count_den
+                    item['so_van_ban_di'] = count_di
+                    item['tong_cong'] = count_van_ban + count_den + count_di
+                
+                result.append(item)
+            
+            return {
+                'message': f'Hệ thống có {len(result)} loại văn bản',
+                'loai_van_ban': result,
+                'tong_so_loai': len(result),
+            }
+            
+        except Exception as e:
+            _logger.warning(f"Error listing document types: {e}")
+            return {'error': str(e)}
+
+    @api.model
     def tool_suggest_workflow(self, arguments, session=None):
         """
         Đề xuất bước xử lý tiếp theo cho văn bản

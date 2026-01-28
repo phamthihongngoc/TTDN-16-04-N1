@@ -417,3 +417,99 @@ BODY:
             
         except Exception as e:
             return {'error': str(e)}
+
+    @api.model
+    def tool_get_customer_statistics(self, arguments, session=None):
+        """
+        Lấy thống kê tổng quan về khách hàng trong hệ thống.
+        Sử dụng tool này khi người dùng hỏi về:
+        - Có bao nhiêu khách hàng
+        - Thống kê khách hàng theo phân loại, trạng thái
+        - Tổng quan về khách hàng
+        - Doanh thu, đơn hàng tổng quan
+        
+        Arguments:
+            stat_type: Loại thống kê ('phan_loai', 'trang_thai', 'rfm', 'overview', 'all')
+        """
+        stat_type = arguments.get('stat_type', 'all')
+        
+        provider = self.env['ai.context.khach_hang']
+        result = provider.get_customer_statistics(stat_type)
+        
+        return result
+
+    @api.model
+    def tool_list_customer_segments(self, arguments, session=None):
+        """
+        Liệt kê các phân khúc khách hàng và số lượng trong mỗi phân khúc.
+        Sử dụng tool này khi người dùng hỏi:
+        - Có những loại khách hàng nào
+        - Phân loại khách hàng
+        - Số lượng khách theo từng nhóm
+        
+        Arguments:
+            segment_type: Loại phân khúc ('phan_loai', 'trang_thai', 'rfm')
+        """
+        segment_type = arguments.get('segment_type', 'phan_loai')
+        
+        try:
+            KhachHang = self.env['khach_hang'].sudo()
+            result = []
+            
+            if segment_type == 'phan_loai':
+                # Phân loại tiềm năng
+                phan_loai_selections = KhachHang._fields['phan_loai'].selection
+                for code, name in phan_loai_selections:
+                    count = KhachHang.search_count([('phan_loai', '=', code)])
+                    result.append({
+                        'ma': code,
+                        'ten': name,
+                        'so_luong': count,
+                    })
+                return {
+                    'message': f'Có {len(result)} loại phân loại khách hàng',
+                    'phan_khuc': result,
+                    'loai': 'phan_loai',
+                }
+            
+            elif segment_type == 'trang_thai':
+                # Trạng thái khách hàng
+                trang_thai_selections = KhachHang._fields['trang_thai'].selection
+                for code, name in trang_thai_selections:
+                    count = KhachHang.search_count([('trang_thai', '=', code)])
+                    result.append({
+                        'ma': code,
+                        'ten': name,
+                        'so_luong': count,
+                    })
+                return {
+                    'message': f'Có {len(result)} trạng thái khách hàng',
+                    'phan_khuc': result,
+                    'loai': 'trang_thai',
+                }
+            
+            elif segment_type == 'rfm':
+                # RFM Segment
+                if 'rfm_segment' in KhachHang._fields:
+                    rfm_selections = KhachHang._fields['rfm_segment'].selection
+                    for code, name in rfm_selections:
+                        count = KhachHang.search_count([('rfm_segment', '=', code)])
+                        result.append({
+                            'ma': code,
+                            'ten': name,
+                            'so_luong': count,
+                        })
+                    return {
+                        'message': f'Có {len(result)} phân khúc RFM',
+                        'phan_khuc': result,
+                        'loai': 'rfm',
+                    }
+                else:
+                    return {'error': 'RFM segment chưa được cấu hình'}
+            
+            else:
+                return {'error': f'Loại phân khúc không hợp lệ: {segment_type}'}
+            
+        except Exception as e:
+            _logger.warning(f"Error listing customer segments: {e}")
+            return {'error': str(e)}

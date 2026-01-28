@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'AI Integration - OpenAI',
-    'version': '15.0.2.0.0',
+    'version': '15.0.2.1.0',
     'summary': 'Tích hợp OpenAI ChatGPT API cho hệ thống Odoo',
     'description': """
 AI Integration - OpenAI
@@ -36,6 +36,7 @@ Tích hợp với: Văn bản, Nhân sự, Khách hàng
         'security/ir.model.access.csv',
         'data/ai_config_data.xml',
         'data/ai_chat_tools_data.xml',
+        'data/ai_chat_tools_statistics.xml',
         'views/ai_config_settings_views.xml',
         'views/ai_job_views.xml',
         'views/ai_log_views.xml',

@@ -1,0 +1,492 @@
+/* AI Extract & Summary Styles for van_ban module */
+
+/* ===== Header Buttons - All Buttons Styled ===== */
+.o_form_view header .btn {
+    min-width: 140px !important;
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+    transition: all 0.2s ease !important;
+    border: none !important;
+    margin-right: 8px !important;
+}
+
+/* Primary Button (Duyệt, Gửi duyệt) */
+.o_form_view header .btn.oe_highlight,
+.o_form_view header .btn.btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    color: white !important;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3) !important;
+}
+
+.o_form_view header .btn.oe_highlight:hover,
+.o_form_view header .btn.btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Secondary/Default Buttons (Từ chối, Hủy) */
+.o_form_view header .btn.btn-secondary,
+.o_form_view header .btn:not(.oe_highlight):not(.btn-primary):not(.btn-success):not(.btn-info):not(.btn-danger):not(.btn-warning) {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%) !important;
+    color: #374151 !important;
+    border: 1px solid #d1d5db !important;
+}
+
+.o_form_view header .btn.btn-secondary:hover,
+.o_form_view header .btn:not(.oe_highlight):not(.btn-primary):not(.btn-success):not(.btn-info):not(.btn-danger):not(.btn-warning):hover {
+    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Success Buttons (Tóm tắt văn bản) */
+.o_form_view header .btn.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3) !important;
+}
+
+.o_form_view header .btn.btn-success:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Info Buttons (Phân tích AI, Trích xuất) */
+.o_form_view header .btn.btn-info {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    color: white !important;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3) !important;
+}
+
+.o_form_view header .btn.btn-info:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Danger Buttons (Xóa file) */
+.o_form_view header .btn.btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3) !important;
+}
+
+.o_form_view header .btn.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Warning Buttons */
+.o_form_view header .btn.btn-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: white !important;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3) !important;
+}
+
+.o_form_view header .btn.btn-warning:hover {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ===== Custom AI Buttons ===== */
+.o_form_view header .btn.o_ai_btn {
+    min-width: 150px !important;
+    padding: 10px 20px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: all 0.25s ease !important;
+    border: none !important;
+}
+
+.o_form_view header .btn.o_ai_btn--extract {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    color: white !important;
+    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.35) !important;
+}
+
+.o_form_view header .btn.o_ai_btn--extract:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.45) !important;
+    transform: translateY(-2px) !important;
+}
+
+.o_form_view header .btn.o_ai_btn--summary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35) !important;
+}
+
+.o_form_view header .btn.o_ai_btn--summary:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.45) !important;
+    transform: translateY(-2px) !important;
+}
+
+.o_form_view header .btn.o_ai_btn--danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+    box-shadow: 0 3px 10px rgba(239, 68, 68, 0.35) !important;
+}
+
+.o_form_view header .btn.o_ai_btn--danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.45) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ===== Common Layout - 2 cột ngang hàng ===== */
+.o_ai_layout,
+.o_ocr_layout {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 24px !important;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.o_ai_panel,
+.o_ocr_panel {
+    flex: 1 1 50% !important;
+    min-width: 0 !important;
+    max-width: calc(50% - 12px) !important;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+/* ===== Panel Headers ===== */
+.o_ai_panel_header,
+.o_ocr_panel_header {
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.o_ai_panel_header--extract,
+.o_ocr_panel_header--extract {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    color: #0369a1;
+}
+
+.o_ai_panel_header--summary,
+.o_ocr_panel_header--summary {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    color: #15803d;
+}
+
+/* ===== Panel Body ===== */
+.o_ai_panel_body,
+.o_ocr_panel_body {
+    padding: 20px;
+    min-height: 280px;
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.o_ai_panel_body textarea,
+.o_ai_panel_body .o_field_widget,
+.o_ocr_panel_body textarea,
+.o_ocr_panel_body .o_field_widget {
+    width: 100%;
+    min-height: 240px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    background: #fafafa;
+    resize: none;
+}
+
+.o_ai_panel_body--monospace textarea,
+.o_ai_panel_body--monospace .o_field_widget,
+.o_ocr_panel_body--monospace textarea,
+.o_ocr_panel_body--monospace .o_field_widget {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+}
+
+/* ===== Meta Info ===== */
+.o_ai_meta {
+    padding: 10px 20px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.o_ai_meta_item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.o_ai_meta_item strong {
+    color: #374151;
+}
+
+/* ===== Header Buttons - Equal Size ===== */
+.o_form_view header .btn.o_ai_btn {
+    min-width: 160px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.o_form_view header .btn.o_ai_btn--extract {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: none;
+    color: white;
+}
+
+.o_form_view header .btn.o_ai_btn--extract:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.o_form_view header .btn.o_ai_btn--summary {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    border: none;
+    color: white;
+}
+
+.o_form_view header .btn.o_ai_btn--summary:hover {
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);
+}
+
+.o_form_view header .btn.o_ai_btn--danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border: none;
+    color: white;
+}
+
+.o_form_view header .btn.o_ai_btn--danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+}
+
+/* ===== Info Box ===== */
+.o_ai_info_box {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+
+.o_ai_info_box--info {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+}
+
+.o_ai_info_box--error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+}
+
+/* ===== Văn bản Buttons - Styled ===== */
+.o_form_view header .o_vanban_btn,
+.o_form_view header button.o_vanban_btn,
+header .o_vanban_btn {
+    min-width: 140px !important;
+    padding: 10px 20px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-radius: 25px !important;
+    transition: all 0.25s ease !important;
+    border: none !important;
+    margin-right: 8px !important;
+    text-transform: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+}
+
+/* Gửi duyệt - Xanh dương đậm gradient */
+.o_form_view header .o_vanban_btn--send,
+.o_form_view header button.o_vanban_btn--send,
+header .o_vanban_btn--send {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+}
+
+.o_form_view header .o_vanban_btn--send:hover,
+header .o_vanban_btn--send:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%) !important;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Duyệt - Xanh lá gradient */
+.o_form_view header .o_vanban_btn--approve,
+.o_form_view header button.o_vanban_btn--approve,
+header .o_vanban_btn--approve {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4) !important;
+}
+
+.o_form_view header .o_vanban_btn--approve:hover,
+header .o_vanban_btn--approve:hover {
+    background: linear-gradient(135deg, #0d8377 0%, #2ed573 100%) !important;
+    box-shadow: 0 6px 20px rgba(17, 153, 142, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Từ chối - Đỏ gradient */
+.o_form_view header .o_vanban_btn--reject,
+.o_form_view header button.o_vanban_btn--reject,
+header .o_vanban_btn--reject {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(235, 51, 73, 0.4) !important;
+}
+
+.o_form_view header .o_vanban_btn--reject:hover,
+header .o_vanban_btn--reject:hover {
+    background: linear-gradient(135deg, #d62839 0%, #e74c3c 100%) !important;
+    box-shadow: 0 6px 20px rgba(235, 51, 73, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Hủy - Xám gradient */
+.o_form_view header .o_vanban_btn--cancel,
+.o_form_view header button.o_vanban_btn--cancel,
+header .o_vanban_btn--cancel {
+    background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(189, 195, 199, 0.4) !important;
+}
+
+.o_form_view header .o_vanban_btn--cancel:hover,
+header .o_vanban_btn--cancel:hover {
+    background: linear-gradient(135deg, #95a5a6 0%, #1e2a36 100%) !important;
+    box-shadow: 0 6px 20px rgba(189, 195, 199, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Phân tích AI - Tím gradient */
+.o_form_view header .o_vanban_btn--analyze,
+.o_form_view header button.o_vanban_btn--analyze,
+header .o_vanban_btn--analyze {
+    background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4) !important;
+}
+
+.o_form_view header .o_vanban_btn--analyze:hover,
+header .o_vanban_btn--analyze:hover {
+    background: linear-gradient(135deg, #9333ea 0%, #4f46e5 100%) !important;
+    box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Trích xuất PDF - Xanh dương gradient */
+.o_form_view header .o_vanban_btn--extract,
+.o_form_view header button.o_vanban_btn--extract,
+header .o_vanban_btn--extract {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+}
+
+.o_form_view header .o_vanban_btn--extract:hover,
+header .o_vanban_btn--extract:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%) !important;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Tóm tắt văn bản - Cam gradient */
+.o_form_view header .o_vanban_btn--summary,
+.o_form_view header button.o_vanban_btn--summary,
+header .o_vanban_btn--summary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4) !important;
+}
+
+.o_form_view header .o_vanban_btn--summary:hover,
+header .o_vanban_btn--summary:hover {
+    background: linear-gradient(135deg, #e879f9 0%, #e11d48 100%) !important;
+    box-shadow: 0 6px 20px rgba(240, 147, 251, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Gửi ký - Cam gradient */
+.o_form_view header .o_vanban_btn--send-sign,
+.o_form_view header button.o_vanban_btn--send-sign,
+header .o_vanban_btn--send-sign {
+    background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%) !important;
+    color: #333 !important;
+    box-shadow: 0 4px 15px rgba(247, 151, 30, 0.4) !important;
+}
+
+.o_form_view header .o_vanban_btn--send-sign:hover,
+header .o_vanban_btn--send-sign:hover {
+    background: linear-gradient(135deg, #e88a17 0%, #e6bc00 100%) !important;
+    box-shadow: 0 6px 20px rgba(247, 151, 30, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Ký điện tử - Xanh lá đậm gradient */
+.o_form_view header .o_vanban_btn--sign,
+.o_form_view header button.o_vanban_btn--sign,
+header .o_vanban_btn--sign {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4) !important;
+}
+
+.o_form_view header .o_vanban_btn--sign:hover,
+header .o_vanban_btn--sign:hover {
+    background: linear-gradient(135deg, #0d8377 0%, #2ed573 100%) !important;
+    box-shadow: 0 6px 20px rgba(17, 153, 142, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Xác thực chữ ký - Xanh navy gradient */
+.o_form_view header .o_vanban_btn--verify,
+.o_form_view header button.o_vanban_btn--verify,
+header .o_vanban_btn--verify {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+    color: #333 !important;
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4) !important;
+}
+
+.o_form_view header .o_vanban_btn--verify:hover,
+header .o_vanban_btn--verify:hover {
+    background: linear-gradient(135deg, #3d9be8 0%, #00d8e8 100%) !important;
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+/* ===== Responsive ===== */
+@media (max-width: 992px) {
+    .o_ai_layout,
+    .o_ocr_layout {
+        flex-direction: column !important;
+    }
+    
+    .o_ai_panel,
+    .o_ocr_panel {
+        max-width: 100% !important;
+        min-width: 100% !important;
+    }
+}

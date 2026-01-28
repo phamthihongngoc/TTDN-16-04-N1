@@ -336,3 +336,107 @@ NỘI DUNG:
             
         except Exception as e:
             return {'error': str(e)}
+
+    @api.model
+    def get_document_statistics(self, stat_type='all'):
+        """
+        Lấy thống kê tổng quan về văn bản trong hệ thống.
+        
+        Args:
+            stat_type: 'loai_van_ban', 'trang_thai', 'overview', 'all'
+        
+        Returns:
+            Dict chứa thống kê theo yêu cầu
+        """
+        try:
+            result = {
+                'success': True,
+            }
+            
+            # Thống kê theo loại văn bản
+            if stat_type in ['loai_van_ban', 'all']:
+                loai_van_bans = self.env['loai_van_ban'].sudo().search([('active', '=', True)])
+                loai_stats = []
+                
+                for loai in loai_van_bans:
+                    count_van_ban = self.env['van_ban'].sudo().search_count([
+                        ('loai_van_ban_id', '=', loai.id)
+                    ])
+                    count_den = self.env['van_ban_den'].sudo().search_count([
+                        ('loai_van_ban_id', '=', loai.id)
+                    ])
+                    count_di = self.env['van_ban_di'].sudo().search_count([
+                        ('loai_van_ban_id', '=', loai.id)
+                    ])
+                    
+                    loai_stats.append({
+                        'ten_loai': loai.ten_loai,
+                        'ma_loai': loai.ma_loai,
+                        'so_van_ban': count_van_ban,
+                        'so_van_ban_den': count_den,
+                        'so_van_ban_di': count_di,
+                        'tong': count_van_ban + count_den + count_di,
+                    })
+                
+                result['thong_ke_theo_loai'] = loai_stats
+                result['tong_so_loai'] = len(loai_van_bans)
+            
+            # Thống kê tổng quan
+            if stat_type in ['overview', 'all']:
+                # Đếm tổng số văn bản
+                total_van_ban = self.env['van_ban'].sudo().search_count([])
+                total_van_ban_den = self.env['van_ban_den'].sudo().search_count([])
+                total_van_ban_di = self.env['van_ban_di'].sudo().search_count([])
+                
+                result['tong_quan'] = {
+                    'tong_van_ban': total_van_ban,
+                    'tong_van_ban_den': total_van_ban_den,
+                    'tong_van_ban_di': total_van_ban_di,
+                    'tong_tat_ca': total_van_ban + total_van_ban_den + total_van_ban_di,
+                }
+            
+            # Thống kê theo trạng thái văn bản đến
+            if stat_type in ['trang_thai', 'all']:
+                # Văn bản đến theo trạng thái
+                den_stats = {}
+                for state in ['moi', 'dang_xu_ly', 'cho_y_kien', 'hoan_thanh', 'luu']:
+                    count = self.env['van_ban_den'].sudo().search_count([('trang_thai', '=', state)])
+                    den_stats[state] = count
+                
+                # Văn bản đi theo trạng thái
+                di_stats = {}
+                for state in ['soan_thao', 'cho_duyet', 'cho_ky', 'da_ky', 'da_gui', 'huy']:
+                    count = self.env['van_ban_di'].sudo().search_count([('trang_thai', '=', state)])
+                    di_stats[state] = count
+                
+                # Văn bản chính theo trạng thái
+                van_ban_stats = {}
+                for state in ['nhap', 'cho_duyet', 'da_duyet', 'cho_ky', 'da_ky', 'da_gui', 'het_hieu_luc', 'huy']:
+                    count = self.env['van_ban'].sudo().search_count([('trang_thai', '=', state)])
+                    van_ban_stats[state] = count
+                
+                result['thong_ke_trang_thai'] = {
+                    'van_ban_den': den_stats,
+                    'van_ban_di': di_stats,
+                    'van_ban': van_ban_stats,
+                }
+            
+            # Tạo message tóm tắt
+            messages = []
+            if 'tong_quan' in result:
+                tq = result['tong_quan']
+                messages.append(f"Tổng số văn bản trong hệ thống: {tq['tong_tat_ca']}")
+                messages.append(f"  - Văn bản chính: {tq['tong_van_ban']}")
+                messages.append(f"  - Văn bản đến: {tq['tong_van_ban_den']}")
+                messages.append(f"  - Văn bản đi: {tq['tong_van_ban_di']}")
+            
+            if 'tong_so_loai' in result:
+                messages.append(f"Số loại văn bản: {result['tong_so_loai']}")
+            
+            result['message'] = '\n'.join(messages)
+            
+            return result
+            
+        except Exception as e:
+            _logger.warning(f"Error getting document statistics: {e}")
+            return {'error': str(e)}

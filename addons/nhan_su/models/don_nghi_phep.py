@@ -77,9 +77,21 @@ class DonNghiPhep(models.Model):
     ], string='Trạng thái', default='nhap', required=True, tracking=True, index=True)
     
     # Người xử lý
-    nguoi_duyet_id = fields.Many2one('res.users', string='Người duyệt', readonly=True)
+    nguoi_duyet_id = fields.Many2one(
+        'res.users',
+        string='Người duyệt',
+        default=lambda self: self._default_nguoi_duyet_id(),
+        tracking=True,
+        help='Người sẽ duyệt đơn (thường là Trưởng phòng/Quản lý trực tiếp).'
+    )
     ngay_duyet = fields.Datetime('Ngày duyệt', readonly=True)
     ly_do_tu_choi = fields.Text('Lý do từ chối')
+
+    # Helpers
+    is_current_approver = fields.Boolean(
+        string='Là người duyệt hiện tại',
+        compute='_compute_is_current_approver'
+    )
     
     # Thông tin bổ sung
     ngay_tao = fields.Datetime('Ngày tạo', default=fields.Datetime.now, readonly=True)
@@ -96,6 +108,60 @@ class DonNghiPhep(models.Model):
         """Lấy nhân viên hiện tại dựa trên user đăng nhập"""
         employee = self.env['nhan_vien'].search([('user_id', '=', self.env.uid)], limit=1)
         return employee.id if employee else False
+
+    def _default_nguoi_duyet_id(self):
+        """Default approver: prefer direct manager; fallback to department head (Trưởng phòng)."""
+        employee = self.env['nhan_vien'].search([('user_id', '=', self.env.uid)], limit=1)
+        return self._find_default_approver_user(employee).id if employee else False
+
+    def _find_default_approver_user(self, employee):
+        """Return a res.users record for default approver."""
+        if not employee:
+            return self.env['res.users']
+
+        # 1) Direct manager
+        if employee.manager_id and employee.manager_id.user_id:
+            return employee.manager_id.user_id
+
+        # 2) Department head: someone in same department with position containing 'Trưởng phòng'
+        if employee.phong_ban_id:
+            # If department has an explicit head field, use it
+            phong_ban = employee.phong_ban_id
+            if 'truong_phong_id' in phong_ban._fields and phong_ban.truong_phong_id:
+                if getattr(phong_ban.truong_phong_id, 'user_id', False):
+                    return phong_ban.truong_phong_id.user_id
+            if 'truong_phong_user_id' in phong_ban._fields and phong_ban.truong_phong_user_id:
+                return phong_ban.truong_phong_user_id
+
+            domain = [
+                ('phong_ban_id', '=', employee.phong_ban_id.id),
+                ('user_id', '!=', False),
+                '|',
+                ('chuc_vu', 'ilike', 'Trưởng phòng'),
+                ('chuc_vu_id.name', 'ilike', 'Trưởng phòng'),
+            ]
+            head = self.env['nhan_vien'].search(domain, limit=1, order='id')
+            if head and head.user_id:
+                return head.user_id
+
+        # 3) Fallback to HR admin
+        hr_group = self.env.ref('nhan_su.group_quan_tri_nhan_su', raise_if_not_found=False)
+        if hr_group and hr_group.users:
+            return hr_group.users[0]
+
+        return self.env['res.users']
+
+    @api.onchange('nhan_vien_id')
+    def _onchange_nhan_vien_id_set_approver(self):
+        for rec in self:
+            if rec.nhan_vien_id:
+                rec.nguoi_duyet_id = rec._find_default_approver_user(rec.nhan_vien_id).id or False
+
+    @api.depends('nguoi_duyet_id')
+    def _compute_is_current_approver(self):
+        current_user_id = self.env.user.id
+        for rec in self:
+            rec.is_current_approver = bool(rec.nguoi_duyet_id and rec.nguoi_duyet_id.id == current_user_id)
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -147,13 +213,6 @@ class DonNghiPhep(models.Model):
                 if rec.ngay_bat_dau > rec.ngay_ket_thuc:
                     raise ValidationError(_('Ngày bắt đầu phải trước ngày kết thúc!'))
     
-    @api.constrains('so_ngay_nghi', 'so_phep_con_lai', 'loai_nghi_phep_id')
-    def _check_so_phep(self):
-        for rec in self:
-            if rec.loai_nghi_phep_id and rec.loai_nghi_phep_id.co_luong:
-                if rec.so_ngay_nghi > rec.so_phep_con_lai + rec.so_ngay_nghi:
-                    raise ValidationError(_('Số ngày nghỉ vượt quá số phép còn lại!'))
-    
     @api.onchange('nghi_nua_ngay')
     def _onchange_nghi_nua_ngay(self):
         if self.nghi_nua_ngay:
@@ -166,7 +225,84 @@ class DonNghiPhep(models.Model):
         self.ensure_one()
         if self.so_ngay_nghi <= 0:
             raise ValidationError(_('Số ngày nghỉ phải lớn hơn 0!'))
-        
+
+        # Kiểm tra số phép còn lại - chỉ áp dụng cho phép có lương
+        if self.loai_nghi_phep_id and self.loai_nghi_phep_id.co_luong:
+            if self.so_ngay_nghi > self.so_phep_con_lai:
+                so_ngay_vuot = self.so_ngay_nghi - self.so_phep_con_lai
+                # Tự động từ chối và gửi thông báo
+                self.write({
+                    'trang_thai': 'tu_choi',
+                    'ly_do_tu_choi': _('Đơn nghỉ phép tự động từ chối do vượt quá số phép còn lại. '
+                                       'Bạn đang yêu cầu nghỉ %s ngày nhưng chỉ còn %s ngày phép. '
+                                       'Vượt quá %s ngày.') % (
+                                           self.so_ngay_nghi,
+                                           self.so_phep_con_lai,
+                                           so_ngay_vuot
+                                       )
+                })
+                
+                # Gửi thông báo cho nhân viên
+                self.message_post(
+                    body=_('<b>Đơn nghỉ phép tự động từ chối</b><br/>'
+                           '<ul>'
+                           '<li>Số ngày yêu cầu: %s ngày</li>'
+                           '<li>Số phép còn lại: %s ngày</li>'
+                           '<li>Vượt quá: %s ngày</li>'
+                           '</ul>'
+                           '<p style="color:red;">Vui lòng điều chỉnh lại số ngày nghỉ hoặc chọn loại phép khác.</p>') % (
+                               self.so_ngay_nghi,
+                               self.so_phep_con_lai,
+                               so_ngay_vuot
+                           ),
+                    message_type='notification',
+                    subtype_xmlid='mail.mt_comment',
+                )
+                
+                # Tạo activity để nhân viên nhận được thông báo
+                if self.nhan_vien_id and self.nhan_vien_id.user_id:
+                    try:
+                        self.activity_schedule(
+                            'mail.mail_activity_data_todo',
+                            user_id=self.nhan_vien_id.user_id.id,
+                            summary=_('Đơn nghỉ phép bị từ chối - Vượt quá số phép'),
+                            note=_('Đơn %s của bạn đã bị từ chối tự động.<br/>'
+                                   'Lý do: Vượt quá số phép còn lại %s ngày.<br/>'
+                                   'Số ngày yêu cầu: %s ngày<br/>'
+                                   'Số phép còn lại: %s ngày') % (
+                                       self.ma_don,
+                                       so_ngay_vuot,
+                                       self.so_ngay_nghi,
+                                       self.so_phep_con_lai
+                                   ),
+                        )
+                    except Exception:
+                        pass
+                
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Đơn bị từ chối'),
+                        'message': _('Đơn nghỉ phép bị từ chối tự động do vượt quá số phép còn lại %s ngày. '
+                                     'Bạn yêu cầu nghỉ %s ngày nhưng chỉ còn %s ngày phép.') % (
+                                         so_ngay_vuot,
+                                         self.so_ngay_nghi,
+                                         self.so_phep_con_lai
+                                     ),
+                        'type': 'danger',
+                        'sticky': True,
+                    }
+                }
+
+        # Ensure approver is set
+        if not self.nguoi_duyet_id:
+            approver = self._find_default_approver_user(self.nhan_vien_id)
+            if approver:
+                self.nguoi_duyet_id = approver.id
+        if not self.nguoi_duyet_id:
+            raise ValidationError(_('Vui lòng chọn Người duyệt (Trưởng phòng/Quản lý) trước khi gửi!'))
+
         self.write({'trang_thai': 'cho_duyet'})
         
         # Tạo activity cho quản lý
@@ -192,26 +328,89 @@ class DonNghiPhep(models.Model):
     def action_duyet(self):
         """Duyệt đơn nghỉ phép"""
         self.ensure_one()
+
+        # Only assigned approver or HR admin can approve
+        if self.nguoi_duyet_id and self.env.user.id != self.nguoi_duyet_id.id:
+            if not (self.env.user.has_group('nhan_su.group_quan_tri_nhan_su') or self.env.user.has_group('base.group_system')):
+                raise ValidationError(_('Bạn không phải người được phân công duyệt đơn này.'))
+
         self.write({
             'trang_thai': 'da_duyet',
             'nguoi_duyet_id': self.env.user.id,
             'ngay_duyet': fields.Datetime.now()
         })
+
+        # Mark pending approval activities as done
+        try:
+            acts = self.env['mail.activity'].search([
+                ('res_model', '=', 'don_nghi_phep'),
+                ('res_id', '=', self.id),
+                ('activity_type_id', '=', self.env.ref('mail.mail_activity_data_todo').id),
+            ])
+            if acts:
+                acts.action_feedback(feedback=_('Đã duyệt'))
+        except Exception:
+            pass
         
         # Tạo bản ghi chấm công nghỉ phép
         self._create_cham_cong_nghi_phep()
         
+        # Cập nhật thông tin nghỉ phép cho nhân viên
+        if self.nhan_vien_id:
+            self.nhan_vien_id._compute_thong_tin_nghi_phep()
+        
+        # Gửi thông báo chi tiết
         self.message_post(
-            body=_('Đơn nghỉ phép đã được duyệt bởi %s') % self.env.user.name,
-            message_type='notification'
+            body=_('<b>Đơn nghỉ phép đã được duyệt</b><br/>'
+                   '<ul>'
+                   '<li>Người duyệt: %s</li>'
+                   '<li>Số ngày nghỉ: %s ngày</li>'
+                   '<li>Từ ngày: %s</li>'
+                   '<li>Đến ngày: %s</li>'
+                   '<li>Lý do: %s</li>'
+                   '</ul>') % (
+                       self.env.user.name,
+                       self.so_ngay_nghi,
+                       self.ngay_bat_dau,
+                       self.ngay_ket_thuc,
+                       self.ly_do or ''
+                   ),
+            message_type='notification',
+            subtype_xmlid='mail.mt_comment',
         )
+
+        # Notify employee - gửi activity để nhân viên nhận được thông báo
+        if self.nhan_vien_id and self.nhan_vien_id.user_id:
+            try:
+                self.activity_schedule(
+                    'mail.mail_activity_data_todo',
+                    user_id=self.nhan_vien_id.user_id.id,
+                    summary=_('Đơn nghỉ phép đã được duyệt'),
+                    note=_('Đơn %s đã được duyệt bởi %s.<br/>'
+                           'Bạn được nghỉ phép %s ngày từ %s đến %s.<br/>'
+                           'Lý do: %s') % (
+                               self.ma_don,
+                               self.env.user.name,
+                               self.so_ngay_nghi,
+                               self.ngay_bat_dau,
+                               self.ngay_ket_thuc,
+                               self.ly_do or ''
+                           ),
+                )
+            except Exception:
+                pass
         
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'title': _('Đã duyệt'),
-                'message': _('Đơn nghỉ phép đã được duyệt!'),
+                'message': _('Đơn nghỉ phép đã được duyệt! Nhân viên %s sẽ nghỉ %s ngày từ %s đến %s.') % (
+                    self.nhan_vien_id.ten_nv if self.nhan_vien_id else '',
+                    self.so_ngay_nghi,
+                    self.ngay_bat_dau,
+                    self.ngay_ket_thuc
+                ),
                 'type': 'success',
                 'sticky': False,
             }
@@ -220,6 +419,12 @@ class DonNghiPhep(models.Model):
     def action_tu_choi(self):
         """Từ chối đơn nghỉ phép"""
         self.ensure_one()
+
+        # Only assigned approver or HR admin can reject
+        if self.nguoi_duyet_id and self.env.user.id != self.nguoi_duyet_id.id:
+            if not (self.env.user.has_group('nhan_su.group_quan_tri_nhan_su') or self.env.user.has_group('base.group_system')):
+                raise ValidationError(_('Bạn không phải người được phân công duyệt đơn này.'))
+
         return {
             'type': 'ir.actions.act_window',
             'name': _('Từ chối đơn nghỉ phép'),
@@ -305,21 +510,28 @@ class DonNghiPhep(models.Model):
     def _create_approval_activity(self):
         """Tạo activity cho người duyệt"""
         for rec in self:
-            # Tìm quản lý trực tiếp hoặc HR
-            manager = rec.nhan_vien_id.manager_id.user_id if rec.nhan_vien_id.manager_id else False
-            if not manager:
-                # Fallback to HR managers
-                hr_group = self.env.ref('nhan_su.group_quan_tri_nhan_su', raise_if_not_found=False)
-                if hr_group:
-                    manager = hr_group.users[:1]
-            
-            if manager:
+            # Prefer assigned approver; fallback to default approver
+            approver = rec.nguoi_duyet_id or rec._find_default_approver_user(rec.nhan_vien_id)
+            if approver:
+                # Avoid duplicates
+                try:
+                    existing = self.env['mail.activity'].search([
+                        ('res_model', '=', 'don_nghi_phep'),
+                        ('res_id', '=', rec.id),
+                        ('activity_type_id', '=', self.env.ref('mail.mail_activity_data_todo').id),
+                        ('user_id', '=', approver.id),
+                    ])
+                    if existing:
+                        existing.unlink()
+                except Exception:
+                    pass
+
                 self.env['mail.activity'].create({
                     'activity_type_id': self.env.ref('mail.mail_activity_data_todo').id,
                     'summary': f'Duyệt đơn nghỉ phép: {rec.ma_don}',
                     'note': f'{rec.nhan_vien_id.ten_nv} xin nghỉ từ {rec.ngay_bat_dau} đến {rec.ngay_ket_thuc}. Lý do: {rec.ly_do}',
                     'res_id': rec.id,
                     'res_model_id': self.env['ir.model']._get('don_nghi_phep').id,
-                    'user_id': manager.id,
+                    'user_id': approver.id,
                     'date_deadline': rec.ngay_bat_dau,
                 })

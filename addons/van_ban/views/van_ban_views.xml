@@ -12,55 +12,71 @@
                     
                     <!-- Bước 1: Nhân viên gửi văn bản để Trưởng phòng Sales duyệt -->
                     <button name="action_gui_duyet" string="Gửi duyệt (đến Trưởng phòng)" type="object" 
-                            class="oe_highlight"
+                            class="btn btn-primary oe_highlight o_vanban_btn o_vanban_btn--send"
                             attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}"/>
                     
                     <!-- Bước 2: Trưởng phòng Sales duyệt văn bản -->
                     <button name="action_duyet" string="Duyệt" type="object" 
-                            class="oe_highlight"
+                            class="btn btn-success oe_highlight o_vanban_btn o_vanban_btn--approve"
                             attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}"
                             groups="van_ban.group_truong_phong_duyet"/>
                     
                     <button name="action_tu_choi_duyet" string="Từ chối" type="object"
+                            class="btn btn-danger o_vanban_btn o_vanban_btn--reject"
                             attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}"
                             groups="van_ban.group_truong_phong_duyet"/>
                     
                     <!-- Bước 3: Trưởng phòng gửi văn bản đến Giám đốc để ký -->
                     <button name="action_gui_ky" string="Gửi ký (đến Giám đốc)" type="object" 
-                            class="oe_highlight btn-warning"
+                            class="btn btn-warning oe_highlight o_vanban_btn o_vanban_btn--send-sign"
                             attrs="{'invisible': [('trang_thai', '!=', 'da_duyet')]}"
                             groups="van_ban.group_truong_phong_duyet"/>
                     
                     <!-- Bước 4: Giám đốc ký điện tử văn bản -->
                     <button name="action_ky_noi_bo" string="Ký điện tử" type="object" 
-                            class="btn-success"
+                            class="btn btn-success o_vanban_btn o_vanban_btn--sign"
                             attrs="{'invisible': [('trang_thai', '!=', 'cho_ky')]}"
                             groups="van_ban.group_giam_doc_ky"/>
                     
-                    <button name="action_xac_thuc_chu_ky" string="🔍 Xác thực chữ ký" type="object" 
-                            class="btn-info"
+                    <button name="action_xac_thuc_chu_ky" string="Xác thực chữ ký" type="object" 
+                            class="btn btn-info o_vanban_btn o_vanban_btn--verify"
                             attrs="{'invisible': [('da_ky_noi_bo', '=', False)]}"
                             help="Xác thực chữ ký số bằng Public Key từ kho"/>
                     
                     <button name="action_gui_yeu_cau_ky_khach" string="Gửi yêu cầu ký cho KH" 
-                            type="object" class="btn-primary"
-                            attrs="{'invisible': ['|', ('trang_thai', '!=', 'da_ky'), ('khach_hang_id', '=', False)]}"
+                            type="object" class="btn btn-primary o_vanban_btn"
+                            attrs="{'invisible': ['|', '|', ('trang_thai', '!=', 'da_ky'), ('khach_hang_id', '=', False), ('da_khach_ky', '=', True)]}"
                             groups="van_ban.group_truong_phong_duyet"/>
+                    
+                    <!-- Badge hiển thị khi khách đã ký -->
+                    <span class="badge badge-success ml-2" 
+                          attrs="{'invisible': [('da_khach_ky', '=', False)]}">
+                        ✓ Khách hàng đã ký
+                    </span>
                     
                     <!-- Bước 5: Gửi văn bản sau khi đã ký -->
                     <button name="action_gui_van_ban" string="Gửi văn bản" type="object" 
-                            class="oe_highlight btn-primary"
+                            class="btn btn-primary oe_highlight o_vanban_btn o_vanban_btn--send"
                             attrs="{'invisible': [('trang_thai', '!=', 'da_ky')]}"
                             groups="van_ban.group_truong_phong_duyet"
                             confirm="Xác nhận gửi văn bản? Văn bản sẽ bị KHÓA sau khi gửi."/>
                     
                     <button name="action_huy" string="Hủy" type="object"
+                            class="btn btn-secondary o_vanban_btn o_vanban_btn--cancel"
                             attrs="{'invisible': [('trang_thai', 'in', ['da_gui', 'huy', 'het_hieu_luc'])]}"
                             confirm="Bạn có chắc muốn hủy văn bản này?"/>
                     
                     <button name="action_analyze_ai" string="Phân tích AI" type="object"
-                            class="btn-info"
+                            class="btn btn-info o_vanban_btn o_vanban_btn--analyze"
                             attrs="{'invisible': [('trang_thai', 'in', ['da_gui', 'huy', 'het_hieu_luc'])]}"/>
+                    
+                    <!-- AI Buttons - Trích xuất và Tóm tắt -->
+                    <button name="action_ai_autofill_from_pdf" string="Trích xuất từ PDF" type="object" 
+                            class="btn btn-primary o_vanban_btn o_vanban_btn--extract"
+                            attrs="{'invisible': ['|', ('file_dinh_kem', '=', False), ('bi_khoa', '=', True)]}"/>
+                    <button name="action_ai_summarize_pdf" string="Tóm tắt văn bản" type="object" 
+                            class="btn btn-success o_vanban_btn o_vanban_btn--summary"
+                            attrs="{'invisible': [('ai_pdf_extract_state', '!=', 'done')]}"/>
                     
                     <field name="trang_thai" widget="statusbar" 
                            statusbar_visible="nhap,cho_duyet,da_duyet,cho_ky,da_ky,da_gui"/>
@@ -253,28 +269,61 @@
                                            attrs="{'readonly': [('bi_khoa', '=', True)]}"/>
                                     <field name="ten_file" readonly="1"/>
                                     <field name="hash_file" readonly="1"/>
-
-                                    <div class="text-muted" attrs="{'invisible': [('file_dinh_kem', '=', False)]}">
-                                        <i class="fa fa-info-circle"/> Upload PDF để hệ thống tự đọc nội dung và tự điền các trường (chỉ điền khi đang trống).
-                                    </div>
-
-                                    <group string="AI trích xuất từ PDF" col="2" attrs="{'invisible': [('file_dinh_kem', '=', False)]}">
-                                        <button name="action_ai_autofill_from_pdf" string="Tự điền lại từ PDF" type="object"
-                                                class="btn-primary" icon="fa-magic"
-                                                attrs="{'invisible': [('bi_khoa', '=', True)]}"/>
-                                        <field name="ai_pdf_extract_state" readonly="1"/>
-                                        <field name="ai_pdf_extracted_at" readonly="1"/>
-                                        <field name="ai_pdf_extract_error" readonly="1"
-                                               attrs="{'invisible': [('ai_pdf_extract_state', '!=', 'error')]}"/>
-                                        <field name="ai_pdf_text" readonly="1" nolabel="1"
-                                               attrs="{'invisible': [('ai_pdf_extract_state', '!=', 'done')]}"/>
-                                    </group>
                                 </group>
                                 <group string="File đã ký" attrs="{'invisible': [('file_da_ky', '=', False)]}">
                                     <field name="file_da_ky" filename="ten_file_da_ky" readonly="1"/>
                                     <field name="ten_file_da_ky" readonly="1"/>
                                 </group>
                             </group>
+                            
+                            <!-- AI Section - Nằm ngoài group để có full width -->
+                            <div attrs="{'invisible': [('file_dinh_kem', '=', False)]}">
+                                <div class="o_ai_info_box o_ai_info_box--info">
+                                    Upload PDF để hệ thống tự đọc nội dung và tự điền các trường (chỉ điền khi đang trống).
+                                </div>
+                                
+                                <!-- Status info -->
+                                <div class="o_ai_meta" attrs="{'invisible': [('ai_pdf_extract_state', '=', False)]}">
+                                    <div class="o_ai_meta_item">
+                                        <strong>Trạng thái:</strong>
+                                        <field name="ai_pdf_extract_state" readonly="1" nolabel="1"/>
+                                    </div>
+                                    <div class="o_ai_meta_item">
+                                        <strong>Thời gian:</strong>
+                                        <field name="ai_pdf_extracted_at" readonly="1" nolabel="1"/>
+                                    </div>
+                                </div>
+                                
+                                <!-- Error message -->
+                                <div class="o_ai_info_box o_ai_info_box--error" attrs="{'invisible': [('ai_pdf_extract_state', '!=', 'error')]}">
+                                    <strong>Lỗi:</strong> <field name="ai_pdf_extract_error" readonly="1" nolabel="1"/>
+                                </div>
+                                
+                                <!-- Layout 2 cột ngang: Trích xuất bên trái, Tóm tắt bên phải -->
+                                <div class="o_ai_layout">
+                                    <!-- Cột trái: Nội dung trích xuất -->
+                                    <div class="o_ai_panel">
+                                        <div class="o_ai_panel_header o_ai_panel_header--extract">
+                                            Nội dung trích xuất
+                                        </div>
+                                        <div class="o_ai_panel_body o_ai_panel_body--monospace">
+                                            <field name="ai_pdf_text" readonly="1" nolabel="1"
+                                                   placeholder="Nhấn 'Trích xuất từ PDF' để trích xuất nội dung văn bản..."/>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Cột phải: Tóm tắt AI -->
+                                    <div class="o_ai_panel">
+                                        <div class="o_ai_panel_header o_ai_panel_header--summary">
+                                            Tóm tắt AI
+                                        </div>
+                                        <div class="o_ai_panel_body">
+                                            <field name="ai_pdf_summary" readonly="1" nolabel="1"
+                                                   placeholder="Nhấn 'Tóm tắt văn bản' để AI tạo tóm tắt nội dung..."/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </page>
 
                         <page string="Lịch sử ký">

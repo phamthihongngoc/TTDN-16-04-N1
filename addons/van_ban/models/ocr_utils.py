@@ -2,6 +2,7 @@
 
 import io
 import re
+import unicodedata
 
 
 def fix_spacing_artifacts(text):
@@ -11,69 +12,153 @@ def fix_spacing_artifacts(text):
     (e.g. "V ũ  D u y" -> "Vũ Duy", "Th ái" -> "Thái"), which breaks matching and autofill.
 
     This function:
-    - normalizes odd whitespace (NBSP, tabs)
-    - removes zero-width characters
-    - joins runs of small-character tokens (1-2 chars) into a word unless there are wide gaps
-    - collapses remaining whitespace
+        - normalizes odd whitespace (NBSP, tabs)
+        - removes zero-width characters
+        - fixes character-by-character spacing WITHOUT adding new spaces
+        - preserves original word boundaries as much as possible
     """
     if not text:
         return text
 
-    def _clean_line(line):
+    # Normalize unicode so Vietnamese diacritics are in composed form.
+    try:
+        text = unicodedata.normalize('NFC', text)
+    except Exception:
+        pass
+
+    def _fix_char_spacing(line):
+        """Fix split syllables without adding new spaces."""
         if not line:
             return ''
 
-        # Normalize whitespace characters early
-        line = (line or '')
+        try:
+            line = unicodedata.normalize('NFC', line)
+        except Exception:
+            pass
+
+        # Normalize whitespace
         line = line.replace('\u00a0', ' ').replace('\t', ' ')
         line = line.replace('\u200b', '').replace('\u200c', '').replace('\u200d', '').replace('\ufeff', '')
 
-        # Simple approach: join 1-2 char fragments, but use Vietnamese word length heuristics
-        tokens = re.split(r'\s+', line.strip())
+        tokens = re.split(r'\s+', line.strip()) if line.strip() else []
         if not tokens:
             return ''
-        
-        result_tokens = []
-        current_word = []
-        
-        for token in tokens:
-            if not token:
-                continue
-                
-            # If this is a small fragment (1-2 chars), accumulate into current_word
-            if len(token) <= 2 and re.match(r'^[a-zA-ZàáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđĐ]+$', token):
-                current_word.append(token)
-                
-                # Vietnamese words are typically 1-8 characters. If we reach reasonable length, consider it a word.
-                joined_word = ''.join(current_word)
-                # Flush word when it's 3-7 chars (good Vietnamese word length)
-                if len(joined_word) >= 3 and len(joined_word) <= 7:
-                    result_tokens.append(joined_word)
-                    current_word = []
-                elif len(joined_word) > 7:
-                    # Too long, likely multiple words joined, split at reasonable point
-                    if len(joined_word) <= 10:
-                        result_tokens.append(joined_word)
-                    else:
-                        # Split at 4-5 chars for first word
-                        mid = 4 if len(joined_word) >= 8 else 3
-                        result_tokens.append(joined_word[:mid])
-                        result_tokens.append(joined_word[mid:])
-                    current_word = []
-            else:
-                # Longer token or non-alphabetic: flush current_word first
-                if current_word:
-                    result_tokens.append(''.join(current_word))
-                    current_word = []
-                result_tokens.append(token)
-        
-        # Flush any remaining current_word
-        if current_word:
-            result_tokens.append(''.join(current_word))
-        
-        return ' '.join(result_tokens)
 
-    # Preserve line structure but fix each line.
+        _PUNCT_STRIP = "\"'“”‘’.,;:!?()[]{}<>"
+
+        # Vietnamese vowels (uppercase, including diacritics). Used to detect split syllables in ALL-CAPS titles.
+        _VOWELS_UPPER = set(
+            "AEIOUY"
+            "ĂÂÊÔƠƯ"
+            "ÀÁẢÃẠ"
+            "ẮẰẲẴẶ"
+            "ẤẦẨẪẬ"
+            "ÈÉẺẼẸ"
+            "ẾỀỂỄỆ"
+            "ÌÍỈĨỊ"
+            "ÒÓỎÕỌ"
+            "ỐỒỔỖỘ"
+            "ỚỜỞỠỢ"
+            "ÙÚỦŨỤ"
+            "ỨỪỬỮỰ"
+            "ỲÝỶỸỴ"
+        )
+
+        def _core(tok):
+            return (tok or '').strip(_PUNCT_STRIP)
+
+        def _starts_upper(tok):
+            if not tok:
+                return False
+            c = tok[0]
+            return c.isalpha() and c.isupper()
+
+        def _starts_lower(tok):
+            if not tok:
+                return False
+            c = tok[0]
+            return c.isalpha() and c.islower()
+
+        def _is_single_upper_letter(tok):
+            return bool(tok) and len(tok) == 1 and tok.isalpha() and tok.isupper()
+
+        def _is_alpha_word(tok):
+            # Allows Vietnamese letters in the À-ỹ range.
+            return bool(tok) and bool(re.fullmatch(r'[A-Za-zÀ-ỹ]+', tok))
+
+        def _starts_vowel_upper(tok):
+            if not tok:
+                return False
+            c = tok[0]
+            return c in _VOWELS_UPPER
+
+        def _should_merge(prev, curr):
+            """Return True if space between prev/curr is likely an artifact.
+
+            Key principle: do NOT merge when curr starts with uppercase (word boundary),
+            except for safe uppercase fragment cases like "H ỢP" or "Đ ỒNG".
+            """
+            if not prev or not curr:
+                return False
+
+            prev_core = _core(prev)
+            curr_core = _core(curr)
+            if not (prev_core and curr_core):
+                return False
+            if not (_is_alpha_word(prev_core) and _is_alpha_word(curr_core)):
+                return False
+
+            # Protect patterns like "Bên B" / "BÊN A".
+            if len(curr_core) == 1 and curr_core.isupper() and len(prev_core) >= 2:
+                return False
+
+            # Common Vietnamese split syllables: "Th ái" -> "Thái", "Ng ọc" -> "Ngọc", "Nguy ễn" -> "Nguyễn".
+            # Only merge when the NEXT fragment begins with lowercase (vowel/diacritic chunk).
+            if _starts_upper(prev_core) and _starts_lower(curr_core) and (1 <= len(prev_core) <= 4) and (1 <= len(curr_core) <= 6):
+                return True
+
+            # Uppercase text with character spacing: "H ỢP" -> "HỢP", "Đ ỒNG" -> "ĐỒNG".
+            # Allow only when the previous token is a single uppercase letter.
+            if _is_single_upper_letter(prev_core) and _starts_upper(curr_core) and (1 <= len(curr_core) <= 4):
+                return True
+
+            # ALL-CAPS title syllable splits: "ĐI ỆN" -> "ĐIỆN", "THO ẠI" -> "THOẠI".
+            # Only merge when the second fragment starts with a Vietnamese vowel (incl. diacritics).
+            if prev_core.isupper() and curr_core.isupper() and (1 <= len(prev_core) <= 3) and (1 <= len(curr_core) <= 3) and _starts_vowel_upper(curr_core):
+                return True
+
+            # Uppercase split like "TH Ị" -> "THỊ" (but avoid "BÊN A").
+            if _starts_upper(prev_core) and _is_single_upper_letter(curr_core) and len(prev_core) <= 2:
+                return True
+
+            # Extreme char-by-char spacing: "N g ọ c" (rare, but keep safe)
+            if len(prev_core) == 1 and len(curr_core) == 1 and prev_core.isalpha() and curr_core.isalpha():
+                return True
+
+            return False
+
+        out = []
+        for tok in tokens:
+            if out and _should_merge(out[-1], tok):
+                out[-1] = f"{out[-1]}{tok}"
+            else:
+                out.append(tok)
+
+        return ' '.join(out).strip()
+
+    def _clean_line(line):
+        if not line:
+            return ''
+        
+        # Normalize whitespace characters
+        line = (line or '')
+        line = line.replace('\u00a0', ' ').replace('\t', ' ')
+        line = line.replace('\u200b', '').replace('\u200c', '').replace('\u200d', '').replace('\ufeff', '')
+        
+        # Fix character spacing if detected
+        return _fix_char_spacing(line)
+
+    # Preserve line structure but fix each line
     lines = (text or '').splitlines()
     fixed_lines = [_clean_line(ln) for ln in lines]
     return ('\n'.join([ln for ln in fixed_lines if ln is not None])).strip()

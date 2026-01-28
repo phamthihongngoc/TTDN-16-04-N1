@@ -252,6 +252,62 @@
             <field name="applicable_models">khach_hang</field>
         </record>
         
+        <!-- Tool thống kê khách hàng -->
+        <record id="tool_get_customer_statistics" model="ai.chat.tool">
+            <field name="name">get_customer_statistics</field>
+            <field name="display_name">Thống kê khách hàng</field>
+            <field name="description">Lấy thống kê tổng quan về khách hàng trong hệ thống: tổng số khách hàng, doanh thu, đơn hàng, phân loại theo nhóm. Sử dụng khi user hỏi về số liệu thống kê khách hàng, có bao nhiêu khách hàng, tổng doanh thu.</field>
+            <field name="module">khach_hang</field>
+            <field name="model_name">ai.chat.tool.khach_hang</field>
+            <field name="method_name">tool_get_customer_statistics</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "stat_type": {
+            "type": "string",
+            "enum": ["phan_loai", "trang_thai", "rfm", "overview", "all"],
+            "description": "Loại thống kê: phan_loai=theo phân loại, trang_thai=theo trạng thái, rfm=theo RFM, overview=tổng quan, all=tất cả",
+            "default": "all"
+        }
+    }
+}</field>
+            <field name="sequence">81</field>
+            <field name="icon">fa-bar-chart</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Thống kê KH</field>
+            <field name="quick_action_prompt">Cho tôi xem thống kê khách hàng</field>
+            <field name="applicable_models">khach_hang,don_hang,ho_tro_khach_hang</field>
+        </record>
+        
+        <!-- Tool liệt kê phân khúc khách hàng -->
+        <record id="tool_list_customer_segments" model="ai.chat.tool">
+            <field name="name">list_customer_segments</field>
+            <field name="display_name">Phân khúc khách hàng</field>
+            <field name="description">Liệt kê các phân khúc khách hàng và số lượng trong mỗi phân khúc. Sử dụng khi user hỏi: có bao nhiêu loại khách hàng, phân loại khách hàng, các nhóm khách hàng.</field>
+            <field name="module">khach_hang</field>
+            <field name="model_name">ai.chat.tool.khach_hang</field>
+            <field name="method_name">tool_list_customer_segments</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "segment_type": {
+            "type": "string",
+            "enum": ["phan_loai", "trang_thai", "rfm"],
+            "description": "Loại phân khúc: phan_loai=theo tiềm năng, trang_thai=theo trạng thái, rfm=theo RFM",
+            "default": "phan_loai"
+        }
+    }
+}</field>
+            <field name="sequence">82</field>
+            <field name="icon">fa-pie-chart</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Phân khúc</field>
+            <field name="quick_action_prompt">Cho tôi xem các phân loại khách hàng</field>
+            <field name="applicable_models">khach_hang,don_hang,ho_tro_khach_hang</field>
+        </record>
+        
         <!-- ==================== VĂN BẢN TOOLS ==================== -->
         
         <record id="tool_search_document" model="ai.chat.tool">
@@ -399,6 +455,61 @@
             <field name="is_quick_action">True</field>
             <field name="quick_action_label">VB chờ xử lý</field>
             <field name="quick_action_prompt">Tôi có văn bản nào cần xử lý?</field>
+            <field name="applicable_models">van_ban_den,van_ban_di,van_ban</field>
+        </record>
+        
+        <!-- Tool thống kê văn bản -->
+        <record id="tool_get_document_statistics" model="ai.chat.tool">
+            <field name="name">get_document_statistics</field>
+            <field name="display_name">Thống kê văn bản</field>
+            <field name="description">Lấy thống kê tổng quan về văn bản trong hệ thống: số lượng theo loại, trạng thái, văn bản đến/đi. Sử dụng khi user hỏi về số liệu thống kê văn bản, có bao nhiêu văn bản, phân bổ theo loại.</field>
+            <field name="module">van_ban</field>
+            <field name="model_name">ai.chat.tool.van_ban</field>
+            <field name="method_name">tool_get_document_statistics</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "stat_type": {
+            "type": "string",
+            "enum": ["loai_van_ban", "trang_thai", "overview", "all"],
+            "description": "Loại thống kê: loai_van_ban=theo loại, trang_thai=theo trạng thái, overview=tổng quan, all=tất cả",
+            "default": "all"
+        }
+    }
+}</field>
+            <field name="sequence">141</field>
+            <field name="icon">fa-bar-chart</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Thống kê VB</field>
+            <field name="quick_action_prompt">Cho tôi xem thống kê văn bản</field>
+            <field name="applicable_models">van_ban_den,van_ban_di,van_ban</field>
+        </record>
+        
+        <!-- Tool liệt kê loại văn bản -->
+        <record id="tool_list_document_types" model="ai.chat.tool">
+            <field name="name">list_document_types</field>
+            <field name="display_name">Danh sách loại văn bản</field>
+            <field name="description">Liệt kê tất cả các loại văn bản trong hệ thống và số lượng văn bản mỗi loại. Sử dụng khi user hỏi: có bao nhiêu loại văn bản, những loại văn bản nào, danh sách loại văn bản.</field>
+            <field name="module">van_ban</field>
+            <field name="model_name">ai.chat.tool.van_ban</field>
+            <field name="method_name">tool_list_document_types</field>
+            <field name="is_read_only">True</field>
+            <field name="parameters_schema">{
+    "type": "object",
+    "properties": {
+        "include_count": {
+            "type": "boolean",
+            "description": "Có đếm số văn bản mỗi loại không",
+            "default": true
+        }
+    }
+}</field>
+            <field name="sequence">142</field>
+            <field name="icon">fa-list</field>
+            <field name="is_quick_action">True</field>
+            <field name="quick_action_label">Loại VB</field>
+            <field name="quick_action_prompt">Có những loại văn bản nào trong hệ thống?</field>
             <field name="applicable_models">van_ban_den,van_ban_di,van_ban</field>
         </record>
         

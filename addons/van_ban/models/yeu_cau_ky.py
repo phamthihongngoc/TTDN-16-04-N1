@@ -4,7 +4,12 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import secrets
 import string
+import base64
+import io
+import logging
 from datetime import datetime, timedelta
+
+_logger = logging.getLogger(__name__)
 
 
 class YeuCauKy(models.Model):
@@ -165,13 +170,22 @@ class YeuCauKy(models.Model):
             'otp_code': False  # Xóa OTP sau khi ký
         })
         
+        # Embed chữ ký khách hàng vào file PDF văn bản
+        signed_pdf = self._embed_customer_signature_to_pdf(chu_ky_data)
+        
         # Cập nhật văn bản - CHƯA khóa, chờ đến khi GỬI mới khóa
-        self.van_ban_id.write({
+        update_vals = {
             'da_khach_ky': True,
             'ngay_khach_ky': fields.Datetime.now(),
             'chu_ky_khach': chu_ky_data,
             'bi_khoa': False  # CHƯA khóa - chờ đến khi gửi mới khóa
-        })
+        }
+        
+        # Nếu embed thành công, cập nhật file đã ký
+        if signed_pdf:
+            update_vals['file_da_ky'] = base64.b64encode(signed_pdf).decode('utf-8')
+        
+        self.van_ban_id.write(update_vals)
         
         # Gửi email xác nhận
         self._gui_email_xac_nhan_ky()
@@ -213,6 +227,276 @@ class YeuCauKy(models.Model):
                         ),
                     )
     
+    def _embed_customer_signature_to_pdf(self, signature_data):
+        """
+        Embed ảnh chữ ký khách hàng vào file PDF văn bản.
+        Chỉ thêm ảnh chữ ký thuần túy, không thêm icon hay text mặc định.
+        
+        Args:
+            signature_data: Dữ liệu chữ ký dạng base64
+            
+        Returns:
+            bytes: PDF data đã được embed chữ ký, hoặc None nếu lỗi
+        """
+        self.ensure_one()
+        
+        if not signature_data:
+            _logger.warning("Không có dữ liệu chữ ký để embed")
+            return None
+            
+        van_ban = self.van_ban_id
+        if not van_ban:
+            _logger.warning("Không tìm thấy văn bản liên kết")
+            return None
+        
+        # Lấy file PDF hiện tại (ưu tiên file_da_ky nếu đã có, không thì dùng file_dinh_kem)
+        pdf_data = van_ban.file_da_ky or van_ban.file_dinh_kem
+        if not pdf_data:
+            _logger.warning("Văn bản không có file PDF đính kèm")
+            return None
+        
+        try:
+            pdf_bytes = base64.b64decode(pdf_data)
+        except Exception as e:
+            _logger.warning(f"Không thể decode PDF: {e}")
+            return None
+        
+        # Import các thư viện cần thiết
+        try:
+            from reportlab.pdfgen import canvas
+            from reportlab.lib.utils import ImageReader
+        except ImportError as e:
+            _logger.warning(f"Thiếu thư viện reportlab: {e}")
+            return None
+
+        # Optional: use pdfplumber to locate the real signature area (better placement)
+        pdfplumber = None
+        try:
+            import pdfplumber as _pdfplumber
+            pdfplumber = _pdfplumber
+        except Exception:
+            pdfplumber = None
+        
+        # PyPDF2 compatibility
+        PdfReader = None
+        PdfWriter = None
+        pypdf2_api = None
+        
+        try:
+            from PyPDF2 import PdfReader, PdfWriter
+            pypdf2_api = 'new'
+        except ImportError:
+            pass
+        
+        if not pypdf2_api:
+            try:
+                from PyPDF2 import PdfFileReader as PdfReader, PdfFileWriter as PdfWriter
+                pypdf2_api = 'old'
+            except ImportError:
+                _logger.warning("Thiếu thư viện PyPDF2")
+                return None
+        
+        try:
+            # Decode ảnh chữ ký
+            sig_bytes = base64.b64decode(signature_data)
+            
+            # Xử lý ảnh chữ ký
+            try:
+                from PIL import Image
+                sig_img = Image.open(io.BytesIO(sig_bytes))
+                if sig_img.mode not in ('RGB', 'RGBA'):
+                    sig_img = sig_img.convert('RGBA')
+                img_reader = ImageReader(sig_img)
+                img_w, img_h = sig_img.size
+            except Exception:
+                img_reader = ImageReader(io.BytesIO(sig_bytes))
+                img_w, img_h = (200, 80)  # Default size
+            
+            # Đọc PDF
+            if pypdf2_api == 'new':
+                reader = PdfReader(io.BytesIO(pdf_bytes), strict=False)
+                if getattr(reader, 'is_encrypted', False):
+                    try:
+                        reader.decrypt('')
+                    except Exception:
+                        return None
+                writer = PdfWriter()
+                pages = list(reader.pages)
+                total_pages = len(pages)
+            else:
+                reader = PdfReader(io.BytesIO(pdf_bytes), strict=False)
+                if reader.isEncrypted:
+                    try:
+                        reader.decrypt('')
+                    except Exception:
+                        return None
+                writer = PdfWriter()
+                total_pages = reader.getNumPages()
+            
+            # Vị trí chữ ký khách hàng (bên phải - Bên B)
+            # Thường ở trang cuối, góc phải dưới
+            last_page_idx = max(total_pages - 1, 0)
+            
+            for page_idx in range(total_pages):
+                if pypdf2_api == 'new':
+                    page = pages[page_idx]
+                    page_w = float(page.mediabox.width)
+                    page_h = float(page.mediabox.height)
+                else:
+                    page = reader.getPage(page_idx)
+                    page_w = float(page.mediaBox.getWidth())
+                    page_h = float(page.mediaBox.getHeight())
+                
+                # Chỉ thêm chữ ký vào trang cuối
+                if page_idx == last_page_idx:
+                    # Tạo overlay với chữ ký
+                    overlay_buf = io.BytesIO()
+                    c = canvas.Canvas(overlay_buf, pagesize=(page_w, page_h))
+                    
+                    # === TÍNH TOÁN VỊ TRÍ CHỮ KÝ KHÁCH HÀNG (BÊN B) ===
+                    # Ưu tiên tìm đúng vùng ký bằng pdfplumber (tọa độ text), fallback sang heuristic.
+
+                    # Kích thước vùng chữ ký (box). Ảnh sẽ được scale giữ tỉ lệ trong box này.
+                    sig_width = min(170.0, page_w * 0.22)
+                    sig_height = min(70.0, page_h * 0.085)
+
+                    # Defaults (fallback)
+                    center_x = page_w * 0.75
+                    y_pos = page_h * 0.22
+
+                    def _strip_accents(s):
+                        import unicodedata
+                        s = unicodedata.normalize('NFKD', s or '')
+                        s = ''.join(ch for ch in s if unicodedata.category(ch) != 'Mn')
+                        return s
+
+                    def _norm_word(s):
+                        import re as _re
+                        s = _strip_accents(s or '')
+                        s = _re.sub(r"[^0-9A-Za-z]+", "", s)
+                        return (s or '').upper()
+
+                    def _find_phrase_bbox(words, phrase_tokens):
+                        if not words or not phrase_tokens:
+                            return None
+                        toks = [_norm_word(t) for t in phrase_tokens if _norm_word(t)]
+                        if not toks:
+                            return None
+                        wnorm = [_norm_word(w.get('text', '')) for w in words]
+                        n = len(toks)
+                        for i in range(0, max(len(wnorm) - n + 1, 0)):
+                            if wnorm[i:i + n] == toks:
+                                chunk = words[i:i + n]
+                                x0 = min(w.get('x0', 0.0) for w in chunk)
+                                x1 = max(w.get('x1', 0.0) for w in chunk)
+                                top = min(w.get('top', 0.0) for w in chunk)
+                                bottom = max(w.get('bottom', 0.0) for w in chunk)
+                                return {'x0': x0, 'x1': x1, 'top': top, 'bottom': bottom}
+                        return None
+
+                    # Try anchor-based placement on last page
+                    if pdfplumber:
+                        try:
+                            with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+                                if 0 <= last_page_idx < len(pdf.pages):
+                                    p = pdf.pages[last_page_idx]
+                                    words = p.extract_words(keep_blank_chars=False, use_text_flow=True)
+
+                                    # Prefer centering on customer's printed name if found
+                                    kh_name = (self.khach_hang_id and self.khach_hang_id.ten_khach_hang) or ''
+                                    name_bbox = None
+                                    if kh_name:
+                                        name_bbox = _find_phrase_bbox(words, (kh_name or '').split())
+
+                                    ky_bbox = _find_phrase_bbox(words, ['Ký', 'ghi', 'rõ', 'họ', 'tên'])
+                                    benb_bbox = _find_phrase_bbox(words, ['ĐẠI', 'DIỆN', 'BÊN', 'B'])
+
+                                    ref_bbox = name_bbox or ky_bbox or benb_bbox
+                                    if ref_bbox:
+                                        center_x = (ref_bbox['x0'] + ref_bbox['x1']) / 2.0
+
+                                    # Convert from pdfplumber (top-origin) to reportlab (bottom-origin)
+                                    pad = page_h * 0.012
+                                    if ky_bbox:
+                                        ky_y0 = page_h - float(ky_bbox['bottom'])  # bottom of text
+                                    else:
+                                        ky_y0 = None
+                                    if name_bbox:
+                                        name_y1 = page_h - float(name_bbox['top'])  # top of name text
+                                    else:
+                                        name_y1 = None
+
+                                    # Place signature between the '(Ký...)' line and the name line
+                                    if ky_y0 is not None and name_y1 is not None:
+                                        max_top = ky_y0 - pad
+                                        min_bottom = name_y1 + pad
+                                        available = max_top - min_bottom
+                                        if available > 20:
+                                            sig_height = min(sig_height, available)
+                                            y_pos = min_bottom
+                                            if y_pos + sig_height > max_top:
+                                                y_pos = max_top - sig_height
+                                    elif ky_y0 is not None:
+                                        y_pos = max(ky_y0 - sig_height - pad, page_h * 0.12)
+                                    elif name_y1 is not None:
+                                        y_pos = min(name_y1 + pad, page_h * 0.30)
+                        except Exception as _e:
+                            # Fallback to heuristic
+                            pass
+
+                    x_pos = center_x - (sig_width / 2.0)
+                    # Clamp inside page bounds
+                    x_pos = max(min(x_pos, page_w - sig_width - 5.0), 5.0)
+                    y_pos = max(min(y_pos, page_h - sig_height - 5.0), 5.0)
+                    
+                    # Scale ảnh giữ nguyên tỷ lệ
+                    scale = min(sig_width / float(img_w or 1), sig_height / float(img_h or 1))
+                    draw_w = float(img_w) * scale
+                    draw_h = float(img_h) * scale
+                    
+                    # Căn giữa ảnh trong vùng target
+                    draw_x = x_pos + (sig_width - draw_w) / 2.0
+                    draw_y = y_pos + (sig_height - draw_h) / 2.0
+                    
+                    # Vẽ CHỈ ảnh chữ ký - KHÔNG thêm text, border hay icon
+                    c.drawImage(img_reader, draw_x, draw_y, 
+                               width=draw_w, height=draw_h, mask='auto')
+                    
+                    c.showPage()
+                    c.save()
+                    overlay_buf.seek(0)
+                    
+                    # Merge overlay vào page
+                    if pypdf2_api == 'new':
+                        overlay_reader = PdfReader(overlay_buf, strict=False)
+                        overlay_page = overlay_reader.pages[0]
+                        page.merge_page(overlay_page)
+                        writer.add_page(page)
+                    else:
+                        from PyPDF2 import PdfFileReader as PdfFileReaderOld
+                        overlay_reader = PdfFileReaderOld(overlay_buf, strict=False)
+                        overlay_page = overlay_reader.getPage(0)
+                        page.mergePage(overlay_page)
+                        writer.addPage(page)
+                else:
+                    # Các trang khác giữ nguyên
+                    if pypdf2_api == 'new':
+                        writer.add_page(page)
+                    else:
+                        writer.addPage(page)
+            
+            # Xuất PDF mới
+            out_buf = io.BytesIO()
+            writer.write(out_buf)
+            result = out_buf.getvalue()
+            
+            _logger.info(f"Đã embed chữ ký khách hàng vào PDF văn bản {van_ban.ten_van_ban}")
+            return result
+            
+        except Exception as e:
+            _logger.warning(f"Lỗi khi embed chữ ký khách hàng vào PDF: {e}")
+            return None
+
     def _gui_email_xac_nhan_ky(self):
         """Gửi email xác nhận đã ký thành công"""
         self.ensure_one()
