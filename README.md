@@ -136,7 +136,7 @@ Module Quản lý Văn bản số hóa quy trình xử lý văn bản, đảm b�
 ### 3.6. OCR Văn bản
 
 <p align="center">
-    <img src="assets/ORC.png" alt="Trợ lý AI" width="800"/>
+    <img src="assets/OCR.png" alt="Trợ lý AI" width="800"/>
     <br><em>Giao diện OCR Văn bản</em>
 </p>
 
