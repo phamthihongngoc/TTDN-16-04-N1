@@ -278,16 +278,11 @@ Truy cập hệ thống tại: **http://localhost:8069**
 
 ## 7. Poster
 
-<p align="center">
-    <img src="assets/Poster.pdf" alt="Poster" width="900"/>
-    <br><em>Poster giới thiệu hệ thống Platform ERP</em>
-</p>
+[📄 Xem Poster (PDF)](assets/Poster.pdf)
 
 ---
 
 ## 8. Liên hệ
-
-<div align="center">
 
 ### 👩‍💻 Thông tin tác giả
 
@@ -297,5 +292,4 @@ Truy cập hệ thống tại: **http://localhost:8069**
 | **Số điện thoại** | 0395888778 |
 | **Email** | phamnogc887@gmail.com |
 
-</div>
 
