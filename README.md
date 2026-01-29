@@ -284,7 +284,6 @@ Truy cập hệ thống tại: **http://localhost:8069**
   </a>
   <br><em>Poster giới thiệu hệ thống Platform ERP</em>
 </p>
----
 
 ## 8. Liên hệ
 
