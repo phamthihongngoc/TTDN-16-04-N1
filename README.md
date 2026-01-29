@@ -280,7 +280,7 @@ Truy cập hệ thống tại: **http://localhost:8069**
 
 <p align="center">
   <a href="assets/Poster.png">
-    <img src="assets/Poster.png alt="Poster preview" width="900"/>
+    <img src="assets/Poster.png "alt="Poster preview" width="900"/>
   </a>
   <br><em>Poster giới thiệu hệ thống Platform ERP</em>
 </p>
