@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Booking Manager Group -->
+    <record id="group_booking_manager" model="res.groups">
+        <field name="name">Booking Manager</field>
+        <field name="category_id" ref="base.module_category_sales_sales"/>
+        <field name="comment">Quản lý đầy đủ quyền với lịch hẹn khách hàng</field>
+    </record>
+
+    <!-- Booking User Group -->
+    <record id="group_booking_user" model="res.groups">
+        <field name="name">Booking User</field>
+        <field name="category_id" ref="base.module_category_sales_sales"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Có thể tạo và quản lý lịch hẹn của mình</field>
+    </record>
+
+    <!-- Rule: Booking users can only see their own bookings -->
+    <record id="rule_booking_user_own" model="ir.rule">
+        <field name="name">Booking: User can see own bookings</field>
+        <field name="model_id" ref="model_customer_booking"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_booking_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Rule: Booking managers can see all bookings -->
+    <record id="rule_booking_manager_all" model="ir.rule">
+        <field name="name">Booking: Manager can see all bookings</field>
+        <field name="model_id" ref="model_customer_booking"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_booking_manager'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Rule: Administrators can see all bookings -->
+    <record id="rule_booking_admin_all" model="ir.rule">
+        <field name="name">Booking: Admin can see all bookings</field>
+        <field name="model_id" ref="model_customer_booking"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+</odoo>

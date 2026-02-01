@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu under Khách hàng -->
+    <menuitem id="menu_khach_hang_booking_root"
+              name="Lịch hẹn"
+              parent="khach_hang.menu_khach_hang_root"
+              sequence="15"/>
+
+    <!-- Booking submenu items -->
+    <menuitem id="menu_customer_booking"
+              name="Tất cả lịch hẹn"
+              parent="menu_khach_hang_booking_root"
+              action="action_customer_booking"
+              sequence="10"/>
+
+    <menuitem id="menu_my_bookings"
+              name="Lịch hẹn của tôi"
+              parent="menu_khach_hang_booking_root"
+              action="action_my_bookings"
+              sequence="20"/>
+
+    <!-- Configuration Menu -->
+    <menuitem id="menu_booking_config"
+              name="Cấu hình tích hợp"
+              parent="menu_khach_hang_booking_root"
+              sequence="100"
+              groups="base.group_system"/>
+
+    <menuitem id="menu_zoom_integration"
+              name="Cấu hình Zoom"
+              parent="menu_booking_config"
+              action="action_zoom_integration"
+              sequence="10"
+              groups="base.group_system"/>
+
+    <menuitem id="menu_google_calendar_integration"
+              name="Cấu hình Google Calendar"
+              parent="menu_booking_config"
+              action="action_google_calendar_integration"
+              sequence="20"
+              groups="base.group_system"/>
+</odoo>

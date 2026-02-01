@@ -8,19 +8,19 @@
             <form string="Hồ Sơ Nhân Viên">
                 <header>
                     <button name="action_gui_duyet" string="Gửi Duyệt" type="object" 
-                            class="oe_highlight" states="nhap"/>
+                            class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'nhap')]}"/>
                     <button name="action_duyet" string="Duyệt" type="object" 
-                            class="oe_highlight" states="cho_duyet"
+                            class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}"
                             groups="nhan_su.group_quan_tri_nhan_su"/>
                     <button name="action_tu_choi" string="Từ Chối" type="object" 
-                            states="cho_duyet"
+                            attrs="{'invisible': [('trang_thai', '!=', 'cho_duyet')]}"
                             groups="nhan_su.group_quan_tri_nhan_su"/>
                     <button name="action_cap_nhat_phien_ban" string="Cập Nhật Phiên Bản" type="object" 
-                            states="da_duyet"/>
+                            attrs="{'invisible': [('trang_thai', '!=', 'da_duyet')]}"/>
                     <button name="action_view_history" string="Lịch Sử Phiên Bản" type="object" 
-                            icon="fa-history" attrs="{'invisible': [('phien_ban', '=', 1)]}"/>
+                            attrs="{'invisible': [('phien_ban', '=', 1)]}"/>
                     <button name="action_download" string="Tải Xuống" type="object" 
-                            icon="fa-download" attrs="{'invisible': [('file_dinh_kem', '=', False)]}"/>
+                            attrs="{'invisible': [('file_dinh_kem', '=', False)]}"/>
                     <field name="trang_thai" widget="statusbar" 
                            statusbar_visible="nhap,cho_duyet,da_duyet"/>
                 </header>

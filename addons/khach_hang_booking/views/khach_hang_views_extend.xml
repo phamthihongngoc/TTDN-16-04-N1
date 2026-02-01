@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend Khach Hang Form View - Add booking smart button and action -->
+    <record id="view_khach_hang_form_booking_inherit" model="ir.ui.view">
+        <field name="name">khach.hang.form.booking.inherit</field>
+        <field name="model">khach_hang</field>
+        <field name="inherit_id" ref="khach_hang.view_khach_hang_form"/>
+        <field name="arch" type="xml">
+            <!-- Add smart button for bookings -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="object" name="action_view_bookings"
+                        icon="fa-calendar-check-o">
+                    <field name="booking_count" string="Lịch hẹn" widget="statinfo"/>
+                </button>
+            </xpath>
+            
+            <!-- Add "Đặt lịch hẹn" button in header -->
+            <xpath expr="//header" position="inside">
+                <button name="action_create_booking" type="object" 
+                        string="Đặt lịch hẹn" class="btn-primary" 
+                        icon="fa-calendar-plus-o"/>
+            </xpath>
+            
+            <!-- Add next booking info after basic info -->
+            <xpath expr="//group[1]" position="after">
+                <group string="Lịch hẹn tiếp theo" attrs="{'invisible': [('next_booking_id', '=', False)]}">
+                    <group>
+                        <field name="next_booking_id" readonly="1"/>
+                        <field name="next_booking_date" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extend Khach Hang Tree View - Add booking count -->
+    <record id="view_khach_hang_tree_booking_inherit" model="ir.ui.view">
+        <field name="name">khach.hang.tree.booking.inherit</field>
+        <field name="model">khach_hang</field>
+        <field name="inherit_id" ref="khach_hang.view_khach_hang_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ngay_tao']" position="after">
+                <field name="booking_count" string="Lịch hẹn" optional="show"/>
+                <field name="next_booking_date" string="Hẹn tiếp theo" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action to create booking from customer context menu -->
+    <record id="action_create_booking_from_customer" model="ir.actions.act_window">
+        <field name="name">Đặt lịch hẹn</field>
+        <field name="res_model">customer.booking</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{
+            'default_khach_hang_id': active_id,
+        }</field>
+    </record>
+</odoo>

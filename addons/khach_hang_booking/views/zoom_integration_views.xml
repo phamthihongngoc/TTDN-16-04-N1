@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Zoom Integration Form View -->
+    <record id="view_zoom_integration_form" model="ir.ui.view">
+        <field name="name">zoom.integration.form</field>
+        <field name="model">zoom.integration</field>
+        <field name="arch" type="xml">
+            <form string="Cấu hình Zoom">
+                <header>
+                    <button name="action_test_connection" type="object" 
+                            string="Kiểm tra kết nối" class="btn-primary"
+                            icon="fa-plug"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_test_connection"
+                                icon="fa-video-camera">
+                            <field name="sync_status" widget="badge" 
+                                   decoration-success="sync_status == 'connected'"
+                                   decoration-warning="sync_status in ('configured', 'not_configured')"
+                                   decoration-danger="sync_status == 'error'"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Đang hoạt động" bg_color="bg-success"
+                            attrs="{'invisible': [('is_active', '=', False)]}"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Tên cấu hình"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Thông tin xác thực Zoom">
+                            <field name="is_active"/>
+                            <field name="account_id" password="True"/>
+                            <field name="client_id"/>
+                            <field name="client_secret" password="True"/>
+                        </group>
+                        <group string="Trạng thái">
+                            <field name="sync_status" readonly="1"/>
+                            <field name="last_sync" readonly="1"/>
+                            <field name="token_expiry" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Cài đặt Meeting mặc định">
+                        <group>
+                            <field name="default_duration"/>
+                            <field name="timezone"/>
+                        </group>
+                        <group>
+                            <field name="host_video"/>
+                            <field name="participant_video"/>
+                            <field name="join_before_host"/>
+                            <field name="waiting_room"/>
+                            <field name="mute_upon_entry"/>
+                        </group>
+                    </group>
+                    <group string="Thông báo lỗi" attrs="{'invisible': [('error_message', '=', False)]}">
+                        <field name="error_message" nolabel="1" colspan="2" readonly="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Zoom Integration Tree View -->
+    <record id="view_zoom_integration_tree" model="ir.ui.view">
+        <field name="name">zoom.integration.tree</field>
+        <field name="model">zoom.integration</field>
+        <field name="arch" type="xml">
+            <tree string="Cấu hình Zoom">
+                <field name="name"/>
+                <field name="is_active"/>
+                <field name="sync_status" widget="badge"
+                       decoration-success="sync_status == 'connected'"
+                       decoration-warning="sync_status in ('configured', 'not_configured')"
+                       decoration-danger="sync_status == 'error'"/>
+                <field name="last_sync"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Zoom Integration Action -->
+    <record id="action_zoom_integration" model="ir.actions.act_window">
+        <field name="name">Cấu hình Zoom</field>
+        <field name="res_model">zoom.integration</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Cấu hình tích hợp Zoom Meeting
+            </p>
+            <p>
+                Để sử dụng tích hợp Zoom:
+                <ol>
+                    <li>Tạo Server-to-Server OAuth App trên <a href="https://marketplace.zoom.us/" target="_blank">Zoom Marketplace</a></li>
+                    <li>Lấy Account ID, Client ID, Client Secret</li>
+                    <li>Cấp scope: <code>meeting:write:admin</code></li>
+                    <li>Nhập thông tin vào đây và bấm "Kiểm tra kết nối"</li>
+                </ol>
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,5 +1,0 @@
- id | van_ban_id | van_ban_di_id | van_ban_den_id | verification_status |      signed_at      | has_sig | certificate_id 
-----+------------+---------------+----------------+---------------------+---------------------+---------+----------------
- 22 |        149 |               |                | invalid             | 2026-01-25 21:07:11 | t       |             12
-(1 row)
-

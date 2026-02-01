@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_customer_booking_admin,customer.booking.admin,model_customer_booking,base.group_system,1,1,1,1
+access_customer_booking_user,customer.booking.user,model_customer_booking,group_booking_user,1,1,1,0
+access_customer_booking_manager,customer.booking.manager,model_customer_booking,group_booking_manager,1,1,1,1
+access_zoom_integration_admin,zoom.integration.admin,model_zoom_integration,base.group_system,1,1,1,1
+access_google_calendar_integration_admin,google.calendar.integration.admin,model_google_calendar_integration,base.group_system,1,1,1,1
+access_zoom_integration_user,zoom.integration.user,model_zoom_integration,base.group_user,1,0,0,0
+access_google_calendar_integration_user,google.calendar.integration.user,model_google_calendar_integration,base.group_user,1,0,0,0
+access_booking_wizard_admin,booking.quick.create.wizard.admin,model_booking_quick_create_wizard,base.group_system,1,1,1,1
+access_booking_wizard_user,booking.quick.create.wizard.user,model_booking_quick_create_wizard,base.group_user,1,1,1,1

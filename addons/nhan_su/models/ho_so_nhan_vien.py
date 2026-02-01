@@ -439,7 +439,7 @@ class HoSoNhanVien(models.Model):
                 self.env['mail.activity'].create({
                     'activity_type_id': self.env.ref('mail.mail_activity_data_todo').id,
                     'summary': f'Duyệt hồ sơ: {rec.name}',
-                    'note': f'Nhân viên {rec.nhan_vien_id.name} đã gửi hồ sơ {rec.loai_ho_so} cần duyệt.',
+                    'note': f'Nhân viên {rec.nhan_vien_id.ten_nv} đã gửi hồ sơ {rec.loai_ho_so} cần duyệt.',
                     'res_id': rec.id,
                     'res_model_id': self.env.ref('nhan_su.model_ho_so_nhan_vien').id,
                     'user_id': manager.id,

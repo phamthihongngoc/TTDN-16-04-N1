@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Google Calendar Integration Form View -->
+    <record id="view_google_calendar_integration_form" model="ir.ui.view">
+        <field name="name">google.calendar.integration.form</field>
+        <field name="model">google.calendar.integration</field>
+        <field name="arch" type="xml">
+            <form string="Cấu hình Google Calendar">
+                <header>
+                    <button name="action_authorize_google" type="object" 
+                            string="Authorize Google" class="btn-primary"
+                            icon="fa-google"
+                            attrs="{'invisible': [('authorized', '=', True)]}"/>
+                    <button name="action_test_connection" type="object" 
+                            string="Kiểm tra kết nối" class="btn-secondary"
+                            icon="fa-plug"
+                            attrs="{'invisible': [('authorized', '=', False)]}"/>
+                    <button name="action_revoke_authorization" type="object" 
+                            string="Hủy xác thực" class="btn-warning"
+                            icon="fa-times"
+                            attrs="{'invisible': [('authorized', '=', False)]}"
+                            confirm="Bạn có chắc muốn hủy xác thực Google Calendar?"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_test_connection"
+                                icon="fa-calendar"
+                                attrs="{'invisible': [('authorized', '=', False)]}">
+                            <field name="sync_status" widget="badge" 
+                                   decoration-success="sync_status in ('authorized', 'connected')"
+                                   decoration-warning="sync_status in ('pending_auth', 'not_configured')"
+                                   decoration-danger="sync_status == 'error'"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Đang hoạt động" bg_color="bg-success"
+                            attrs="{'invisible': [('is_active', '=', False)]}"/>
+                    <widget name="web_ribbon" title="Đã xác thực" bg_color="bg-info"
+                            attrs="{'invisible': ['|', ('is_active', '=', True), ('authorized', '=', False)]}"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Tên cấu hình"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Thông tin xác thực Google">
+                            <field name="is_active"/>
+                            <field name="client_id"/>
+                            <field name="client_secret" password="True"/>
+                            <field name="redirect_uri"/>
+                        </group>
+                        <group string="Trạng thái">
+                            <field name="authorized" readonly="1"/>
+                            <field name="authorized_email" readonly="1" 
+                                   attrs="{'invisible': [('authorized_email', '=', False)]}"/>
+                            <field name="sync_status" readonly="1"/>
+                            <field name="last_sync" readonly="1"/>
+                            <field name="token_expiry" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Cài đặt Calendar">
+                        <group>
+                            <field name="calendar_id"/>
+                            <field name="timezone"/>
+                        </group>
+                        <group>
+                            <field name="send_notifications"/>
+                            <field name="reminder_minutes"/>
+                            <field name="popup_reminder"/>
+                            <field name="email_reminder"/>
+                        </group>
+                    </group>
+                    <group string="Thông báo lỗi" attrs="{'invisible': [('error_message', '=', False)]}">
+                        <field name="error_message" nolabel="1" colspan="2" readonly="1"/>
+                    </group>
+                    <div class="alert alert-info" role="alert" 
+                         attrs="{'invisible': [('authorized', '=', True)]}">
+                        <h4 class="alert-heading">
+                            <i class="fa fa-info-circle"/> Hướng dẫn thiết lập Google Calendar
+                        </h4>
+                        <ol>
+                            <li>Truy cập <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                            <li>Tạo project mới hoặc chọn project có sẵn</li>
+                            <li>Bật <strong>Google Calendar API</strong> trong APIs &amp; Services</li>
+                            <li>Tạo OAuth 2.0 Client ID (loại Web application)</li>
+                            <li>Thêm Redirect URI: <code><field name="redirect_uri" readonly="1"/></code></li>
+                            <li>Lấy Client ID và Client Secret, nhập vào form này</li>
+                            <li>Bấm <strong>Authorize Google</strong></li>
+                        </ol>
+                    </div>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Google Calendar Integration Tree View -->
+    <record id="view_google_calendar_integration_tree" model="ir.ui.view">
+        <field name="name">google.calendar.integration.tree</field>
+        <field name="model">google.calendar.integration</field>
+        <field name="arch" type="xml">
+            <tree string="Cấu hình Google Calendar">
+                <field name="name"/>
+                <field name="is_active"/>
+                <field name="authorized"/>
+                <field name="authorized_email"/>
+                <field name="sync_status" widget="badge"
+                       decoration-success="sync_status in ('authorized', 'connected')"
+                       decoration-warning="sync_status in ('pending_auth', 'not_configured')"
+                       decoration-danger="sync_status == 'error'"/>
+                <field name="last_sync"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Google Calendar Integration Action -->
+    <record id="action_google_calendar_integration" model="ir.actions.act_window">
+        <field name="name">Cấu hình Google Calendar</field>
+        <field name="res_model">google.calendar.integration</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Cấu hình tích hợp Google Calendar
+            </p>
+            <p>
+                Đồng bộ lịch hẹn khách hàng với Google Calendar để:
+                <ul>
+                    <li>Xem lịch hẹn trên Google Calendar</li>
+                    <li>Tự động gửi email mời đến attendees</li>
+                    <li>Nhận thông báo nhắc nhở</li>
+                </ul>
+            </p>
+        </field>
+    </record>
+
+    <!-- OAuth Callback Templates -->
+    <template id="oauth_callback_success">
+        <html>
+            <head>
+                <title>Google Calendar - Xác thực thành công</title>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                    .success { color: #28a745; }
+                    .icon { font-size: 64px; margin-bottom: 20px; }
+                </style>
+            </head>
+            <body>
+                <div class="icon success">✓</div>
+                <h1 class="success">Xác thực thành công!</h1>
+                <p>Đã kết nối với Google Calendar: <strong><t t-esc="email"/></strong></p>
+                <p>Bạn có thể đóng cửa sổ này.</p>
+                <script>
+                    setTimeout(function() {
+                        if (window.opener) {
+                            window.opener.location.reload();
+                        }
+                        window.close();
+                    }, 3000);
+                </script>
+            </body>
+        </html>
+    </template>
+
+    <template id="oauth_callback_error">
+        <html>
+            <head>
+                <title>Google Calendar - Lỗi xác thực</title>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                    .error { color: #dc3545; }
+                    .icon { font-size: 64px; margin-bottom: 20px; }
+                </style>
+            </head>
+            <body>
+                <div class="icon error">✗</div>
+                <h1 class="error">Lỗi xác thực!</h1>
+                <p><t t-esc="error_message"/></p>
+                <p>Vui lòng đóng cửa sổ này và thử lại.</p>
+            </body>
+        </html>
+    </template>
+</odoo>

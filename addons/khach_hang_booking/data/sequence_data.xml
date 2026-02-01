@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequence for Customer Booking -->
+    <record id="seq_customer_booking" model="ir.sequence">
+        <field name="name">Customer Booking Sequence</field>
+        <field name="code">customer.booking</field>
+        <field name="prefix">BOOK-</field>
+        <field name="padding">5</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+</odoo>
